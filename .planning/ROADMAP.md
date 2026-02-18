@@ -28,7 +28,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Zenoh endpoint, keelson realm, and entity ID are configurable via a config file or environment variables before starting the simulation
   3. A round-trip unit test passes: a payload wrapped with `keelson.enclose()` can be recovered with `keelson.uncover()` and contains the correct subject and protobuf bytes
   4. All keelson subjects used by the project are validated as well-known at startup and the process exits with a clear error if any subject is unrecognised
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Project scaffold, config loader, FastAPI server, startup sequence, placeholder UI
+- [ ] 01-02-PLAN.md — ZenohPublisher daemon thread scaffold, keelson round-trip tests, GitHub Actions CI
 
 ### Phase 2: Simulation and Map UI
 **Goal**: A user can draw a waypoint route on the browser map, hit play, and watch an animated drone marker follow the route with realistic motion
@@ -70,7 +74,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/TBD | Not started | - |
+| 1. Foundation | 0/2 | Ready to execute | - |
 | 2. Simulation and Map UI | 0/TBD | Not started | - |
 | 3. Telemetry Publishing | 0/TBD | Not started | - |
 | 4. Camera Integration | 0/TBD | Not started | - |
