@@ -66,32 +66,30 @@
 
 ## Traceability
 
-*To be populated during roadmap creation.*
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SETUP-01 | — | Pending |
-| SETUP-02 | — | Pending |
-| SIM-01 | — | Pending |
-| SIM-02 | — | Pending |
-| SIM-03 | — | Pending |
-| UI-01 | — | Pending |
-| UI-02 | — | Pending |
-| UI-03 | — | Pending |
-| UI-04 | — | Pending |
-| UI-05 | — | Pending |
-| TELEM-01 | — | Pending |
-| TELEM-02 | — | Pending |
-| TELEM-03 | — | Pending |
-| TELEM-04 | — | Pending |
-| CAM-01 | — | Pending |
-| CAM-02 | — | Pending |
+| SETUP-01 | Phase 1 | Pending |
+| SETUP-02 | Phase 1 | Pending |
+| SIM-01 | Phase 2 | Pending |
+| SIM-02 | Phase 2 | Pending |
+| SIM-03 | Phase 2 | Pending |
+| UI-01 | Phase 2 | Pending |
+| UI-02 | Phase 2 | Pending |
+| UI-03 | Phase 2 | Pending |
+| UI-04 | Phase 4 | Pending |
+| UI-05 | Phase 3 | Pending |
+| TELEM-01 | Phase 3 | Pending |
+| TELEM-02 | Phase 3 | Pending |
+| TELEM-03 | Phase 3 | Pending |
+| TELEM-04 | Phase 3 | Pending |
+| CAM-01 | Phase 4 | Pending |
+| CAM-02 | Phase 4 | Pending |
 
 **Coverage:**
 - v1 requirements: 16 total
-- Mapped to phases: 0
-- Unmapped: 15 ⚠️
+- Mapped to phases: 16
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-18*
-*Last updated: 2026-02-18 after initial definition*
+*Last updated: 2026-02-18 after roadmap creation*
