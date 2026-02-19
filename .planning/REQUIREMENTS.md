@@ -7,8 +7,8 @@
 
 ### Setup & Configuration
 
-- [ ] **SETUP-01**: User can configure the zenoh endpoint and keelson key prefix (realm, entity ID) before starting the simulation
-- [ ] **SETUP-02**: Application serves the web UI directly from the Python backend with no separate frontend build step
+- [x] **SETUP-01**: User can configure the zenoh endpoint and keelson key prefix (realm, entity ID) before starting the simulation
+- [x] **SETUP-02**: Application serves the web UI directly from the Python backend with no separate frontend build step
 
 ### Simulation Engine
 
@@ -68,8 +68,8 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SETUP-01 | Phase 1 | Pending |
-| SETUP-02 | Phase 1 | Pending |
+| SETUP-01 | Phase 1 | Complete (plan 01-01) |
+| SETUP-02 | Phase 1 | Complete (plan 01-01) |
 | SIM-01 | Phase 2 | Pending |
 | SIM-02 | Phase 2 | Pending |
 | SIM-03 | Phase 2 | Pending |
@@ -92,4 +92,4 @@
 
 ---
 *Requirements defined: 2026-02-18*
-*Last updated: 2026-02-18 after roadmap creation*
+*Last updated: 2026-02-19 after plan 01-01 — SETUP-01, SETUP-02 complete*
