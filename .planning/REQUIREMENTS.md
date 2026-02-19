@@ -12,9 +12,9 @@
 
 ### Simulation Engine
 
-- [ ] **SIM-01**: Drone follows the drawn waypoint route with smooth motion using a first-order lag heading model at a configurable cruise speed
-- [ ] **SIM-02**: Drone telemetry includes Gaussian noise on position, heading, and speed to simulate realistic sensor imperfection
-- [ ] **SIM-03**: Drone starts at the first waypoint of the drawn route when the simulation is played
+- [x] **SIM-01**: Drone follows the drawn waypoint route with smooth motion using a first-order lag heading model at a configurable cruise speed
+- [x] **SIM-02**: Drone telemetry includes Gaussian noise on position, heading, and speed to simulate realistic sensor imperfection
+- [x] **SIM-03**: Drone starts at the first waypoint of the drawn route when the simulation is played
 
 ### Web UI
 
@@ -70,9 +70,9 @@
 |-------------|-------|--------|
 | SETUP-01 | Phase 1 | Complete (plan 01-01) |
 | SETUP-02 | Phase 1 | Complete (plan 01-01) |
-| SIM-01 | Phase 2 | Pending |
-| SIM-02 | Phase 2 | Pending |
-| SIM-03 | Phase 2 | Pending |
+| SIM-01 | Phase 2 | Complete |
+| SIM-02 | Phase 2 | Complete |
+| SIM-03 | Phase 2 | Complete |
 | UI-01 | Phase 2 | Pending |
 | UI-02 | Phase 2 | Pending |
 | UI-03 | Phase 2 | Pending |

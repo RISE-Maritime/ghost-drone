@@ -5,21 +5,21 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Draw a route, hit play, get a fully keelson-compatible drone publishing telemetry and video — no hardware required.
-**Current focus:** Phase 1 — Foundation (COMPLETE)
+**Current focus:** Phase 2 — Simulation and Map UI
 
 ## Current Position
 
-Phase: 1 of 4 (Foundation)
-Plan: 2 of 2 in current phase (01-02 complete — phase done)
-Status: Phase 1 complete, ready for Phase 2
-Last activity: 2026-02-19 — Executed plan 01-02
+Phase: 2 of 4 (Simulation and Map UI)
+Plan: 1 of 3 in current phase (02-01 complete)
+Status: Plan 02-01 complete, ready for 02-02
+Last activity: 2026-02-19 — Executed plan 02-01
 
-Progress: [██░░░░░░░░] 20%
+Progress: [███░░░░░░░] 30%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
+- Total plans completed: 3
 - Average duration: ~3 min
 - Total execution time: ~0.1 hours
 
@@ -28,10 +28,11 @@ Progress: [██░░░░░░░░] 20%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Foundation | 2/2 | ~6 min | ~3 min |
+| 2. Simulation and Map UI | 1/3 | ~2 min | ~2 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (4 min), 01-02 (2 min)
-- Trend: Fast (foundation work complete)
+- Last 5 plans: 01-01 (4 min), 01-02 (2 min), 02-01 (2 min)
+- Trend: Fast and consistent
 
 *Updated after each plan completion*
 
@@ -52,6 +53,10 @@ Recent decisions affecting current work:
 - Subject validation is warning-only in startup banner (not hard exit); user decision overrides roadmap criterion 4 — plan 01-01
 - Float32 proto value assertions require tolerance >= 1e-3 (not 1e-6) — TimestampedFloat.value is 32-bit — plan 01-02
 - CI uses uv sync --locked --all-extras to ensure pytest and protoc tools are installed — plan 01-02
+- Simulation noise applied to output TelemetryFrame only — internal state stays clean, noise cannot accumulate — plan 02-01
+- Heading lag uses discrete first-order filter (alpha = dt / (HEADING_TAU + dt), TAU=3s) for stable smooth turns — plan 02-01
+- Position interpolated with linear lat/lng lerp per segment (not spherical) — negligible error for drone-scale distances — plan 02-01
+- Simulation helper functions kept at module level (not static methods) for easier isolated unit testing — plan 02-01
 
 ### Pending Todos
 
@@ -66,5 +71,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 01-02-PLAN.md — round-trip tests + ZenohPublisher scaffold + CI pipeline all working
+Stopped at: Completed 02-01-PLAN.md — SimEngine + TelemetryFrame + SimState implemented, all verification checks pass
 Resume file: None
