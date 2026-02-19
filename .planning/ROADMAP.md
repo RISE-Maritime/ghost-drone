@@ -12,7 +12,7 @@ ghost-drone builds in four phases driven by the dependency tree: validated zenoh
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Project scaffold, configuration, and a validated zenoh/keelson publish helper with round-trip tests (1/2 plans complete)
+- [x] **Phase 1: Foundation** - Project scaffold, configuration, and a validated zenoh/keelson publish helper with round-trip tests (2/2 plans complete)
 - [ ] **Phase 2: Simulation and Map UI** - Drone simulation engine with route following and noise, wired to an interactive browser map with play/pause/stop controls
 - [ ] **Phase 3: Telemetry Publishing** - Simulation output published to zenoh as keelson-wrapped messages; browser shows live telemetry plots
 - [ ] **Phase 4: Camera Integration** - Host webcam streamed to browser and published as keelson image_compressed to zenoh
@@ -32,7 +32,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01-PLAN.md — Project scaffold, config loader, FastAPI server, startup sequence, placeholder UI
-- [ ] 01-02-PLAN.md — ZenohPublisher daemon thread scaffold, keelson round-trip tests, GitHub Actions CI
+- [x] 01-02-PLAN.md — ZenohPublisher daemon thread scaffold, keelson round-trip tests, GitHub Actions CI
 
 ### Phase 2: Simulation and Map UI
 **Goal**: A user can draw a waypoint route on the browser map, hit play, and watch an animated drone marker follow the route with realistic motion
@@ -74,7 +74,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 1/2 | In progress | - |
+| 1. Foundation | 2/2 | Complete   | 2026-02-19 |
 | 2. Simulation and Map UI | 0/TBD | Not started | - |
 | 3. Telemetry Publishing | 0/TBD | Not started | - |
 | 4. Camera Integration | 0/TBD | Not started | - |
