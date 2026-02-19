@@ -60,7 +60,12 @@ Plans:
   2. Each received message decodes correctly as a keelson envelope containing the expected protobuf payload type with a non-zero timestamp
   3. The browser UI shows live-updating plots of heading, speed, roll, and pitch that change in real time during simulation and freeze when paused
   4. No telemetry messages are published while the simulation is stopped or paused
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — RollPitchModel sinusoidal oscillator + keelson encode pipeline (telemetry.py, roll_pitch.py)
+- [ ] 03-02-PLAN.md — Server wiring: FastAPI lifespan, PublishSettings, extended tick loop with zenoh publishing
+- [ ] 03-03-PLAN.md — Browser UI: right sidebar gauges+sparklines, settings modal
 
 ### Phase 4: Camera Integration
 **Goal**: The host webcam feed is visible in the browser and published as keelson image_compressed to the zenoh network
@@ -81,5 +86,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete    | 2026-02-19 |
 | 2. Simulation and Map UI | 3/3 | Complete   | 2026-02-19 |
-| 3. Telemetry Publishing | 0/TBD | Not started | - |
+| 3. Telemetry Publishing | 0/3 | Not started | - |
 | 4. Camera Integration | 0/TBD | Not started | - |
