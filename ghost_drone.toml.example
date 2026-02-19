@@ -1,0 +1,7 @@
+# ghost-drone configuration
+# Copy this file to ghost_drone.toml in the directory where you run ghost-drone.
+# All three keys are required.
+
+zenoh_endpoint = "tcp/127.0.0.1:7447"
+keelson_realm = "ghost-drone"
+entity_id = "sim001"
