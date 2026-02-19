@@ -22,6 +22,8 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0",
+    # httpx is required by starlette.testclient (used in e2e tests)
+    "httpx>=0.27",
     # protoc-wheel-0 provides the `protoc` binary used by scripts/generate_keelson_protos.sh
     # Run that script after `uv sync --all-extras` to compile the keelson protobuf stubs.
     "protoc-wheel-0>=30.2",
