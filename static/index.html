@@ -13,19 +13,41 @@
   <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.19.0/dist/leaflet-geoman.css"/>
   <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.19.0/dist/leaflet-geoman.js"></script>
 
+  <!-- Sparkline CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@fnando/sparkline@0.3.10/dist/sparkline.js"></script>
+
   <style>
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #app-wrapper {
       display: flex;
       flex-direction: column;
       height: 100vh;
       overflow: hidden;
     }
 
+    #main-area {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
     #map {
       flex: 1;
+    }
+
+    #telemetry-sidebar {
+      width: 220px;
+      background: #1a1a2e;
+      overflow-y: auto;
+      padding: 12px;
+      flex-shrink: 0;
     }
 
     #bottom-bar {
@@ -73,27 +95,122 @@
       padding: 4px 6px;
       font-size: 13px;
     }
+
+    .gauge-block { margin-bottom: 14px; }
+    .gauge-label { color: #999; font-size: 11px; margin-bottom: 2px; }
+    .gauge-value { color: #e0e0e0; font-size: 22px; font-weight: bold; font-family: monospace; margin-bottom: 4px; }
+    .sparkline-svg { display: block; }
   </style>
 </head>
 <body>
 
-  <div id="map"></div>
+  <div id="app-wrapper">
+    <div id="main-area">
+      <div id="map"></div>
 
-  <div id="bottom-bar">
-    <button id="btn-draw" class="ctrl-btn">Draw Mode</button>
-    <div style="width:1px;height:28px;background:#444"></div>
-    <button id="btn-play" class="ctrl-btn">Play</button>
-    <button id="btn-pause" class="ctrl-btn">Pause</button>
-    <button id="btn-stop" class="ctrl-btn">Stop</button>
-    <div style="width:1px;height:28px;background:#444"></div>
-    <label style="color:#ccc;font-size:13px">Speed (m/s)
-      <input id="speed-input" type="number" value="10" min="1" max="100" step="1">
-    </label>
-    <div style="flex:1"></div>
-    <button id="btn-clear" class="ctrl-btn">Clear</button>
+      <div id="telemetry-sidebar">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <span style="color:#e0e0e0;font-size:13px;font-weight:bold">Telemetry</span>
+          <button id="btn-settings" class="ctrl-btn" style="padding:4px 10px;font-size:12px">Settings</button>
+        </div>
+
+        <div class="gauge-block">
+          <div class="gauge-label">Heading (&deg;)</div>
+          <div class="gauge-value" id="gauge-heading">0.0</div>
+          <svg id="spark-heading" class="sparkline-svg" width="196" height="36" stroke-width="1.5"></svg>
+        </div>
+        <div class="gauge-block">
+          <div class="gauge-label">Speed (kn)</div>
+          <div class="gauge-value" id="gauge-speed">0.0</div>
+          <svg id="spark-speed" class="sparkline-svg" width="196" height="36" stroke-width="1.5"></svg>
+        </div>
+        <div class="gauge-block">
+          <div class="gauge-label">Roll (&deg;)</div>
+          <div class="gauge-value" id="gauge-roll">0.0</div>
+          <svg id="spark-roll" class="sparkline-svg" width="196" height="36" stroke-width="1.5"></svg>
+        </div>
+        <div class="gauge-block">
+          <div class="gauge-label">Pitch (&deg;)</div>
+          <div class="gauge-value" id="gauge-pitch">0.0</div>
+          <svg id="spark-pitch" class="sparkline-svg" width="196" height="36" stroke-width="1.5"></svg>
+        </div>
+      </div>
+    </div>
+
+    <div id="bottom-bar">
+      <button id="btn-draw" class="ctrl-btn">Draw Mode</button>
+      <div style="width:1px;height:28px;background:#444"></div>
+      <button id="btn-play" class="ctrl-btn">Play</button>
+      <button id="btn-pause" class="ctrl-btn">Pause</button>
+      <button id="btn-stop" class="ctrl-btn">Stop</button>
+      <div style="width:1px;height:28px;background:#444"></div>
+      <label style="color:#ccc;font-size:13px">Speed (m/s)
+        <input id="speed-input" type="number" value="10" min="1" max="100" step="1">
+      </label>
+      <div style="flex:1"></div>
+      <button id="btn-clear" class="ctrl-btn">Clear</button>
+    </div>
+  </div>
+
+  <!-- Settings modal (outside #app-wrapper so it overlays everything) -->
+  <div id="settings-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center">
+    <div id="settings-modal" style="background:#1a1a2e;border:1px solid #555;border-radius:8px;padding:20px;width:420px;max-height:80vh;overflow-y:auto;color:#e0e0e0;font-size:13px">
+      <h3 style="margin:0 0 14px;font-size:15px">Simulation Settings</h3>
+
+      <!-- Per-subject table -->
+      <table style="width:100%;border-collapse:collapse;margin-bottom:16px">
+        <thead>
+          <tr style="color:#999;font-size:11px;text-align:left">
+            <th style="padding:4px 0">Subject</th>
+            <th style="padding:4px 6px">Rate (Hz)</th>
+            <th style="padding:4px 6px">Source</th>
+          </tr>
+        </thead>
+        <tbody id="subject-rows">
+          <!-- Rows built by JS -->
+        </tbody>
+      </table>
+
+      <!-- Roll oscillation -->
+      <div style="margin-bottom:10px">
+        <label>Roll amplitude (deg): <span id="lbl-roll-amp">5.0</span>
+          <input type="range" id="sl-roll-amp" min="0.1" max="20" step="0.1" value="5.0" style="width:140px;vertical-align:middle">
+        </label>
+      </div>
+      <div style="margin-bottom:10px">
+        <label>Roll period (s): <span id="lbl-roll-period">10</span>
+          <input type="range" id="sl-roll-period" min="2" max="30" step="1" value="10" style="width:140px;vertical-align:middle">
+        </label>
+      </div>
+      <!-- Pitch oscillation -->
+      <div style="margin-bottom:10px">
+        <label>Pitch amplitude (deg): <span id="lbl-pitch-amp">3.0</span>
+          <input type="range" id="sl-pitch-amp" min="0.1" max="10" step="0.1" value="3.0" style="width:140px;vertical-align:middle">
+        </label>
+      </div>
+      <div style="margin-bottom:10px">
+        <label>Pitch period (s): <span id="lbl-pitch-period">8</span>
+          <input type="range" id="sl-pitch-period" min="2" max="30" step="1" value="8" style="width:140px;vertical-align:middle">
+        </label>
+      </div>
+      <!-- Location noise -->
+      <div style="margin-bottom:16px">
+        <label>Location noise (m): <span id="lbl-loc-noise">0.5</span>
+          <input type="range" id="sl-loc-noise" min="0" max="5" step="0.1" value="0.5" style="width:140px;vertical-align:middle">
+        </label>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button id="btn-settings-save" class="ctrl-btn" style="background:#2ecc71;border-color:#2ecc71;color:#000">Save</button>
+        <button id="btn-settings-close" class="ctrl-btn">Close</button>
+      </div>
+    </div>
   </div>
 
   <script>
+    // Verify sparkline library loaded
+    console.log('sparkline loaded:', typeof sparkline !== 'undefined');
+
     // ---------------------------------------------------------------------------
     // Map initialization — centered on Lindholmen, Gothenburg
     // ---------------------------------------------------------------------------
@@ -131,6 +248,24 @@
     let drawModeActive = false;
     let ws = null;
     let isZooming = false;    // suppress panTo during zoom animations
+
+    // ---------------------------------------------------------------------------
+    // Telemetry history and gauge/sparkline elements
+    // ---------------------------------------------------------------------------
+    const HISTORY_SAMPLES = 30 * 20;  // 30 seconds at 20 Hz = 600 samples
+    const history = { heading: [], speed: [], roll: [], pitch: [] };
+    const gaugeEls = {
+      heading: document.getElementById('gauge-heading'),
+      speed:   document.getElementById('gauge-speed'),
+      roll:    document.getElementById('gauge-roll'),
+      pitch:   document.getElementById('gauge-pitch'),
+    };
+    const svgEls = {
+      heading: document.getElementById('spark-heading'),
+      speed:   document.getElementById('spark-speed'),
+      roll:    document.getElementById('spark-roll'),
+      pitch:   document.getElementById('spark-pitch'),
+    };
 
     // ---------------------------------------------------------------------------
     // Button references
@@ -327,6 +462,42 @@
     }
 
     // ---------------------------------------------------------------------------
+    // Telemetry frame handler
+    // ---------------------------------------------------------------------------
+    function onTelemetryFrame(frame) {
+      if (frame.state === 'stopped') {
+        // Clear all sparkline history and reset gauges
+        for (const k of Object.keys(history)) history[k] = [];
+        for (const k of Object.keys(gaugeEls)) gaugeEls[k].textContent = '0.0';
+        return;
+      }
+      if (frame.state === 'playing') {
+        // Push new values and cap rolling window
+        const values = {
+          heading: frame.heading,
+          speed:   frame.speed * 1.94384,  // m/s -> knots
+          roll:    frame.roll,
+          pitch:   frame.pitch,
+        };
+        for (const key of Object.keys(history)) {
+          history[key].push(values[key]);
+          if (history[key].length > HISTORY_SAMPLES) history[key].shift();
+        }
+        // Update gauge text
+        gaugeEls.heading.textContent = frame.heading.toFixed(1);
+        gaugeEls.speed.textContent   = (frame.speed * 1.94384).toFixed(2);
+        gaugeEls.roll.textContent    = frame.roll.toFixed(2);
+        gaugeEls.pitch.textContent   = frame.pitch.toFixed(2);
+      }
+      // Redraw sparklines (both playing and paused — paused keeps last state)
+      for (const key of Object.keys(svgEls)) {
+        if (history[key].length > 1) {
+          sparkline.sparkline(svgEls[key], history[key]);
+        }
+      }
+    }
+
+    // ---------------------------------------------------------------------------
     // WebSocket
     // ---------------------------------------------------------------------------
     function sendRoute() {
@@ -363,12 +534,92 @@
 
         // Sync button states
         updateControlStates();
+
+        // Update telemetry sidebar
+        onTelemetryFrame(frame);
       };
 
       ws.onclose = function() {
         setTimeout(connectWS, 2000);
       };
     }
+
+    // ---------------------------------------------------------------------------
+    // Settings modal
+    // ---------------------------------------------------------------------------
+    const SUBJECTS_LIST = [
+      'location_fix',
+      'heading_true_north_deg',
+      'speed_over_ground_knots',
+      'roll_deg',
+      'pitch_deg',
+    ];
+
+    function buildSubjectRows() {
+      const tbody = document.getElementById('subject-rows');
+      tbody.innerHTML = '';
+      const defaults = {
+        location_fix:            { rate_hz: 1.0, source_id: 'gnss/0' },
+        heading_true_north_deg:  { rate_hz: 1.0, source_id: 'imu/0'  },
+        speed_over_ground_knots: { rate_hz: 1.0, source_id: 'imu/0'  },
+        roll_deg:                { rate_hz: 1.0, source_id: 'imu/0'  },
+        pitch_deg:               { rate_hz: 1.0, source_id: 'imu/0'  },
+      };
+      for (const subj of SUBJECTS_LIST) {
+        const d = defaults[subj];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="padding:4px 0;color:#ccc;font-size:11px">${subj}</td>
+          <td style="padding:4px 6px"><input type="number" data-subj="${subj}" data-field="rate_hz"
+              value="${d.rate_hz}" min="0.1" max="10" step="0.1"
+              style="width:58px;background:#2d2d44;color:#e0e0e0;border:1px solid #555;border-radius:3px;padding:2px 4px;font-size:12px"></td>
+          <td style="padding:4px 6px"><input type="text" data-subj="${subj}" data-field="source_id"
+              value="${d.source_id}"
+              style="width:80px;background:#2d2d44;color:#e0e0e0;border:1px solid #555;border-radius:3px;padding:2px 4px;font-size:12px"></td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    // Slider live-label updates
+    for (const [id, lblId] of [['sl-roll-amp','lbl-roll-amp'],['sl-roll-period','lbl-roll-period'],['sl-pitch-amp','lbl-pitch-amp'],['sl-pitch-period','lbl-pitch-period'],['sl-loc-noise','lbl-loc-noise']]) {
+      document.getElementById(id).addEventListener('input', function() {
+        document.getElementById(lblId).textContent = this.value;
+      });
+    }
+
+    // Open/close modal
+    document.getElementById('btn-settings').addEventListener('click', function() {
+      document.getElementById('settings-overlay').style.display = 'flex';
+    });
+    document.getElementById('btn-settings-close').addEventListener('click', function() {
+      document.getElementById('settings-overlay').style.display = 'none';
+    });
+    document.getElementById('settings-overlay').addEventListener('click', function(e) {
+      if (e.target === this) this.style.display = 'none';
+    });
+
+    // Save button — build and send update_settings message
+    document.getElementById('btn-settings-save').addEventListener('click', function() {
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+      const subjectsPayload = {};
+      for (const inp of document.querySelectorAll('#subject-rows input')) {
+        const subj = inp.dataset.subj;
+        const field = inp.dataset.field;
+        if (!subjectsPayload[subj]) subjectsPayload[subj] = {};
+        subjectsPayload[subj][field] = field === 'rate_hz' ? parseFloat(inp.value) : inp.value;
+      }
+      ws.send(JSON.stringify({
+        type: 'update_settings',
+        subjects: subjectsPayload,
+        roll_amplitude_deg:     parseFloat(document.getElementById('sl-roll-amp').value),
+        roll_period_s:          parseFloat(document.getElementById('sl-roll-period').value),
+        pitch_amplitude_deg:    parseFloat(document.getElementById('sl-pitch-amp').value),
+        pitch_period_s:         parseFloat(document.getElementById('sl-pitch-period').value),
+        location_noise_sigma_m: parseFloat(document.getElementById('sl-loc-noise').value),
+      }));
+      document.getElementById('settings-overlay').style.display = 'none';
+    });
 
     // ---------------------------------------------------------------------------
     // Button event handlers
@@ -422,6 +673,7 @@
     document.addEventListener('DOMContentLoaded', function() {
       connectWS();
       updateControlStates();
+      buildSubjectRows();
     });
   </script>
 </body>
