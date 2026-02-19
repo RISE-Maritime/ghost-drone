@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 2 of 4 (Simulation and Map UI)
-Plan: 1 of 3 in current phase (02-01 complete)
-Status: Plan 02-01 complete, ready for 02-02
-Last activity: 2026-02-19 — Executed plan 02-01
+Plan: 2 of 3 in current phase (02-02 complete)
+Status: Plan 02-02 complete, ready for 02-03
+Last activity: 2026-02-19 — Executed plan 02-02
 
-Progress: [███░░░░░░░] 30%
+Progress: [████░░░░░░] 40%
 
 ## Performance Metrics
 
@@ -28,10 +28,10 @@ Progress: [███░░░░░░░] 30%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Foundation | 2/2 | ~6 min | ~3 min |
-| 2. Simulation and Map UI | 1/3 | ~2 min | ~2 min |
+| 2. Simulation and Map UI | 2/3 | ~6 min | ~3 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (4 min), 01-02 (2 min), 02-01 (2 min)
+- Last 5 plans: 01-01 (4 min), 01-02 (2 min), 02-01 (2 min), 02-02 (4 min)
 - Trend: Fast and consistent
 
 *Updated after each plan completion*
@@ -57,6 +57,7 @@ Recent decisions affecting current work:
 - Heading lag uses discrete first-order filter (alpha = dt / (HEADING_TAU + dt), TAU=3s) for stable smooth turns — plan 02-01
 - Position interpolated with linear lat/lng lerp per segment (not spherical) — negligible error for drone-scale distances — plan 02-01
 - Simulation helper functions kept at module level (not static methods) for easier isolated unit testing — plan 02-01
+- [Phase 02-02]: Pause speed test uses < 10x SPEED_NOISE_SIGMA_MPS threshold — engine applies Gaussian noise even when paused, exact-zero assertion is flawed — plan 02-02
 
 ### Pending Todos
 
@@ -71,5 +72,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 02-01-PLAN.md — SimEngine + TelemetryFrame + SimState implemented, all verification checks pass
+Stopped at: Completed 02-02-PLAN.md — 12 SimEngine unit tests (deterministic + statistical) all passing
 Resume file: None
