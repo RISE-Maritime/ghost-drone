@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 3 of 4 (Telemetry Publishing)
-Plan: 1 of 3 in current phase (03-01 complete)
-Status: Phase 03 in progress — plan 03-01 complete
-Last activity: 2026-02-19 — Executed plan 03-01
+Plan: 2 of 3 in current phase (03-02 complete)
+Status: Phase 03 in progress — plan 03-02 complete
+Last activity: 2026-02-19 — Executed plan 03-02
 
-Progress: [██████░░░░] 58%
+Progress: [███████░░░] 67%
 
 ## Performance Metrics
 
@@ -29,7 +29,7 @@ Progress: [██████░░░░] 58%
 |-------|-------|-------|----------|
 | 1. Foundation | 2/2 | ~6 min | ~3 min |
 | 2. Simulation and Map UI | 3/3 | ~9 min | ~3 min |
-| 3. Telemetry Publishing | 1/3 | ~4 min | ~4 min |
+| 3. Telemetry Publishing | 2/3 | ~6 min | ~3 min |
 
 **Recent Trend:**
 - Last 5 plans: 01-01 (4 min), 01-02 (2 min), 02-01 (2 min), 02-02 (4 min)
@@ -66,6 +66,9 @@ Recent decisions affecting current work:
 - [Phase 03-01]: RollPitchModel noise applied to tick() output only — elapsed_s internal state stays clean so noise cannot accumulate across ticks — plan 03-01
 - [Phase 03-01]: SubjectThrottle uses time.monotonic() for rate limiting (immune to wall-clock jumps or NTP adjustments) — plan 03-01
 - [Phase 03-01]: encode_timestamped_float uses proto float32 (TimestampedFloat.value is 32-bit); test assertions use 1e-3 tolerance — plan 03-01
+- [Phase 03-02]: ZenohPublisher is lifespan-global (one per app); PublishSettings, RollPitchModel, SubjectThrottle are connection-local — plan 03-02
+- [Phase 03-02]: prev_state pattern for one-time reset on STOPPED transition — roll_pitch.reset() and throttle.reset() called exactly once per stop — plan 03-02
+- [Phase 03-02]: Location noise applied in _publish_telemetry using settings.location_noise_sigma_m (user-configurable); SimEngine noise and publish noise kept separate — plan 03-02
 
 ### Pending Todos
 
@@ -80,5 +83,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 03-01-PLAN.md — RollPitchModel oscillator and keelson encode pipeline ready for server wiring
+Stopped at: Completed 03-02-PLAN.md — server.py wired with create_app factory, ZenohPublisher lifespan, extended tick loop with roll/pitch publishing
 Resume file: None
