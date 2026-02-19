@@ -54,7 +54,8 @@ def main() -> None:
     threading.Timer(1.0, lambda: webbrowser.open(url)).start()
 
     # 5. Start server — this call blocks until the server is stopped
-    from ghost_drone.server import app  # noqa: PLC0415  (import after startup checks)
+    from ghost_drone.server import create_app  # noqa: PLC0415  (import after startup checks)
+    app = create_app(cfg)
     uvicorn.run(app, host=args.host, port=args.port)
 
 
