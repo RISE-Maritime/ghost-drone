@@ -95,9 +95,9 @@
 
   <script>
     // ---------------------------------------------------------------------------
-    // Map initialization
+    // Map initialization — centered on Lindholmen, Gothenburg
     // ---------------------------------------------------------------------------
-    const map = L.map('map').setView([57.7, 11.97], 13);
+    const map = L.map('map', { zoomAnimation: true }).setView([57.7069, 11.9381], 15);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap'
@@ -130,6 +130,7 @@
     let simState = 'stopped'; // 'stopped' | 'playing' | 'paused'
     let drawModeActive = false;
     let ws = null;
+    let isZooming = false;    // suppress panTo during zoom animations
 
     // ---------------------------------------------------------------------------
     // Button references
@@ -140,6 +141,10 @@
     const btnStop  = document.getElementById('btn-stop');
     const btnClear = document.getElementById('btn-clear');
     const speedInput = document.getElementById('speed-input');
+
+    // Suppress panTo during zoom to prevent map shake
+    map.on('zoomstart', function() { isZooming = true; });
+    map.on('zoomend',   function() { isZooming = false; });
 
     // ---------------------------------------------------------------------------
     // Waypoint icon factory
@@ -157,25 +162,22 @@
     }
 
     // ---------------------------------------------------------------------------
-    // Drone icon factory
+    // Boat / surface vessel icon factory
     // ---------------------------------------------------------------------------
     function createDroneIcon(opacity) {
       if (opacity === undefined) opacity = 1.0;
+      // Top-down view of a surface vessel (boat hull shape with bow indicator)
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-        <!-- arms -->
-        <line x1="20" y1="20" x2="6"  y2="6"  stroke="#333" stroke-width="2.5"/>
-        <line x1="20" y1="20" x2="34" y2="6"  stroke="#333" stroke-width="2.5"/>
-        <line x1="20" y1="20" x2="6"  y2="34" stroke="#333" stroke-width="2.5"/>
-        <line x1="20" y1="20" x2="34" y2="34" stroke="#333" stroke-width="2.5"/>
-        <!-- rotors -->
-        <circle cx="6"  cy="6"  r="5" fill="#555" opacity="0.85"/>
-        <circle cx="34" cy="6"  r="5" fill="#555" opacity="0.85"/>
-        <circle cx="6"  cy="34" r="5" fill="#555" opacity="0.85"/>
-        <circle cx="34" cy="34" r="5" fill="#555" opacity="0.85"/>
-        <!-- body -->
-        <circle cx="20" cy="20" r="6" fill="#e67e22"/>
-        <!-- heading indicator (front) -->
-        <polygon points="20,4 17,12 23,12" fill="#e67e22"/>
+        <!-- boat hull: pointed bow at top, rounded stern at bottom -->
+        <path d="M20,3 L30,14 L28,34 Q20,38 12,34 L10,14 Z"
+              fill="#e67e22" stroke="#333" stroke-width="1.5" stroke-linejoin="round"/>
+        <!-- deck centre line -->
+        <line x1="20" y1="7" x2="20" y2="30" stroke="#fff" stroke-width="1.2" opacity="0.6"/>
+        <!-- bridge / superstructure block -->
+        <rect x="15" y="18" width="10" height="8" rx="2"
+              fill="#333" opacity="0.75"/>
+        <!-- bow tip highlight -->
+        <polygon points="20,3 17,10 23,10" fill="#fff" opacity="0.5"/>
       </svg>`;
       return L.divIcon({
         className: '',
@@ -186,7 +188,7 @@
     }
 
     // Create drone marker at map init at default center
-    droneMarker = L.marker([57.7, 11.97], {
+    droneMarker = L.marker([57.7069, 11.9381], {
       icon: createDroneIcon(0.4),
       zIndexOffset: 1000
     }).addTo(map);
@@ -217,12 +219,13 @@
 
       if (waypoints.length === 0) return;
 
-      // Create numbered markers
+      // Create numbered markers — draggable only when draw mode is active and sim is stopped
+      const isDraggable = drawModeActive && simState === 'stopped';
       for (let i = 0; i < waypoints.length; i++) {
         const wp = waypoints[i];
         const marker = L.marker([wp.lat, wp.lng], {
           icon: createWpIcon(i + 1),
-          draggable: true
+          draggable: isDraggable
         }).addTo(map);
 
         // Capture i via IIFE to avoid closure issue
@@ -254,6 +257,20 @@
     }
 
     // ---------------------------------------------------------------------------
+    // Update waypoint marker draggability without full redraw
+    // ---------------------------------------------------------------------------
+    function updateWaypointDraggability() {
+      const isDraggable = drawModeActive && simState === 'stopped';
+      for (let i = 0; i < wpMarkers.length; i++) {
+        if (isDraggable) {
+          wpMarkers[i].dragging.enable();
+        } else {
+          wpMarkers[i].dragging.disable();
+        }
+      }
+    }
+
+    // ---------------------------------------------------------------------------
     // Draw mode
     // ---------------------------------------------------------------------------
     function onMapClick(e) {
@@ -280,6 +297,8 @@
       } else {
         map.off('click', onMapClick);
       }
+      // Update draggability of existing waypoint markers immediately
+      updateWaypointDraggability();
     });
 
     // ---------------------------------------------------------------------------
@@ -287,7 +306,8 @@
     // ---------------------------------------------------------------------------
     function updateControlStates() {
       const canEdit = simState === 'stopped';
-      const canPlay = canEdit && waypoints.length >= 2;
+      // Play is available when stopped with 2+ waypoints OR when paused (to resume)
+      const canPlay = (canEdit && waypoints.length >= 2) || simState === 'paused';
 
       btnPlay.disabled  = !canPlay;
       btnPause.disabled = simState !== 'playing';
@@ -301,6 +321,9 @@
         map.off('click', onMapClick);
         updateDrawButtonStyle();
       }
+
+      // Sync waypoint draggability with current draw mode + sim state
+      updateWaypointDraggability();
     }
 
     // ---------------------------------------------------------------------------
@@ -324,7 +347,11 @@
         // Update drone marker position
         const latlng = L.latLng(frame.lat, frame.lng);
         droneMarker.setLatLng(latlng);
-        map.panTo(latlng);
+
+        // Pan to follow drone only when playing and not in the middle of a zoom
+        if (frame.state === 'playing' && !isZooming) {
+          map.panTo(latlng, { animate: true, duration: 0.1 });
+        }
 
         // Update heading rotation on inner div
         setDroneHeading(frame.heading);
@@ -348,7 +375,10 @@
     // ---------------------------------------------------------------------------
     btnPlay.addEventListener('click', function() {
       if (waypoints.length < 2) return;
-      sendRoute();
+      // Only send route on fresh play (not resume from pause)
+      if (simState === 'stopped') {
+        sendRoute();
+      }
       if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({ type: 'play' }));
       }
