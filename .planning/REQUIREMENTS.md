@@ -22,7 +22,7 @@
 - [x] **UI-02**: Drone position is shown as an animated marker on the map that updates in real time during simulation
 - [x] **UI-03**: User can play, pause, and stop the simulation from the web UI
 - [ ] **UI-04**: User can view the host webcam feed embedded in the web UI
-- [ ] **UI-05**: Web UI displays real-time plots of published telemetry values (heading, speed, roll, pitch) updating live during simulation
+- [x] **UI-05**: Web UI displays real-time plots of published telemetry values (heading, speed, roll, pitch) updating live during simulation
 
 ### Telemetry Publishing
 
@@ -77,7 +77,7 @@
 | UI-02 | Phase 2 | Complete |
 | UI-03 | Phase 2 | Complete |
 | UI-04 | Phase 4 | Pending |
-| UI-05 | Phase 3 | Pending |
+| UI-05 | Phase 3 | Complete |
 | TELEM-01 | Phase 3 | Complete |
 | TELEM-02 | Phase 3 | Complete |
 | TELEM-03 | Phase 3 | Complete |

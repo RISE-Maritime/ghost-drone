@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Draw a route, hit play, get a fully keelson-compatible drone publishing telemetry and video — no hardware required.
-**Current focus:** Phase 2 — Simulation and Map UI
+**Current focus:** Phase 3 — Telemetry Publishing
 
 ## Current Position
 
 Phase: 3 of 4 (Telemetry Publishing)
-Plan: 2 of 3 in current phase (03-02 complete)
-Status: Phase 03 in progress — plan 03-02 complete
-Last activity: 2026-02-19 — Executed plan 03-02
+Plan: 3 of 3 in current phase (03-03 auto tasks complete — awaiting human-verify checkpoint)
+Status: Phase 03 auto tasks complete — checkpoint pending
+Last activity: 2026-02-19 — Executed plan 03-03 auto tasks
 
-Progress: [███████░░░] 67%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
@@ -29,13 +29,14 @@ Progress: [███████░░░] 67%
 |-------|-------|-------|----------|
 | 1. Foundation | 2/2 | ~6 min | ~3 min |
 | 2. Simulation and Map UI | 3/3 | ~9 min | ~3 min |
-| 3. Telemetry Publishing | 2/3 | ~6 min | ~3 min |
+| 3. Telemetry Publishing | 3/3 | ~8 min | ~2.7 min |
 
 **Recent Trend:**
 - Last 5 plans: 01-01 (4 min), 01-02 (2 min), 02-01 (2 min), 02-02 (4 min)
 - Trend: Fast and consistent
 
 *Updated after each plan completion*
+| Phase 03-telemetry-publishing P03 | 2 | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -69,6 +70,7 @@ Recent decisions affecting current work:
 - [Phase 03-02]: ZenohPublisher is lifespan-global (one per app); PublishSettings, RollPitchModel, SubjectThrottle are connection-local — plan 03-02
 - [Phase 03-02]: prev_state pattern for one-time reset on STOPPED transition — roll_pitch.reset() and throttle.reset() called exactly once per stop — plan 03-02
 - [Phase 03-02]: Location noise applied in _publish_telemetry using settings.location_noise_sigma_m (user-configurable); SimEngine noise and publish noise kept separate — plan 03-02
+- [Phase 03-telemetry-publishing]: @fnando/sparkline UMD call is sparkline.sparkline(el, data); sidebar and modal committed as one atomic change; settings overlay placed outside #app-wrapper for full-viewport coverage
 
 ### Pending Todos
 
@@ -83,5 +85,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 03-02-PLAN.md — server.py wired with create_app factory, ZenohPublisher lifespan, extended tick loop with roll/pitch publishing
+Stopped at: 03-03 checkpoint:human-verify — telemetry sidebar+sparklines and settings modal added to index.html; awaiting user verification of live gauge updates, sparklines, pause/stop behavior, and settings modal
 Resume file: None
