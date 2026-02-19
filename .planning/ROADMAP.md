@@ -44,7 +44,12 @@ Plans:
   3. Pause halts the drone marker mid-route; Play resumes from the paused position; Stop returns the drone to idle with no marker movement
   4. Drone heading changes smoothly using a first-order lag model rather than snapping instantly between waypoints
   5. Published position, heading, and speed values show Gaussian noise visible in logged output (values are not perfectly deterministic across identical runs)
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Simulation engine (SimEngine, TelemetryFrame, heading lag, Gaussian noise)
+- [ ] 02-02-PLAN.md — Engine unit tests (deterministic behaviour + statistical noise distribution)
+- [ ] 02-03-PLAN.md — WebSocket route + browser UI (Leaflet map, draw mode, drone marker, controls)
 
 ### Phase 3: Telemetry Publishing
 **Goal**: Every keelson telemetry subject is published to the zenoh network during simulation, and the browser displays live plots of the published values
