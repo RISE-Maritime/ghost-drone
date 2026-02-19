@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 2 of 4 (Simulation and Map UI)
-Plan: 2 of 3 in current phase (02-02 complete)
-Status: Plan 02-02 complete, ready for 02-03
-Last activity: 2026-02-19 — Executed plan 02-02
+Plan: 3 of 3 in current phase (02-03 complete — phase complete)
+Status: Phase 02 complete, ready for Phase 03
+Last activity: 2026-02-19 — Executed plan 02-03
 
-Progress: [████░░░░░░] 40%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
@@ -58,6 +58,10 @@ Recent decisions affecting current work:
 - Position interpolated with linear lat/lng lerp per segment (not spherical) — negligible error for drone-scale distances — plan 02-01
 - Simulation helper functions kept at module level (not static methods) for easier isolated unit testing — plan 02-01
 - [Phase 02-02]: Pause speed test uses < 10x SPEED_NOISE_SIGMA_MPS threshold — engine applies Gaussian noise even when paused, exact-zero assertion is flawed — plan 02-02
+- [Phase 02-03]: Play re-enables after Pause via canPlay including simState==='paused'; engine.play() resumes mid-route without route reload — plan 02-03
+- [Phase 02-03]: isZooming flag (zoomstart/zoomend) suppresses panTo during zoom animations to eliminate map shake at 20 Hz update rate — plan 02-03
+- [Phase 02-03]: Waypoint draggability gated on drawModeActive && simState==='stopped'; updateWaypointDraggability() called on every state change — plan 02-03
+- [Phase 02-03]: Default map center is Lindholmen, Gothenburg: [57.7069, 11.9381] zoom 15 — operational area for maritime simulation — plan 02-03
 
 ### Pending Todos
 
@@ -72,5 +76,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 02-02-PLAN.md — 12 SimEngine unit tests (deterministic + statistical) all passing
+Stopped at: Completed 02-03-PLAN.md — interactive Leaflet/WebSocket simulation UI complete with all 5 user-reported fixes
 Resume file: None

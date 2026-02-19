@@ -18,9 +18,9 @@
 
 ### Web UI
 
-- [ ] **UI-01**: User can draw a route on an interactive map by placing waypoints (polyline) in the browser
-- [ ] **UI-02**: Drone position is shown as an animated marker on the map that updates in real time during simulation
-- [ ] **UI-03**: User can play, pause, and stop the simulation from the web UI
+- [x] **UI-01**: User can draw a route on an interactive map by placing waypoints (polyline) in the browser
+- [x] **UI-02**: Drone position is shown as an animated marker on the map that updates in real time during simulation
+- [x] **UI-03**: User can play, pause, and stop the simulation from the web UI
 - [ ] **UI-04**: User can view the host webcam feed embedded in the web UI
 - [ ] **UI-05**: Web UI displays real-time plots of published telemetry values (heading, speed, roll, pitch) updating live during simulation
 
@@ -73,9 +73,9 @@
 | SIM-01 | Phase 2 | Complete |
 | SIM-02 | Phase 2 | Complete |
 | SIM-03 | Phase 2 | Complete |
-| UI-01 | Phase 2 | Pending |
-| UI-02 | Phase 2 | Pending |
-| UI-03 | Phase 2 | Pending |
+| UI-01 | Phase 2 | Complete |
+| UI-02 | Phase 2 | Complete |
+| UI-03 | Phase 2 | Complete |
 | UI-04 | Phase 4 | Pending |
 | UI-05 | Phase 3 | Pending |
 | TELEM-01 | Phase 3 | Pending |
