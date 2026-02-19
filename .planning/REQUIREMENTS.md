@@ -26,10 +26,10 @@
 
 ### Telemetry Publishing
 
-- [ ] **TELEM-01**: Drone publishes position (`location_fix`, foxglove.LocationFix) to zenoh using keelson envelope encoding at the configured key expression
-- [ ] **TELEM-02**: Drone publishes heading (`heading_true_north_deg`, TimestampedFloat) to zenoh using keelson envelope encoding
-- [ ] **TELEM-03**: Drone publishes speed (`speed_over_ground_knots`, TimestampedFloat) to zenoh using keelson envelope encoding
-- [ ] **TELEM-04**: Drone publishes attitude (`roll_deg` and `pitch_deg`, TimestampedFloat each) to zenoh using keelson envelope encoding
+- [x] **TELEM-01**: Drone publishes position (`location_fix`, foxglove.LocationFix) to zenoh using keelson envelope encoding at the configured key expression
+- [x] **TELEM-02**: Drone publishes heading (`heading_true_north_deg`, TimestampedFloat) to zenoh using keelson envelope encoding
+- [x] **TELEM-03**: Drone publishes speed (`speed_over_ground_knots`, TimestampedFloat) to zenoh using keelson envelope encoding
+- [x] **TELEM-04**: Drone publishes attitude (`roll_deg` and `pitch_deg`, TimestampedFloat each) to zenoh using keelson envelope encoding
 
 ### Camera
 
@@ -78,10 +78,10 @@
 | UI-03 | Phase 2 | Complete |
 | UI-04 | Phase 4 | Pending |
 | UI-05 | Phase 3 | Pending |
-| TELEM-01 | Phase 3 | Pending |
-| TELEM-02 | Phase 3 | Pending |
-| TELEM-03 | Phase 3 | Pending |
-| TELEM-04 | Phase 3 | Pending |
+| TELEM-01 | Phase 3 | Complete |
+| TELEM-02 | Phase 3 | Complete |
+| TELEM-03 | Phase 3 | Complete |
+| TELEM-04 | Phase 3 | Complete |
 | CAM-01 | Phase 4 | Pending |
 | CAM-02 | Phase 4 | Pending |
 

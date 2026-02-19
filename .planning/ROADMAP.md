@@ -86,5 +86,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete    | 2026-02-19 |
 | 2. Simulation and Map UI | 3/3 | Complete   | 2026-02-19 |
-| 3. Telemetry Publishing | 0/3 | Not started | - |
+| 3. Telemetry Publishing | 1/3 | In Progress|  |
 | 4. Camera Integration | 0/TBD | Not started | - |

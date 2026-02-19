@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 
 ## Current Position
 
-Phase: 2 of 4 (Simulation and Map UI)
-Plan: 3 of 3 in current phase (02-03 complete — phase complete)
-Status: Phase 02 complete, ready for Phase 03
-Last activity: 2026-02-19 — Executed plan 02-03
+Phase: 3 of 4 (Telemetry Publishing)
+Plan: 1 of 3 in current phase (03-01 complete)
+Status: Phase 03 in progress — plan 03-01 complete
+Last activity: 2026-02-19 — Executed plan 03-01
 
-Progress: [█████░░░░░] 50%
+Progress: [██████░░░░] 58%
 
 ## Performance Metrics
 
@@ -28,7 +28,8 @@ Progress: [█████░░░░░] 50%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Foundation | 2/2 | ~6 min | ~3 min |
-| 2. Simulation and Map UI | 2/3 | ~6 min | ~3 min |
+| 2. Simulation and Map UI | 3/3 | ~9 min | ~3 min |
+| 3. Telemetry Publishing | 1/3 | ~4 min | ~4 min |
 
 **Recent Trend:**
 - Last 5 plans: 01-01 (4 min), 01-02 (2 min), 02-01 (2 min), 02-02 (4 min)
@@ -62,6 +63,9 @@ Recent decisions affecting current work:
 - [Phase 02-03]: isZooming flag (zoomstart/zoomend) suppresses panTo during zoom animations to eliminate map shake at 20 Hz update rate — plan 02-03
 - [Phase 02-03]: Waypoint draggability gated on drawModeActive && simState==='stopped'; updateWaypointDraggability() called on every state change — plan 02-03
 - [Phase 02-03]: Default map center is Lindholmen, Gothenburg: [57.7069, 11.9381] zoom 15 — operational area for maritime simulation — plan 02-03
+- [Phase 03-01]: RollPitchModel noise applied to tick() output only — elapsed_s internal state stays clean so noise cannot accumulate across ticks — plan 03-01
+- [Phase 03-01]: SubjectThrottle uses time.monotonic() for rate limiting (immune to wall-clock jumps or NTP adjustments) — plan 03-01
+- [Phase 03-01]: encode_timestamped_float uses proto float32 (TimestampedFloat.value is 32-bit); test assertions use 1e-3 tolerance — plan 03-01
 
 ### Pending Todos
 
@@ -76,5 +80,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 02-03-PLAN.md — interactive Leaflet/WebSocket simulation UI complete with all 5 user-reported fixes
+Stopped at: Completed 03-01-PLAN.md — RollPitchModel oscillator and keelson encode pipeline ready for server wiring
 Resume file: None
