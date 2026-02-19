@@ -4,17 +4,395 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ghost-drone</title>
+
+  <!-- Leaflet 1.9.4 -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Geoman 2.19.0 -->
+  <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.19.0/dist/leaflet-geoman.css"/>
+  <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.19.0/dist/leaflet-geoman.js"></script>
+
   <style>
-    body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: #f0f4f8; }
-    .card { background: white; border-radius: 8px; padding: 2rem 3rem; box-shadow: 0 2px 8px rgba(0,0,0,.1); text-align: center; }
-    h1 { margin: 0 0 0.5rem; color: #1a202c; }
-    p { margin: 0; color: #718096; }
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #map {
+      flex: 1;
+    }
+
+    #bottom-bar {
+      height: 52px;
+      background: #1a1a2e;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 16px;
+      flex-shrink: 0;
+    }
+
+    .ctrl-btn {
+      background: #2d2d44;
+      color: #e0e0e0;
+      border: 1px solid #555;
+      border-radius: 4px;
+      padding: 6px 14px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .ctrl-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .ctrl-btn:not(:disabled):hover {
+      background: #3d3d5c;
+    }
+
+    #btn-draw.active {
+      background: #e67e22;
+      color: #fff;
+      border-color: #e67e22;
+    }
+
+    #speed-input {
+      width: 60px;
+      margin-left: 6px;
+      background: #2d2d44;
+      color: #e0e0e0;
+      border: 1px solid #555;
+      border-radius: 4px;
+      padding: 4px 6px;
+      font-size: 13px;
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>ghost-drone is running</h1>
-    <p>Simulation UI coming in Phase 2.</p>
+
+  <div id="map"></div>
+
+  <div id="bottom-bar">
+    <button id="btn-draw" class="ctrl-btn">Draw Mode</button>
+    <div style="width:1px;height:28px;background:#444"></div>
+    <button id="btn-play" class="ctrl-btn">Play</button>
+    <button id="btn-pause" class="ctrl-btn">Pause</button>
+    <button id="btn-stop" class="ctrl-btn">Stop</button>
+    <div style="width:1px;height:28px;background:#444"></div>
+    <label style="color:#ccc;font-size:13px">Speed (m/s)
+      <input id="speed-input" type="number" value="10" min="1" max="100" step="1">
+    </label>
+    <div style="flex:1"></div>
+    <button id="btn-clear" class="ctrl-btn">Clear</button>
   </div>
+
+  <script>
+    // ---------------------------------------------------------------------------
+    // Map initialization
+    // ---------------------------------------------------------------------------
+    const map = L.map('map').setView([57.7, 11.97], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    // Geoman — disable all built-in controls; we manage state manually via API
+    map.pm.addControls({
+      position: 'topleft',
+      drawMarker: false,
+      drawCircle: false,
+      drawCircleMarker: false,
+      drawPolygon: false,
+      drawRectangle: false,
+      drawText: false,
+      editMode: false,
+      dragMode: false,
+      cutPolygon: false,
+      removalMode: false,
+      rotateMode: false,
+      drawPolyline: false
+    });
+
+    // ---------------------------------------------------------------------------
+    // State
+    // ---------------------------------------------------------------------------
+    let waypoints = [];       // [{lat, lng}, ...] in sequence order
+    let wpMarkers = [];       // L.marker array (numbered circles)
+    let routeLayer = null;    // L.polyline or null
+    let droneMarker = null;   // L.marker with SVG icon
+    let simState = 'stopped'; // 'stopped' | 'playing' | 'paused'
+    let drawModeActive = false;
+    let ws = null;
+
+    // ---------------------------------------------------------------------------
+    // Button references
+    // ---------------------------------------------------------------------------
+    const btnDraw  = document.getElementById('btn-draw');
+    const btnPlay  = document.getElementById('btn-play');
+    const btnPause = document.getElementById('btn-pause');
+    const btnStop  = document.getElementById('btn-stop');
+    const btnClear = document.getElementById('btn-clear');
+    const speedInput = document.getElementById('speed-input');
+
+    // ---------------------------------------------------------------------------
+    // Waypoint icon factory
+    // ---------------------------------------------------------------------------
+    function createWpIcon(number) {
+      return L.divIcon({
+        className: '',
+        html: `<div style="width:24px;height:24px;border-radius:50%;background:#e67e22;
+                           color:#fff;font-weight:bold;font-size:11px;display:flex;
+                           align-items:center;justify-content:center;
+                           border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.5)">${number}</div>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+      });
+    }
+
+    // ---------------------------------------------------------------------------
+    // Drone icon factory
+    // ---------------------------------------------------------------------------
+    function createDroneIcon(opacity) {
+      if (opacity === undefined) opacity = 1.0;
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+        <!-- arms -->
+        <line x1="20" y1="20" x2="6"  y2="6"  stroke="#333" stroke-width="2.5"/>
+        <line x1="20" y1="20" x2="34" y2="6"  stroke="#333" stroke-width="2.5"/>
+        <line x1="20" y1="20" x2="6"  y2="34" stroke="#333" stroke-width="2.5"/>
+        <line x1="20" y1="20" x2="34" y2="34" stroke="#333" stroke-width="2.5"/>
+        <!-- rotors -->
+        <circle cx="6"  cy="6"  r="5" fill="#555" opacity="0.85"/>
+        <circle cx="34" cy="6"  r="5" fill="#555" opacity="0.85"/>
+        <circle cx="6"  cy="34" r="5" fill="#555" opacity="0.85"/>
+        <circle cx="34" cy="34" r="5" fill="#555" opacity="0.85"/>
+        <!-- body -->
+        <circle cx="20" cy="20" r="6" fill="#e67e22"/>
+        <!-- heading indicator (front) -->
+        <polygon points="20,4 17,12 23,12" fill="#e67e22"/>
+      </svg>`;
+      return L.divIcon({
+        className: '',
+        html: `<div id="drone-icon-inner" style="width:40px;height:40px;opacity:${opacity};transform-origin:center;transition:opacity 0.3s">${svg}</div>`,
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
+      });
+    }
+
+    // Create drone marker at map init at default center
+    droneMarker = L.marker([57.7, 11.97], {
+      icon: createDroneIcon(0.4),
+      zIndexOffset: 1000
+    }).addTo(map);
+
+    // ---------------------------------------------------------------------------
+    // Drone heading update
+    // ---------------------------------------------------------------------------
+    function setDroneHeading(heading) {
+      const inner = droneMarker.getElement() && droneMarker.getElement().querySelector('#drone-icon-inner');
+      if (inner) inner.style.transform = `rotate(${heading}deg)`;
+    }
+
+    // ---------------------------------------------------------------------------
+    // Route rendering
+    // ---------------------------------------------------------------------------
+    function refreshRoute() {
+      // Remove all existing waypoint markers
+      for (let i = 0; i < wpMarkers.length; i++) {
+        wpMarkers[i].remove();
+      }
+      wpMarkers = [];
+
+      // Remove route polyline
+      if (routeLayer) {
+        routeLayer.remove();
+        routeLayer = null;
+      }
+
+      if (waypoints.length === 0) return;
+
+      // Create numbered markers
+      for (let i = 0; i < waypoints.length; i++) {
+        const wp = waypoints[i];
+        const marker = L.marker([wp.lat, wp.lng], {
+          icon: createWpIcon(i + 1),
+          draggable: true
+        }).addTo(map);
+
+        // Capture i via IIFE to avoid closure issue
+        (function(idx) {
+          marker.on('dragend', function() {
+            const latlng = marker.getLatLng();
+            waypoints[idx] = { lat: latlng.lat, lng: latlng.lng };
+            refreshRoute();
+            updateControlStates();
+          });
+
+          marker.on('contextmenu', function() {
+            waypoints.splice(idx, 1);
+            refreshRoute();
+            updateControlStates();
+          });
+        })(i);
+
+        wpMarkers.push(marker);
+      }
+
+      // Create polyline connecting all waypoints
+      const latlngs = waypoints.map(function(w) { return [w.lat, w.lng]; });
+      routeLayer = L.polyline(latlngs, {
+        color: '#e67e22',
+        weight: 3,
+        opacity: 0.9
+      }).addTo(map);
+    }
+
+    // ---------------------------------------------------------------------------
+    // Draw mode
+    // ---------------------------------------------------------------------------
+    function onMapClick(e) {
+      if (!drawModeActive || simState !== 'stopped') return;
+      waypoints.push({ lat: e.latlng.lat, lng: e.latlng.lng });
+      refreshRoute();
+      updateControlStates();
+    }
+
+    function updateDrawButtonStyle() {
+      if (drawModeActive) {
+        btnDraw.classList.add('active');
+      } else {
+        btnDraw.classList.remove('active');
+      }
+    }
+
+    btnDraw.addEventListener('click', function() {
+      if (simState !== 'stopped') return;
+      drawModeActive = !drawModeActive;
+      updateDrawButtonStyle();
+      if (drawModeActive) {
+        map.on('click', onMapClick);
+      } else {
+        map.off('click', onMapClick);
+      }
+    });
+
+    // ---------------------------------------------------------------------------
+    // Control state management
+    // ---------------------------------------------------------------------------
+    function updateControlStates() {
+      const canEdit = simState === 'stopped';
+      const canPlay = canEdit && waypoints.length >= 2;
+
+      btnPlay.disabled  = !canPlay;
+      btnPause.disabled = simState !== 'playing';
+      btnStop.disabled  = simState === 'stopped';
+      btnClear.disabled = !canEdit;
+      btnDraw.disabled  = !canEdit;
+
+      // If sim is running and draw mode was active, disable it
+      if (!canEdit && drawModeActive) {
+        drawModeActive = false;
+        map.off('click', onMapClick);
+        updateDrawButtonStyle();
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // WebSocket
+    // ---------------------------------------------------------------------------
+    function sendRoute() {
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+      ws.send(JSON.stringify({
+        type: 'load_route',
+        waypoints: waypoints.map(function(w) { return [w.lat, w.lng]; })
+      }));
+    }
+
+    function connectWS() {
+      ws = new WebSocket('ws://' + location.host + '/ws');
+
+      ws.onmessage = function(event) {
+        const frame = JSON.parse(event.data);
+        simState = frame.state;
+
+        // Update drone marker position
+        const latlng = L.latLng(frame.lat, frame.lng);
+        droneMarker.setLatLng(latlng);
+        map.panTo(latlng);
+
+        // Update heading rotation on inner div
+        setDroneHeading(frame.heading);
+
+        // Update drone opacity
+        const opacity = frame.state === 'playing' ? 1.0 : 0.4;
+        const inner = droneMarker.getElement() && droneMarker.getElement().querySelector('#drone-icon-inner');
+        if (inner) inner.style.opacity = opacity;
+
+        // Sync button states
+        updateControlStates();
+      };
+
+      ws.onclose = function() {
+        setTimeout(connectWS, 2000);
+      };
+    }
+
+    // ---------------------------------------------------------------------------
+    // Button event handlers
+    // ---------------------------------------------------------------------------
+    btnPlay.addEventListener('click', function() {
+      if (waypoints.length < 2) return;
+      sendRoute();
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'play' }));
+      }
+    });
+
+    btnPause.addEventListener('click', function() {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'pause' }));
+      }
+    });
+
+    btnStop.addEventListener('click', function() {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'stop' }));
+      }
+    });
+
+    btnClear.addEventListener('click', function() {
+      if (simState !== 'stopped') return;
+      waypoints = [];
+      for (let i = 0; i < wpMarkers.length; i++) {
+        wpMarkers[i].remove();
+      }
+      wpMarkers = [];
+      if (routeLayer) {
+        routeLayer.remove();
+        routeLayer = null;
+      }
+      updateControlStates();
+    });
+
+    speedInput.addEventListener('change', function() {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'set_speed', value: parseFloat(speedInput.value) }));
+      }
+    });
+
+    // ---------------------------------------------------------------------------
+    // Init
+    // ---------------------------------------------------------------------------
+    document.addEventListener('DOMContentLoaded', function() {
+      connectWS();
+      updateControlStates();
+    });
+  </script>
 </body>
 </html>
