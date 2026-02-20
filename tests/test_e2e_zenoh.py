@@ -67,7 +67,7 @@ def test_all_five_subjects_published_and_decode(zenoh_router):
     time.sleep(0.1)
 
     def on_sample(sample):
-        # Key format: realm/@v0/entity_id/pubsub/<subject>/<source_id>
+        # Key format: realm/@v1/entity_id/pubsub/<subject>/<source_id>
         parts = str(sample.key_expr).split("/")
         if len(parts) >= 5:
             subject = parts[4]
@@ -76,8 +76,8 @@ def test_all_five_subjects_published_and_decode(zenoh_router):
                 received.setdefault(subject, bytes(sample.payload))
 
     # zenoh treats @ as a special segment separator — "**" does not cross it.
-    # The full key pattern is: realm/@v0/entity_id/pubsub/subject/source_id
-    subscriber = sub_session.declare_subscriber("ghost-drone/@v0/**", on_sample)
+    # The full key pattern is: realm/@v1/entity_id/pubsub/subject/source_id
+    subscriber = sub_session.declare_subscriber("ghost-drone/@v1/**", on_sample)
 
     try:
         with TestClient(app) as client:
@@ -152,7 +152,7 @@ def test_no_messages_published_when_stopped(zenoh_router):
         with lock:
             received_count += 1
 
-    subscriber = sub_session.declare_subscriber("ghost-drone/@v0/**", on_sample)
+    subscriber = sub_session.declare_subscriber("ghost-drone/@v1/**", on_sample)
 
     try:
         with TestClient(app) as client:

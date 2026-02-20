@@ -73,12 +73,7 @@ def make_key(cfg: AppConfig, subject: str, source_id: str) -> str:
     Returns:
         The full keelson key expression string.
     """
-    return keelson.construct_pubsub_key(
-        base_path=cfg.keelson_realm,
-        entity_id=cfg.entity_id,
-        subject=subject,
-        source_id=source_id,
-    )
+    return f"{cfg.keelson_realm}/@v1/{cfg.entity_id}/pubsub/{subject}/{source_id}"
 
 
 class SubjectThrottle:
