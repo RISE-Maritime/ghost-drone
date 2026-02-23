@@ -13,9 +13,8 @@ ghost-drone builds in four phases driven by the dependency tree: validated zenoh
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Project scaffold, configuration, and a validated zenoh/keelson publish helper with round-trip tests (2/2 plans complete)
-- [x] **Phase 2: Simulation and Map UI** - Drone simulation engine with route following and noise, wired to an interactive browser map with play/pause/stop controls (completed 2026-02-19)
-- [x] **Phase 3: Telemetry Publishing** - Simulation output published to zenoh as keelson-wrapped messages; browser shows live telemetry plots (completed 2026-02-19)
-- [ ] **Phase 4: Camera Integration** - Host webcam streamed to browser and published as keelson image_compressed to zenoh
+- [x] **Phase 2: Simulation and Map UI** - Drone simulation engine with route following and noise, wired to an interactive browser map with play/pause/stop controls (completed 2004-02-19)
+- [x] **Phase 3: Telemetry Publishing** - Simulation output published to zenoh as keelson-wrapped messages; browser shows live telemetry plots (completed 2004-02-19)
 
 ## Phase Details
 
@@ -66,25 +65,3 @@ Plans:
 - [ ] 03-01-PLAN.md — RollPitchModel sinusoidal oscillator + keelson encode pipeline (telemetry.py, roll_pitch.py)
 - [ ] 03-02-PLAN.md — Server wiring: FastAPI lifespan, PublishSettings, extended tick loop with zenoh publishing
 - [ ] 03-03-PLAN.md — Browser UI: right sidebar gauges+sparklines, settings modal
-
-### Phase 4: Camera Integration
-**Goal**: The host webcam feed is visible in the browser and published as keelson image_compressed to the zenoh network
-**Depends on**: Phase 3
-**Requirements**: CAM-01, CAM-02, UI-04
-**Success Criteria** (what must be TRUE):
-  1. The browser UI shows a live webcam feed from the host machine that updates in real time without requiring any browser plugin or separate server
-  2. A zenoh subscriber receives `image_compressed` messages while the webcam is active, and each message decodes as a keelson envelope containing JPEG bytes that form a valid image
-  3. The JPEG frame is encoded once and delivered to both the browser MJPEG stream and the zenoh publisher without a second encode pass
-**Plans**: TBD
-
-## Progress
-
-**Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4
-
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Foundation | 2/2 | Complete    | 2026-02-19 |
-| 2. Simulation and Map UI | 3/3 | Complete   | 2026-02-19 |
-| 3. Telemetry Publishing | 3/3 | Complete   | 2026-02-19 |
-| 4. Camera Integration | 0/TBD | Not started | - |
