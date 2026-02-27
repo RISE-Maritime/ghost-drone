@@ -2,6 +2,12 @@
 # Copy this file to ghost_drone.toml in the directory where you run ghost-drone.
 # All three keys are required.
 
+# Use host.docker.internal when running inside a devcontainer
+# zenoh_endpoint = "tcp/host.docker.internal:7447"
 zenoh_endpoint = "tcp/127.0.0.1:7447"
 keelson_realm = "ghost-drone"
 entity_id = "sim001"
+
+# The zenoh-bridge-remote-api must be running alongside zenohd.
+# Default WebSocket endpoint: ws://localhost:10001
+# Configure the frontend via URL params: ?remote_api=ws://host:port
