@@ -1,5 +1,5 @@
 import { Config, Session, open, Duration, type Sample, type Reply, type ReplyError } from "@eclipse-zenoh/zenoh-ts";
-import type { SimFrame, SettingsPayload } from "./types";
+import type { SimFrame, SettingsPayload, FaultType } from "./types";
 
 const KEELSON_VERSION = "v0";
 const QUERY_TIMEOUT = Duration.milliseconds.of(5000);
@@ -135,6 +135,52 @@ export class ZenohClient {
       return null;
     } catch {
       return null;
+    }
+  }
+
+  async injectFault(subject: string, faultType: FaultType): Promise<boolean> {
+    if (!this.session) return false;
+    const receiver = await this.session.get(
+      `${this.prefix()}/service/fault`,
+      {
+        payload: JSON.stringify({ action: "inject", subject, fault_type: faultType }),
+        timeout: QUERY_TIMEOUT,
+      },
+    );
+    if (!receiver) return false;
+    try {
+      const reply: Reply = await receiver.receive();
+      const result = reply.result();
+      if (this.isSample(result)) {
+        const data = JSON.parse(result.payload().toString());
+        return data.ok === true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  }
+
+  async clearFault(subject: string, faultType: FaultType): Promise<boolean> {
+    if (!this.session) return false;
+    const receiver = await this.session.get(
+      `${this.prefix()}/service/fault`,
+      {
+        payload: JSON.stringify({ action: "clear", subject, fault_type: faultType }),
+        timeout: QUERY_TIMEOUT,
+      },
+    );
+    if (!receiver) return false;
+    try {
+      const reply: Reply = await receiver.receive();
+      const result = reply.result();
+      if (this.isSample(result)) {
+        const data = JSON.parse(result.payload().toString());
+        return data.ok === true;
+      }
+      return false;
+    } catch {
+      return false;
     }
   }
 

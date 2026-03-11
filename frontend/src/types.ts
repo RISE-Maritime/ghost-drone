@@ -9,6 +9,10 @@ export interface HealthSummary {
   subsystems: SubsystemHealth[];
 }
 
+export type FaultType = "drop" | "stuck" | "nan" | "wrong_rate";
+
+export type FaultState = Record<string, FaultType[]>;
+
 export interface SimFrame {
   lat: number;
   lng: number;
@@ -18,6 +22,7 @@ export interface SimFrame {
   pitch: number;
   state: "stopped" | "playing" | "paused";
   health?: HealthSummary;
+  faults?: FaultState;
 }
 
 export interface SettingsPayload {

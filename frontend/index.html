@@ -308,6 +308,59 @@
     .health-sub-level[data-level="inactive"] { color: var(--element-inactive-color); }
     .health-sub-level[data-level="unknown"]  { color: var(--element-inactive-color); }
 
+    /* Fault injection panel */
+    .fault-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .fault-table th {
+      color: var(--element-inactive-color);
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-align: center;
+      padding: 0 2px 4px;
+      border-bottom: 1px solid var(--border-divider-color);
+    }
+
+    .fault-table th:first-child { text-align: left; }
+
+    .fault-table td {
+      padding: 3px 2px;
+      font-size: 11px;
+      color: var(--element-neutral-color);
+      border-bottom: 1px solid var(--border-divider-color);
+    }
+
+    .fault-table tr:last-child td { border-bottom: none; }
+
+    .fault-toggle {
+      background: var(--normal-enabled-background-color);
+      color: var(--element-inactive-color);
+      border: 1px solid var(--normal-enabled-border-color, var(--border-outline-color));
+      border-radius: 3px;
+      padding: 2px 4px;
+      font-size: 9px;
+      font-family: 'Noto Sans', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+      min-width: 32px;
+      transition: background 0.1s ease, color 0.1s ease;
+    }
+
+    .fault-toggle:hover { background: var(--normal-hover-background-color); }
+
+    .fault-toggle.active {
+      background: var(--alert-alarm-color);
+      color: var(--container-global-color);
+      border-color: var(--alert-alarm-color);
+    }
+
+    .fault-toggle.active:hover { opacity: 0.85; }
+
     /* =====================================================================
        Bottom control bar
        ===================================================================== */
@@ -633,6 +686,25 @@
             <span class="health-level" id="health-level">&mdash;</span>
           </div>
           <div id="health-subsystems"></div>
+        </div>
+
+        <div class="sidebar-header" style="margin-top: 4px;">
+          <span class="sidebar-label">Fault Injection</span>
+        </div>
+
+        <div class="gauge-block" id="fault-panel">
+          <table class="fault-table">
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Drop</th>
+                <th>Stuck</th>
+                <th>NaN</th>
+                <th>2x</th>
+              </tr>
+            </thead>
+            <tbody id="fault-rows"></tbody>
+          </table>
         </div>
       </div>
     </div>

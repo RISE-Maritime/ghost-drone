@@ -8,6 +8,7 @@ import {
   initSettingsModal,
   applySettingsToUI,
 } from "./settings";
+import { initFaultPanel, updateFaultPanel } from "./faults";
 import { ZenohClient } from "./zenoh-client";
 import type { SimFrame, SettingsPayload } from "./types";
 
@@ -80,7 +81,17 @@ zenoh = new ZenohClient({
     );
     controls.updateControlStates(mapCtrl.waypoints.length);
     onTelemetryFrame(frame);
+    updateFaultPanel(frame.faults);
   },
+});
+
+// --- Fault injection panel ---
+initFaultPanel((subject, faultType, active) => {
+  if (active) {
+    zenoh.injectFault(subject, faultType);
+  } else {
+    zenoh.clearFault(subject, faultType);
+  }
 });
 
 // --- Settings ---
