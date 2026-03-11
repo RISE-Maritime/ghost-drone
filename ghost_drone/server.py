@@ -27,6 +27,8 @@ from ghost_drone.simulation.models import SimState
 from ghost_drone.zenoh_bridge.control import register_control_handlers
 from ghost_drone.zenoh_bridge.publisher import ZenohPublisher
 from ghost_drone.zenoh_bridge.telemetry import (
+    HEALTH_CRITICAL,
+    HEALTH_DEGRADED,
     HEALTH_INACTIVE,
     HEALTH_NOMINAL,
     MODE_AUTONOMOUS,
@@ -124,8 +126,30 @@ HEALTH_SUBJECT = "entity_health"
 HEALTH_SOURCE_ID = "system/0"
 HEALTH_RATE_HZ = 1.0
 
-# Subsystems that the ghost drone reports health for.
-_SUBSYSTEMS = ("position", "heading", "speed")
+# Subsystems that the ghost drone reports health for,
+# mapped to the telemetry subject they depend on.
+_SUBSYSTEM_SUBJECT_MAP = {
+    "position": "location_fix",
+    "heading": "heading_true_north_deg",
+    "speed": "speed_over_ground_knots",
+}
+
+# Faults that indicate total data loss → CRITICAL
+_CRITICAL_FAULTS = {"drop", "nan"}
+# Faults that indicate compromised data → DEGRADED
+_DEGRADED_FAULTS = {"stuck", "wrong_rate"}
+
+
+def _subsystem_health(sim: SimGlobals, subject: str) -> tuple[int, str]:
+    """Return (health_level, detail) for the subsystem tied to *subject*."""
+    faults = sim.faults.active_faults(subject)
+    if faults & _CRITICAL_FAULTS:
+        detail = ", ".join(sorted(faults & _CRITICAL_FAULTS))
+        return HEALTH_CRITICAL, detail
+    if faults & _DEGRADED_FAULTS:
+        detail = ", ".join(sorted(faults & _DEGRADED_FAULTS))
+        return HEALTH_DEGRADED, detail
+    return HEALTH_NOMINAL, ""
 
 
 def _publish_health(
@@ -139,13 +163,20 @@ def _publish_health(
         return
 
     if is_playing:
-        level = HEALTH_NOMINAL
         operation_mode = MODE_AUTONOMOUS
-        subsystems = [(name, HEALTH_NOMINAL, "") for name in _SUBSYSTEMS]
+        subsystems = []
+        worst_level = HEALTH_NOMINAL
+        for name, subject in _SUBSYSTEM_SUBJECT_MAP.items():
+            sub_level, detail = _subsystem_health(sim, subject)
+            subsystems.append((name, sub_level, detail))
+            # Lower enum value = worse health (CRITICAL=2 < DEGRADED=3 < NOMINAL=4)
+            if sub_level < worst_level:
+                worst_level = sub_level
+        level = worst_level
     else:
         level = HEALTH_INACTIVE
         operation_mode = MODE_IDLE
-        subsystems = [(name, HEALTH_INACTIVE, "") for name in _SUBSYSTEMS]
+        subsystems = [(name, HEALTH_INACTIVE, "") for name in _SUBSYSTEM_SUBJECT_MAP]
 
     telemetry_expectations = [
         (subject, sc.source_id, sc.rate_hz)
