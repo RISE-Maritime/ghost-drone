@@ -320,6 +320,97 @@ def test_stuck_fault_freezes_published_value(zenoh_router):
     )
 
 
+def test_wrong_rate_fault_changes_publish_rate(zenoh_router):
+    """
+    Injecting a 'wrong_rate' fault on a subject causes it to publish at a
+    different rate than configured. After clearing, the rate returns to normal.
+
+    SPEC: "wrong rate: the subject publishes at a rate different from its configured Hz."
+    """
+    cfg = AppConfig(
+        zenoh_endpoint=_ROUTER_ENDPOINT,
+        keelson_realm="ghost-drone",
+        entity_id="sim001",
+    )
+
+    counts_before: list[int] = [0]
+    counts_during: list[int] = [0]
+    counts_after: list[int] = [0]
+    active_counter = [None]  # mutable ref to current counter list
+    lock = threading.Lock()
+
+    client_session = _make_client_session()
+
+    def on_sample(sample):
+        key = str(sample.key_expr)
+        if "heading_true_north_deg" not in key:
+            return
+        with lock:
+            target = active_counter[0]
+            if target is not None:
+                target[0] += 1
+
+    subscriber = client_session.declare_subscriber("ghost-drone/@v0/**", on_sample)
+
+    try:
+        with start_simulator(cfg) as handle:
+            _wait_for_publisher(handle)
+            _start_playing(client_session)
+
+            # Phase 1: Baseline — count heading messages at normal rate (1 Hz)
+            time.sleep(1.5)  # let it stabilise
+            active_counter[0] = counts_before
+            time.sleep(4.0)
+            active_counter[0] = None
+
+            # Phase 2: Inject wrong_rate fault — rate should change
+            result = _inject_fault(client_session, "heading_true_north_deg", "wrong_rate")
+            assert result is not None, "No reply from fault queryable"
+            assert result["ok"] is True, f"Fault injection failed: {result}"
+
+            time.sleep(0.5)  # let the new rate take effect
+            active_counter[0] = counts_during
+            time.sleep(4.0)
+            active_counter[0] = None
+
+            # Phase 3: Clear the fault — rate should return to normal
+            result = _clear_fault(client_session, "heading_true_north_deg", "wrong_rate")
+            assert result is not None, "No reply from fault clear"
+            assert result["ok"] is True, f"Fault clear failed: {result}"
+
+            time.sleep(0.5)
+            active_counter[0] = counts_after
+            time.sleep(4.0)
+            active_counter[0] = None
+
+            client_session.put(f"{_PREFIX}/control/stop", "")
+            time.sleep(0.2)
+    finally:
+        subscriber.undeclare()
+        client_session.close()
+
+    # --- Assertions ---
+
+    # At 1 Hz over 4s, expect ~4 messages baseline
+    assert counts_before[0] >= 2, (
+        f"Expected >=2 heading messages before fault, got {counts_before[0]}"
+    )
+
+    # During wrong_rate fault, expect significantly more messages than baseline.
+    # The fault doubles the rate (2 Hz), so we expect roughly 2x messages.
+    assert counts_during[0] > counts_before[0] * 1.5, (
+        f"Expected wrong_rate fault to increase message count significantly. "
+        f"Before: {counts_before[0]}, During: {counts_during[0]}"
+    )
+
+    # After clearing, rate should return to baseline levels
+    # (should not be significantly more than baseline)
+    assert counts_after[0] <= counts_before[0] * 1.5, (
+        f"Expected rate to return to normal after clearing. "
+        f"Before: {counts_before[0]}, After: {counts_after[0]}"
+    )
+
+
 def test_nan_fault_publishes_nan_values(zenoh_router):
     """
     Injecting a 'nan' fault on a subject causes published values to be NaN.
