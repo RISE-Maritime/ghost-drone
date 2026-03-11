@@ -1,0 +1,216 @@
+"""
+End-to-end test: fault injection via zenoh queryable.
+
+Verifies SPEC behaviors:
+- A fault can be injected on any subject of any drone (drop type).
+- When a fault is cleared, the subject returns to normal behavior.
+- Faults are controllable via zenoh queryable.
+"""
+
+import json
+import time
+import threading
+
+import pytest
+import zenoh
+
+from ghost_drone.config import AppConfig
+from ghost_drone.server import start_simulator
+
+# Non-standard port to avoid colliding with a real zenoh instance.
+_ROUTER_ENDPOINT = "tcp/127.0.0.1:17447"
+
+# Two waypoints near the default map centre (Lindholmen, Gothenburg).
+_ROUTE = [[57.7069, 11.9381], [57.7100, 11.9420]]
+
+# Key expression prefix matching the AppConfig below
+_PREFIX = "ghost-drone/@v0/sim001"
+
+
+@pytest.fixture(scope="module")
+def zenoh_router():
+    """In-process zenoh router that the ghost-drone publisher connects to."""
+    cfg = zenoh.Config.from_json5(
+        json.dumps(
+            {
+                "mode": "router",
+                "listen": {"endpoints": [_ROUTER_ENDPOINT]},
+                "scouting": {"multicast": {"enabled": False}},
+            }
+        )
+    )
+    session = zenoh.open(cfg)
+    time.sleep(0.2)
+    yield session
+    session.close()
+
+
+def _make_client_session():
+    """Open a zenoh client session connected to the test router."""
+    sub_cfg = zenoh.Config.from_json5(
+        json.dumps(
+            {
+                "mode": "client",
+                "connect": {"endpoints": [_ROUTER_ENDPOINT]},
+            }
+        )
+    )
+    session = zenoh.open(sub_cfg)
+    time.sleep(0.1)
+    return session
+
+
+def _wait_for_publisher(handle, timeout=5.0):
+    """Wait until the ZenohPublisher session is ready."""
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        if handle.publisher.session_ready.is_set():
+            return
+        time.sleep(0.1)
+    raise RuntimeError("Publisher session not ready within timeout")
+
+
+def _inject_fault(client_session, subject, fault_type):
+    """Inject a fault via the fault queryable."""
+    replies = client_session.get(
+        f"{_PREFIX}/service/fault",
+        payload=json.dumps({
+            "action": "inject",
+            "subject": subject,
+            "fault_type": fault_type,
+        }).encode(),
+        timeout=5,
+    )
+    result = None
+    for reply in replies:
+        if reply.ok is not None:
+            result = json.loads(bytes(reply.ok.payload))
+    return result
+
+
+def _clear_fault(client_session, subject, fault_type):
+    """Clear a fault via the fault queryable."""
+    replies = client_session.get(
+        f"{_PREFIX}/service/fault",
+        payload=json.dumps({
+            "action": "clear",
+            "subject": subject,
+            "fault_type": fault_type,
+        }).encode(),
+        timeout=5,
+    )
+    result = None
+    for reply in replies:
+        if reply.ok is not None:
+            result = json.loads(bytes(reply.ok.payload))
+    return result
+
+
+def _start_playing(client_session):
+    """Load a route and start playing."""
+    replies = client_session.get(
+        f"{_PREFIX}/service/load_route",
+        payload=json.dumps({"waypoints": _ROUTE}).encode(),
+        timeout=5,
+    )
+    for reply in replies:
+        pass
+    client_session.put(f"{_PREFIX}/control/play", "")
+
+
+def test_drop_fault_stops_subject_publishing(zenoh_router):
+    """
+    Injecting a 'drop' fault on a subject stops it from publishing.
+    Other subjects continue publishing normally.
+    Clearing the fault restores publishing.
+    """
+    cfg = AppConfig(
+        zenoh_endpoint=_ROUTER_ENDPOINT,
+        keelson_realm="ghost-drone",
+        entity_id="sim001",
+    )
+
+    # Track per-subject message counts in time windows
+    counts_before: dict[str, int] = {}
+    counts_during: dict[str, int] = {}
+    counts_after: dict[str, int] = {}
+    active_counter = [None]  # mutable reference to current counter dict
+    lock = threading.Lock()
+
+    client_session = _make_client_session()
+
+    def on_sample(sample):
+        parts = str(sample.key_expr).split("/")
+        if len(parts) >= 5:
+            subject = parts[4]
+            # Only count the 5 keelson telemetry subjects
+            if subject in (
+                "heading_true_north_deg",
+                "speed_over_ground_knots",
+                "roll_deg",
+                "pitch_deg",
+                "location_fix",
+            ):
+                with lock:
+                    counter = active_counter[0]
+                    if counter is not None:
+                        counter[subject] = counter.get(subject, 0) + 1
+
+    subscriber = client_session.declare_subscriber("ghost-drone/@v0/**", on_sample)
+
+    try:
+        with start_simulator(cfg) as handle:
+            _wait_for_publisher(handle)
+            _start_playing(client_session)
+
+            # Phase 1: Collect baseline counts (no faults)
+            time.sleep(1.5)  # let subjects start publishing
+            active_counter[0] = counts_before
+            time.sleep(2.0)
+            active_counter[0] = None
+
+            # Phase 2: Inject drop fault on heading_true_north_deg
+            result = _inject_fault(client_session, "heading_true_north_deg", "drop")
+            assert result is not None, "No reply from fault queryable"
+            assert result["ok"] is True, f"Fault injection failed: {result}"
+
+            active_counter[0] = counts_during
+            time.sleep(2.0)
+            active_counter[0] = None
+
+            # Phase 3: Clear the fault
+            result = _clear_fault(client_session, "heading_true_north_deg", "drop")
+            assert result is not None, "No reply from fault clear"
+            assert result["ok"] is True, f"Fault clear failed: {result}"
+
+            active_counter[0] = counts_after
+            time.sleep(2.0)
+            active_counter[0] = None
+
+            client_session.put(f"{_PREFIX}/control/stop", "")
+            time.sleep(0.2)
+    finally:
+        subscriber.undeclare()
+        client_session.close()
+
+    # --- Assertions ---
+
+    # Before fault: heading should be publishing (at 1Hz, expect >= 1 in 2s)
+    assert counts_before.get("heading_true_north_deg", 0) >= 1, (
+        f"heading should publish before fault, got {counts_before}"
+    )
+
+    # During fault: heading should NOT publish
+    assert counts_during.get("heading_true_north_deg", 0) == 0, (
+        f"heading should be dropped during fault, got {counts_during}"
+    )
+
+    # During fault: other subjects should still publish
+    assert counts_during.get("speed_over_ground_knots", 0) >= 1, (
+        f"speed should still publish during heading fault, got {counts_during}"
+    )
+
+    # After clearing: heading should resume
+    assert counts_after.get("heading_true_north_deg", 0) >= 1, (
+        f"heading should resume after clearing fault, got {counts_after}"
+    )
