@@ -1,30 +1,77 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-obc-theme="dusk" class="obc-component-size-regular">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ghost-drone</title>
 
-  <!-- Leaflet 1.9.4 -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <!-- Geoman 2.19.0 -->
-  <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.19.0/dist/leaflet-geoman.css"/>
-  <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.19.0/dist/leaflet-geoman.js"></script>
-
-  <!-- Sparkline CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@fnando/sparkline@0.3.10/dist/sparkline.js"></script>
+  <!-- OpenBridge design tokens — all 4 themes, sizing tokens, typography -->
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@oicl/openbridge-webcomponents@0.0.17/src/palettes/variables.css">
 
   <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      height: 100vh;
-      overflow: hidden;
+    /* Noto Sans — served from the OB package so it always matches */
+    @font-face {
+      font-family: 'Noto Sans';
+      src: url('https://cdn.jsdelivr.net/npm/@oicl/openbridge-webcomponents@0.0.17/dist/NotoSans.ttf')
+           format('truetype');
     }
 
+    /* =====================================================================
+       Supplemental CSS variables — instrument and overlay colours that are
+       not included in the OB base variables.css but required by this app.
+       One block per theme, matching the OB token naming convention.
+       ===================================================================== */
+    :root,
+    [data-obc-theme="dusk"] {
+      --container-overlay-color:          rgba(0, 0, 0, 0.72);
+      --instrument-enhanced-primary-color: rgb(90, 132, 191);   /* = --data-categorical-01 */
+      --instrument-port-primary-color:    rgb(165, 90, 106);
+      --instrument-starboard-primary-color: rgb(0, 128, 95);
+      --shadow-overlay: 0 8px 32px rgba(0, 0, 0, 0.72);
+    }
+
+    [data-obc-theme="night"] {
+      --container-overlay-color:          rgba(0, 0, 0, 0.90);
+      --instrument-enhanced-primary-color: rgb(200, 148, 0);
+      --instrument-port-primary-color:    rgb(120, 40, 52);
+      --instrument-starboard-primary-color: rgb(0, 82, 58);
+      --shadow-overlay: 0 8px 32px rgba(0, 0, 0, 0.90);
+    }
+
+    [data-obc-theme="day"] {
+      --container-overlay-color:          rgba(80, 80, 90, 0.50);
+      --instrument-enhanced-primary-color: rgb(0, 56, 158);
+      --instrument-port-primary-color:    rgb(165, 90, 106);
+      --instrument-starboard-primary-color: rgb(0, 128, 95);
+      --shadow-overlay: 0 8px 32px rgba(0, 0, 0, 0.38);
+    }
+
+    [data-obc-theme="bright"] {
+      --container-overlay-color:          rgba(60, 62, 70, 0.45);
+      --instrument-enhanced-primary-color: rgb(0, 46, 148);
+      --instrument-port-primary-color:    rgb(165, 90, 106);
+      --instrument-starboard-primary-color: rgb(0, 128, 95);
+      --shadow-overlay: 0 8px 32px rgba(0, 0, 0, 0.32);
+    }
+
+    /* =====================================================================
+       Base reset
+       ===================================================================== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      height: 100vh;
+      overflow: hidden;
+      font-family: 'Noto Sans', sans-serif;
+      font-size: 13px;
+      background-color: var(--container-backdrop-color);
+      color: var(--element-active-color);
+    }
+
+    /* =====================================================================
+       App shell
+       ===================================================================== */
     #app-wrapper {
       display: flex;
       flex-direction: column;
@@ -32,649 +79,588 @@
       overflow: hidden;
     }
 
+    /* =====================================================================
+       Top bar
+       ===================================================================== */
+    #top-bar {
+      height: 52px;
+      background: var(--container-global-color);
+      border-bottom: 1px solid var(--border-outline-color);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 12px;
+      flex-shrink: 0;
+      z-index: 200;
+    }
+
+    #app-identity {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #app-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--element-active-color);
+      letter-spacing: 0.02em;
+      user-select: none;
+    }
+
+    #app-subtitle {
+      font-size: 11px;
+      color: var(--element-inactive-color);
+      letter-spacing: 0.03em;
+      user-select: none;
+    }
+
+    #top-bar-clock {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--element-neutral-color);
+      letter-spacing: 0.04em;
+      font-variant-numeric: tabular-nums;
+      min-width: 52px;
+    }
+
+    #top-bar-spacer { flex: 1; }
+
+    #top-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Theme selector — OB normal button style */
+    #theme-select {
+      background: var(--normal-enabled-background-color);
+      color: var(--on-normal-active-color);
+      border: 1px solid var(--normal-enabled-border-color, var(--border-outline-color));
+      border-radius: 4px;
+      padding: 5px 8px;
+      font-size: 12px;
+      font-family: 'Noto Sans', sans-serif;
+      cursor: pointer;
+      outline: none;
+    }
+
+    #theme-select:hover { background: var(--normal-hover-background-color); }
+    #theme-select:focus { border-color: var(--border-focus-color); }
+
     #main-area {
       display: flex;
       flex: 1;
       overflow: hidden;
     }
 
-    #map {
-      flex: 1;
+    #map { flex: 1; }
+
+    /* =====================================================================
+       Running-status badge (top bar, centre-right)
+       ===================================================================== */
+    #sim-status-badge {
+      display: none;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--alert-running-color);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0 12px 0 4px;
     }
 
+    #sim-status-badge.visible { display: flex; }
+    #sim-status-badge.paused  { color: var(--alert-caution-color); }
+
+    #sim-status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: statusPulse 1.4s ease-in-out infinite;
+    }
+
+    #sim-status-badge.paused #sim-status-dot { animation: none; }
+
+    @keyframes statusPulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    /* =====================================================================
+       Telemetry sidebar
+       ===================================================================== */
     #telemetry-sidebar {
       width: 220px;
-      background: #1a1a2e;
+      background: var(--container-section-color);
+      border-left: 1px solid var(--border-outline-color);
       overflow-y: auto;
-      padding: 12px;
+      padding: 10px;
       flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
 
+    .sidebar-header {
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-divider-color);
+      margin-bottom: 2px;
+    }
+
+    .sidebar-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--element-inactive-color);
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
+    }
+
+    /* Instrument-style gauge block */
+    .gauge-block {
+      background: var(--container-background-color);
+      border: 1px solid var(--border-outline-color);
+      border-radius: 4px;
+      padding: 8px 10px 6px;
+    }
+
+    .gauge-tag {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--element-inactive-color);
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      margin-bottom: 1px;
+    }
+
+    .gauge-row {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      margin-bottom: 5px;
+    }
+
+    .gauge-value {
+      color: var(--instrument-enhanced-primary-color);
+      font-size: 22px;
+      font-weight: 600;
+      font-family: 'Noto Sans', sans-serif;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      min-width: 60px;
+    }
+
+    .gauge-unit {
+      color: var(--element-inactive-color);
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .sparkline-svg { display: block; width: 100%; }
+
+    /* =====================================================================
+       Bottom control bar
+       ===================================================================== */
     #bottom-bar {
       height: 52px;
-      background: #1a1a2e;
+      background: var(--container-section-color);
+      border-top: 1px solid var(--border-outline-color);
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 0 16px;
+      gap: 4px;
+      padding: 0 12px;
       flex-shrink: 0;
     }
 
+    .bar-divider {
+      width: 1px;
+      height: 28px;
+      background: var(--border-divider-color);
+      flex-shrink: 0;
+      margin: 0 4px;
+    }
+
+    .bar-spacer { flex: 1; }
+
+    /* Native buttons styled with OB CSS variables — reliable event handling,
+       no shadow DOM, identical visual result to obc-button */
     .ctrl-btn {
-      background: #2d2d44;
-      color: #e0e0e0;
-      border: 1px solid #555;
+      background: var(--normal-enabled-background-color);
+      color: var(--on-normal-active-color);
+      border: 1px solid var(--normal-enabled-border-color, var(--border-outline-color));
       border-radius: 4px;
-      padding: 6px 14px;
+      padding: 6px 12px;
       cursor: pointer;
-      font-size: 13px;
+      font-size: 12px;
+      font-family: 'Noto Sans', sans-serif;
+      font-weight: 500;
+      line-height: 1;
+      white-space: nowrap;
+      outline: none;
+      transition: background 0.08s ease;
     }
 
     .ctrl-btn:disabled {
-      opacity: 0.4;
+      opacity: 0.32;
       cursor: not-allowed;
     }
 
-    .ctrl-btn:not(:disabled):hover {
-      background: #3d3d5c;
+    .ctrl-btn:not(:disabled):hover   { background: var(--normal-hover-background-color); }
+    .ctrl-btn:not(:disabled):active  { background: var(--normal-pressed-background-color); }
+    .ctrl-btn:focus-visible          { outline: 2px solid var(--border-focus-color); outline-offset: 1px; }
+
+    /* variant="check" active state */
+    .ctrl-btn.active {
+      background: var(--selected-enabled-background-color);
+      color: var(--on-selected-active-color);
+      border-color: var(--selected-enabled-background-color);
+    }
+    .ctrl-btn.active:not(:disabled):hover {
+      background: var(--selected-hover-background-color);
+      border-color: var(--selected-hover-background-color);
     }
 
-    #btn-draw.active {
-      background: #e67e22;
-      color: #fff;
-      border-color: #e67e22;
+    /* variant="raised" */
+    .ctrl-btn.raised {
+      background: var(--raised-enabled-background-color);
+      color: var(--on-raised-active-color);
+      border-color: var(--raised-enabled-border-color, var(--border-outline-color));
+    }
+    .ctrl-btn.raised:not(:disabled):hover { background: var(--raised-hover-background-color); }
+
+    /* variant="flat" */
+    .ctrl-btn.flat {
+      background: transparent;
+      border-color: transparent;
+    }
+    .ctrl-btn.flat:not(:disabled):hover  { background: var(--flat-hover-background-color); }
+    .ctrl-btn.flat:not(:disabled):active { background: var(--flat-pressed-background-color); }
+
+    .speed-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--element-neutral-color);
+      font-size: 12px;
+      white-space: nowrap;
     }
 
     #speed-input {
-      width: 60px;
-      margin-left: 6px;
-      background: #2d2d44;
-      color: #e0e0e0;
-      border: 1px solid #555;
+      width: 58px;
+      background: var(--normal-enabled-background-color);
+      color: var(--on-normal-active-color);
+      border: 1px solid var(--normal-enabled-border-color, var(--border-outline-color));
       border-radius: 4px;
       padding: 4px 6px;
-      font-size: 13px;
+      font-size: 12px;
+      font-family: 'Noto Sans', sans-serif;
+      text-align: right;
+      outline: none;
     }
 
-    .gauge-block { margin-bottom: 14px; }
-    .gauge-label { color: #999; font-size: 11px; margin-bottom: 2px; }
-    .gauge-value { color: #e0e0e0; font-size: 22px; font-weight: bold; font-family: monospace; margin-bottom: 4px; }
-    .sparkline-svg { display: block; }
+    #speed-input:focus { border-color: var(--border-focus-color); }
+
+    /* =====================================================================
+       Settings modal
+       ===================================================================== */
+    #settings-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--container-overlay-color);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #settings-modal {
+      background: var(--container-background-color);
+      border: 1px solid var(--border-outline-color);
+      border-radius: 8px;
+      padding: 20px;
+      width: 440px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-overlay);
+    }
+
+    .modal-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--element-active-color);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border-divider-color);
+    }
+
+    .modal-section-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--element-inactive-color);
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      margin-bottom: 8px;
+      margin-top: 16px;
+    }
+
+    .modal-section-title:first-of-type { margin-top: 0; }
+
+    .settings-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 4px;
+    }
+
+    .settings-table th {
+      color: var(--element-inactive-color);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      text-align: left;
+      padding: 0 4px 6px;
+      border-bottom: 1px solid var(--border-divider-color);
+    }
+
+    .settings-table td {
+      padding: 5px 4px;
+      color: var(--element-neutral-color);
+      font-size: 11px;
+      border-bottom: 1px solid var(--border-divider-color);
+    }
+
+    .settings-table tr:last-child td { border-bottom: none; }
+
+    .settings-input {
+      background: var(--normal-enabled-background-color);
+      color: var(--on-normal-active-color);
+      border: 1px solid var(--normal-enabled-border-color, var(--border-outline-color));
+      border-radius: 3px;
+      padding: 3px 5px;
+      font-size: 12px;
+      font-family: 'Noto Sans', sans-serif;
+      outline: none;
+    }
+
+    .settings-input:focus { border-color: var(--border-focus-color); }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .slider-row label {
+      color: var(--element-neutral-color);
+      font-size: 12px;
+      flex: 1;
+    }
+
+    .slider-row input[type="range"] {
+      flex: 0 0 120px;
+      accent-color: var(--instrument-enhanced-primary-color);
+    }
+
+    .slider-value {
+      color: var(--element-active-color);
+      font-size: 12px;
+      font-weight: 600;
+      min-width: 34px;
+      text-align: right;
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      padding-top: 14px;
+      margin-top: 4px;
+      border-top: 1px solid var(--border-divider-color);
+    }
   </style>
+  <script type="module" crossorigin src="/assets/index-CFX39vV2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-BDwZpBkf.css">
 </head>
 <body>
 
   <div id="app-wrapper">
+
+    <!-- ================================================================
+         Top bar — native HTML, styled with OB CSS tokens
+         ================================================================ -->
+    <div id="top-bar">
+      <div id="app-identity">
+        <!-- Surface vessel icon -->
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M13 2 L19 9 L18 22 Q13 25 8 22 L7 9 Z"
+                style="fill:var(--instrument-enhanced-primary-color);stroke:var(--border-outline-color);stroke-width:1"
+                stroke-linejoin="round"/>
+          <line x1="13" y1="5" x2="13" y2="18"
+                style="stroke:var(--container-global-color)" stroke-width="0.9" opacity="0.6"/>
+          <rect x="10" y="13" width="6" height="5" rx="1"
+                style="fill:var(--container-backdrop-color)" opacity="0.75"/>
+        </svg>
+        <div>
+          <div id="app-title">ghost-drone</div>
+          <div id="app-subtitle">Surface Vessel Simulator</div>
+        </div>
+      </div>
+
+      <div id="top-bar-spacer"></div>
+
+      <div id="sim-status-badge">
+        <div id="sim-status-dot"></div>
+        <span id="sim-status-text">Running</span>
+      </div>
+
+      <div id="top-bar-right">
+        <span id="top-bar-clock"></span>
+
+        <select id="theme-select" title="Display theme">
+          <option value="bright">Bright</option>
+          <option value="day">Day</option>
+          <option value="dusk" selected>Dusk</option>
+          <option value="night">Night</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- ================================================================
+         Main area: map + telemetry sidebar
+         ================================================================ -->
     <div id="main-area">
       <div id="map"></div>
 
       <div id="telemetry-sidebar">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <span style="color:#e0e0e0;font-size:13px;font-weight:bold">Telemetry</span>
-          <button id="btn-settings" class="ctrl-btn" style="padding:4px 10px;font-size:12px">Settings</button>
+        <div class="sidebar-header">
+          <span class="sidebar-label">Telemetry</span>
         </div>
 
         <div class="gauge-block">
-          <div class="gauge-label">Heading (&deg;)</div>
-          <div class="gauge-value" id="gauge-heading">0.0</div>
-          <svg id="spark-heading" class="sparkline-svg" width="196" height="36" stroke-width="1.5"></svg>
+          <div class="gauge-tag">HDG</div>
+          <div class="gauge-row">
+            <span class="gauge-value" id="gauge-heading">&mdash;</span>
+            <span class="gauge-unit">&deg;</span>
+          </div>
+          <svg id="spark-heading" class="sparkline-svg" width="196" height="32" stroke-width="1.5"></svg>
         </div>
+
         <div class="gauge-block">
-          <div class="gauge-label">Speed (kn)</div>
-          <div class="gauge-value" id="gauge-speed">0.0</div>
-          <svg id="spark-speed" class="sparkline-svg" width="196" height="36" stroke-width="1.5"></svg>
+          <div class="gauge-tag">SOG</div>
+          <div class="gauge-row">
+            <span class="gauge-value" id="gauge-speed">&mdash;</span>
+            <span class="gauge-unit">kn</span>
+          </div>
+          <svg id="spark-speed" class="sparkline-svg" width="196" height="32" stroke-width="1.5"></svg>
         </div>
+
         <div class="gauge-block">
-          <div class="gauge-label">Roll (&deg;)</div>
-          <div class="gauge-value" id="gauge-roll">0.0</div>
-          <svg id="spark-roll" class="sparkline-svg" width="196" height="36" stroke-width="1.5"></svg>
+          <div class="gauge-tag">ROLL</div>
+          <div class="gauge-row">
+            <span class="gauge-value" id="gauge-roll">&mdash;</span>
+            <span class="gauge-unit">&deg;</span>
+          </div>
+          <svg id="spark-roll" class="sparkline-svg" width="196" height="32" stroke-width="1.5"></svg>
         </div>
+
         <div class="gauge-block">
-          <div class="gauge-label">Pitch (&deg;)</div>
-          <div class="gauge-value" id="gauge-pitch">0.0</div>
-          <svg id="spark-pitch" class="sparkline-svg" width="196" height="36" stroke-width="1.5"></svg>
+          <div class="gauge-tag">PITCH</div>
+          <div class="gauge-row">
+            <span class="gauge-value" id="gauge-pitch">&mdash;</span>
+            <span class="gauge-unit">&deg;</span>
+          </div>
+          <svg id="spark-pitch" class="sparkline-svg" width="196" height="32" stroke-width="1.5"></svg>
         </div>
       </div>
     </div>
 
+    <!-- ================================================================
+         Bottom control bar
+         ================================================================ -->
     <div id="bottom-bar">
-      <button id="btn-draw" class="ctrl-btn">Draw Mode</button>
-      <div style="width:1px;height:28px;background:#444"></div>
-      <button id="btn-play" class="ctrl-btn">Play</button>
-      <button id="btn-pause" class="ctrl-btn">Pause</button>
-      <button id="btn-stop" class="ctrl-btn">Stop</button>
-      <div style="width:1px;height:28px;background:#444"></div>
-      <label style="color:#ccc;font-size:13px">Speed (m/s)
+      <button class="ctrl-btn" id="btn-draw">Draw Route</button>
+
+      <div class="bar-divider"></div>
+
+      <button class="ctrl-btn raised" id="btn-play">&#9654; Play</button>
+      <button class="ctrl-btn" id="btn-pause">&#9646;&#9646; Pause</button>
+      <button class="ctrl-btn" id="btn-stop">&#9632; Stop</button>
+
+      <div class="bar-divider"></div>
+
+      <label class="speed-label">
+        Speed (m/s)
         <input id="speed-input" type="number" value="10" min="1" max="100" step="1">
       </label>
-      <div style="flex:1"></div>
-      <button id="btn-clear" class="ctrl-btn">Clear</button>
+
+      <div class="bar-spacer"></div>
+
+      <button class="ctrl-btn flat" id="btn-settings">&#9881; Settings</button>
+      <button class="ctrl-btn flat" id="btn-clear">Clear</button>
     </div>
   </div>
 
-  <!-- Settings modal (outside #app-wrapper so it overlays everything) -->
-  <div id="settings-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center">
-    <div id="settings-modal" style="background:#1a1a2e;border:1px solid #555;border-radius:8px;padding:20px;width:420px;max-height:80vh;overflow-y:auto;color:#e0e0e0;font-size:13px">
-      <h3 style="margin:0 0 14px;font-size:15px">Simulation Settings</h3>
+  <!-- ==================================================================
+       Settings modal
+       ================================================================== -->
+  <div id="settings-overlay">
+    <div id="settings-modal">
+      <div class="modal-title">Simulation Settings</div>
 
-      <!-- Per-subject table -->
-      <table style="width:100%;border-collapse:collapse;margin-bottom:16px">
+      <div class="modal-section-title">Telemetry Subjects</div>
+      <table class="settings-table">
         <thead>
-          <tr style="color:#999;font-size:11px;text-align:left">
-            <th style="padding:4px 0">Subject</th>
-            <th style="padding:4px 6px">Rate (Hz)</th>
-            <th style="padding:4px 6px">Source</th>
+          <tr>
+            <th>Subject</th>
+            <th>Rate (Hz)</th>
+            <th>Source</th>
           </tr>
         </thead>
-        <tbody id="subject-rows">
-          <!-- Rows built by JS -->
-        </tbody>
+        <tbody id="subject-rows"></tbody>
       </table>
 
-      <!-- Roll oscillation -->
-      <div style="margin-bottom:10px">
-        <label>Roll amplitude (deg): <span id="lbl-roll-amp">5.0</span>
-          <input type="range" id="sl-roll-amp" min="0.1" max="20" step="0.1" value="5.0" style="width:140px;vertical-align:middle">
-        </label>
+      <div class="modal-section-title">Motion &mdash; Roll</div>
+      <div class="slider-row">
+        <label>Amplitude (deg)</label>
+        <input type="range" id="sl-roll-amp" min="0.1" max="20" step="0.1" value="5.0">
+        <span class="slider-value" id="lbl-roll-amp">5.0</span>
       </div>
-      <div style="margin-bottom:10px">
-        <label>Roll period (s): <span id="lbl-roll-period">10</span>
-          <input type="range" id="sl-roll-period" min="2" max="30" step="1" value="10" style="width:140px;vertical-align:middle">
-        </label>
-      </div>
-      <!-- Pitch oscillation -->
-      <div style="margin-bottom:10px">
-        <label>Pitch amplitude (deg): <span id="lbl-pitch-amp">3.0</span>
-          <input type="range" id="sl-pitch-amp" min="0.1" max="10" step="0.1" value="3.0" style="width:140px;vertical-align:middle">
-        </label>
-      </div>
-      <div style="margin-bottom:10px">
-        <label>Pitch period (s): <span id="lbl-pitch-period">8</span>
-          <input type="range" id="sl-pitch-period" min="2" max="30" step="1" value="8" style="width:140px;vertical-align:middle">
-        </label>
-      </div>
-      <!-- Location noise -->
-      <div style="margin-bottom:16px">
-        <label>Location noise (m): <span id="lbl-loc-noise">0.5</span>
-          <input type="range" id="sl-loc-noise" min="0" max="5" step="0.1" value="0.5" style="width:140px;vertical-align:middle">
-        </label>
+      <div class="slider-row">
+        <label>Period (s)</label>
+        <input type="range" id="sl-roll-period" min="2" max="30" step="1" value="10">
+        <span class="slider-value" id="lbl-roll-period">10</span>
       </div>
 
-      <div style="display:flex;gap:10px;justify-content:flex-end">
-        <button id="btn-settings-save" class="ctrl-btn" style="background:#2ecc71;border-color:#2ecc71;color:#000">Save</button>
-        <button id="btn-settings-close" class="ctrl-btn">Close</button>
+      <div class="modal-section-title">Motion &mdash; Pitch</div>
+      <div class="slider-row">
+        <label>Amplitude (deg)</label>
+        <input type="range" id="sl-pitch-amp" min="0.1" max="10" step="0.1" value="3.0">
+        <span class="slider-value" id="lbl-pitch-amp">3.0</span>
+      </div>
+      <div class="slider-row">
+        <label>Period (s)</label>
+        <input type="range" id="sl-pitch-period" min="2" max="30" step="1" value="8">
+        <span class="slider-value" id="lbl-pitch-period">8</span>
+      </div>
+
+      <div class="modal-section-title">GNSS Noise</div>
+      <div class="slider-row">
+        <label>Location noise (m)</label>
+        <input type="range" id="sl-loc-noise" min="0" max="5" step="0.1" value="0.5">
+        <span class="slider-value" id="lbl-loc-noise">0.5</span>
+      </div>
+
+      <div class="modal-footer">
+        <button class="ctrl-btn flat"   id="btn-settings-close">Close</button>
+        <button class="ctrl-btn raised" id="btn-settings-save">Save</button>
       </div>
     </div>
   </div>
 
-  <script>
-    // Verify sparkline library loaded
-    console.log('sparkline loaded:', typeof sparkline !== 'undefined');
-
-    // ---------------------------------------------------------------------------
-    // Map initialization — centered on Lindholmen, Gothenburg
-    // ---------------------------------------------------------------------------
-    const map = L.map('map', { zoomAnimation: true }).setView([57.7069, 11.9381], 15);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap'
-    }).addTo(map);
-
-    // Geoman — disable all built-in controls; we manage state manually via API
-    map.pm.addControls({
-      position: 'topleft',
-      drawMarker: false,
-      drawCircle: false,
-      drawCircleMarker: false,
-      drawPolygon: false,
-      drawRectangle: false,
-      drawText: false,
-      editMode: false,
-      dragMode: false,
-      cutPolygon: false,
-      removalMode: false,
-      rotateMode: false,
-      drawPolyline: false
-    });
-
-    // ---------------------------------------------------------------------------
-    // State
-    // ---------------------------------------------------------------------------
-    let waypoints = [];       // [{lat, lng}, ...] in sequence order
-    let wpMarkers = [];       // L.marker array (numbered circles)
-    let routeLayer = null;    // L.polyline or null
-    let droneMarker = null;   // L.marker with SVG icon
-    let simState = 'stopped'; // 'stopped' | 'playing' | 'paused'
-    let drawModeActive = false;
-    let ws = null;
-    let isZooming = false;    // suppress panTo during zoom animations
-
-    // ---------------------------------------------------------------------------
-    // Telemetry history and gauge/sparkline elements
-    // ---------------------------------------------------------------------------
-    const HISTORY_SAMPLES = 30 * 20;  // 30 seconds at 20 Hz = 600 samples
-    const history = { heading: [], speed: [], roll: [], pitch: [] };
-    const gaugeEls = {
-      heading: document.getElementById('gauge-heading'),
-      speed:   document.getElementById('gauge-speed'),
-      roll:    document.getElementById('gauge-roll'),
-      pitch:   document.getElementById('gauge-pitch'),
-    };
-    const svgEls = {
-      heading: document.getElementById('spark-heading'),
-      speed:   document.getElementById('spark-speed'),
-      roll:    document.getElementById('spark-roll'),
-      pitch:   document.getElementById('spark-pitch'),
-    };
-
-    // ---------------------------------------------------------------------------
-    // Button references
-    // ---------------------------------------------------------------------------
-    const btnDraw  = document.getElementById('btn-draw');
-    const btnPlay  = document.getElementById('btn-play');
-    const btnPause = document.getElementById('btn-pause');
-    const btnStop  = document.getElementById('btn-stop');
-    const btnClear = document.getElementById('btn-clear');
-    const speedInput = document.getElementById('speed-input');
-
-    // Suppress panTo during zoom to prevent map shake
-    map.on('zoomstart', function() { isZooming = true; });
-    map.on('zoomend',   function() { isZooming = false; });
-
-    // ---------------------------------------------------------------------------
-    // Waypoint icon factory
-    // ---------------------------------------------------------------------------
-    function createWpIcon(number) {
-      return L.divIcon({
-        className: '',
-        html: `<div style="width:24px;height:24px;border-radius:50%;background:#e67e22;
-                           color:#fff;font-weight:bold;font-size:11px;display:flex;
-                           align-items:center;justify-content:center;
-                           border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.5)">${number}</div>`,
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
-      });
-    }
-
-    // ---------------------------------------------------------------------------
-    // Boat / surface vessel icon factory
-    // ---------------------------------------------------------------------------
-    function createDroneIcon(opacity) {
-      if (opacity === undefined) opacity = 1.0;
-      // Top-down view of a surface vessel (boat hull shape with bow indicator)
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-        <!-- boat hull: pointed bow at top, rounded stern at bottom -->
-        <path d="M20,3 L30,14 L28,34 Q20,38 12,34 L10,14 Z"
-              fill="#e67e22" stroke="#333" stroke-width="1.5" stroke-linejoin="round"/>
-        <!-- deck centre line -->
-        <line x1="20" y1="7" x2="20" y2="30" stroke="#fff" stroke-width="1.2" opacity="0.6"/>
-        <!-- bridge / superstructure block -->
-        <rect x="15" y="18" width="10" height="8" rx="2"
-              fill="#333" opacity="0.75"/>
-        <!-- bow tip highlight -->
-        <polygon points="20,3 17,10 23,10" fill="#fff" opacity="0.5"/>
-      </svg>`;
-      return L.divIcon({
-        className: '',
-        html: `<div id="drone-icon-inner" style="width:40px;height:40px;opacity:${opacity};transform-origin:center;transition:opacity 0.3s">${svg}</div>`,
-        iconSize: [40, 40],
-        iconAnchor: [20, 20]
-      });
-    }
-
-    // Create drone marker at map init at default center
-    droneMarker = L.marker([57.7069, 11.9381], {
-      icon: createDroneIcon(0.4),
-      zIndexOffset: 1000
-    }).addTo(map);
-
-    // ---------------------------------------------------------------------------
-    // Drone heading update
-    // ---------------------------------------------------------------------------
-    function setDroneHeading(heading) {
-      const inner = droneMarker.getElement() && droneMarker.getElement().querySelector('#drone-icon-inner');
-      if (inner) inner.style.transform = `rotate(${heading}deg)`;
-    }
-
-    // ---------------------------------------------------------------------------
-    // Route rendering
-    // ---------------------------------------------------------------------------
-    function refreshRoute() {
-      // Remove all existing waypoint markers
-      for (let i = 0; i < wpMarkers.length; i++) {
-        wpMarkers[i].remove();
-      }
-      wpMarkers = [];
-
-      // Remove route polyline
-      if (routeLayer) {
-        routeLayer.remove();
-        routeLayer = null;
-      }
-
-      if (waypoints.length === 0) return;
-
-      // Create numbered markers — draggable only when draw mode is active and sim is stopped
-      const isDraggable = drawModeActive && simState === 'stopped';
-      for (let i = 0; i < waypoints.length; i++) {
-        const wp = waypoints[i];
-        const marker = L.marker([wp.lat, wp.lng], {
-          icon: createWpIcon(i + 1),
-          draggable: isDraggable
-        }).addTo(map);
-
-        // Capture i via IIFE to avoid closure issue
-        (function(idx) {
-          marker.on('dragend', function() {
-            const latlng = marker.getLatLng();
-            waypoints[idx] = { lat: latlng.lat, lng: latlng.lng };
-            refreshRoute();
-            updateControlStates();
-          });
-
-          marker.on('contextmenu', function() {
-            waypoints.splice(idx, 1);
-            refreshRoute();
-            updateControlStates();
-          });
-        })(i);
-
-        wpMarkers.push(marker);
-      }
-
-      // Create polyline connecting all waypoints
-      const latlngs = waypoints.map(function(w) { return [w.lat, w.lng]; });
-      routeLayer = L.polyline(latlngs, {
-        color: '#e67e22',
-        weight: 3,
-        opacity: 0.9
-      }).addTo(map);
-    }
-
-    // ---------------------------------------------------------------------------
-    // Update waypoint marker draggability without full redraw
-    // ---------------------------------------------------------------------------
-    function updateWaypointDraggability() {
-      const isDraggable = drawModeActive && simState === 'stopped';
-      for (let i = 0; i < wpMarkers.length; i++) {
-        if (isDraggable) {
-          wpMarkers[i].dragging.enable();
-        } else {
-          wpMarkers[i].dragging.disable();
-        }
-      }
-    }
-
-    // ---------------------------------------------------------------------------
-    // Draw mode
-    // ---------------------------------------------------------------------------
-    function onMapClick(e) {
-      if (!drawModeActive || simState !== 'stopped') return;
-      waypoints.push({ lat: e.latlng.lat, lng: e.latlng.lng });
-      refreshRoute();
-      updateControlStates();
-    }
-
-    function updateDrawButtonStyle() {
-      if (drawModeActive) {
-        btnDraw.classList.add('active');
-      } else {
-        btnDraw.classList.remove('active');
-      }
-    }
-
-    btnDraw.addEventListener('click', function() {
-      if (simState !== 'stopped') return;
-      drawModeActive = !drawModeActive;
-      updateDrawButtonStyle();
-      if (drawModeActive) {
-        map.on('click', onMapClick);
-      } else {
-        map.off('click', onMapClick);
-      }
-      // Update draggability of existing waypoint markers immediately
-      updateWaypointDraggability();
-    });
-
-    // ---------------------------------------------------------------------------
-    // Control state management
-    // ---------------------------------------------------------------------------
-    function updateControlStates() {
-      const canEdit = simState === 'stopped';
-      // Play is available when stopped with 2+ waypoints OR when paused (to resume)
-      const canPlay = (canEdit && waypoints.length >= 2) || simState === 'paused';
-
-      btnPlay.disabled  = !canPlay;
-      btnPause.disabled = simState !== 'playing';
-      btnStop.disabled  = simState === 'stopped';
-      btnClear.disabled = !canEdit;
-      btnDraw.disabled  = !canEdit;
-
-      // If sim is running and draw mode was active, disable it
-      if (!canEdit && drawModeActive) {
-        drawModeActive = false;
-        map.off('click', onMapClick);
-        updateDrawButtonStyle();
-      }
-
-      // Sync waypoint draggability with current draw mode + sim state
-      updateWaypointDraggability();
-    }
-
-    // ---------------------------------------------------------------------------
-    // Telemetry frame handler
-    // ---------------------------------------------------------------------------
-    function onTelemetryFrame(frame) {
-      if (frame.state === 'stopped') {
-        // Clear all sparkline history and reset gauges
-        for (const k of Object.keys(history)) history[k] = [];
-        for (const k of Object.keys(gaugeEls)) gaugeEls[k].textContent = '0.0';
-        return;
-      }
-      if (frame.state === 'playing') {
-        // Push new values and cap rolling window
-        const values = {
-          heading: frame.heading,
-          speed:   frame.speed * 1.94384,  // m/s -> knots
-          roll:    frame.roll,
-          pitch:   frame.pitch,
-        };
-        for (const key of Object.keys(history)) {
-          history[key].push(values[key]);
-          if (history[key].length > HISTORY_SAMPLES) history[key].shift();
-        }
-        // Update gauge text
-        gaugeEls.heading.textContent = frame.heading.toFixed(1);
-        gaugeEls.speed.textContent   = (frame.speed * 1.94384).toFixed(2);
-        gaugeEls.roll.textContent    = frame.roll.toFixed(2);
-        gaugeEls.pitch.textContent   = frame.pitch.toFixed(2);
-      }
-      // Redraw sparklines (both playing and paused — paused keeps last state)
-      for (const key of Object.keys(svgEls)) {
-        if (history[key].length > 1) {
-          sparkline.sparkline(svgEls[key], history[key]);
-        }
-      }
-    }
-
-    // ---------------------------------------------------------------------------
-    // WebSocket
-    // ---------------------------------------------------------------------------
-    function sendRoute() {
-      if (!ws || ws.readyState !== WebSocket.OPEN) return;
-      ws.send(JSON.stringify({
-        type: 'load_route',
-        waypoints: waypoints.map(function(w) { return [w.lat, w.lng]; })
-      }));
-    }
-
-    function connectWS() {
-      ws = new WebSocket('ws://' + location.host + '/ws');
-
-      ws.onmessage = function(event) {
-        const frame = JSON.parse(event.data);
-        simState = frame.state;
-
-        // Update drone marker position
-        const latlng = L.latLng(frame.lat, frame.lng);
-        droneMarker.setLatLng(latlng);
-
-        // Pan to follow drone only when playing and not in the middle of a zoom
-        if (frame.state === 'playing' && !isZooming) {
-          map.panTo(latlng, { animate: true, duration: 0.1 });
-        }
-
-        // Update heading rotation on inner div
-        setDroneHeading(frame.heading);
-
-        // Update drone opacity
-        const opacity = frame.state === 'playing' ? 1.0 : 0.4;
-        const inner = droneMarker.getElement() && droneMarker.getElement().querySelector('#drone-icon-inner');
-        if (inner) inner.style.opacity = opacity;
-
-        // Sync button states
-        updateControlStates();
-
-        // Update telemetry sidebar
-        onTelemetryFrame(frame);
-      };
-
-      ws.onclose = function() {
-        setTimeout(connectWS, 2000);
-      };
-    }
-
-    // ---------------------------------------------------------------------------
-    // Settings modal
-    // ---------------------------------------------------------------------------
-    const SUBJECTS_LIST = [
-      'location_fix',
-      'heading_true_north_deg',
-      'speed_over_ground_knots',
-      'roll_deg',
-      'pitch_deg',
-    ];
-
-    function buildSubjectRows() {
-      const tbody = document.getElementById('subject-rows');
-      tbody.innerHTML = '';
-      const defaults = {
-        location_fix:            { rate_hz: 1.0, source_id: 'gnss/0' },
-        heading_true_north_deg:  { rate_hz: 1.0, source_id: 'imu/0'  },
-        speed_over_ground_knots: { rate_hz: 1.0, source_id: 'imu/0'  },
-        roll_deg:                { rate_hz: 1.0, source_id: 'imu/0'  },
-        pitch_deg:               { rate_hz: 1.0, source_id: 'imu/0'  },
-      };
-      for (const subj of SUBJECTS_LIST) {
-        const d = defaults[subj];
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td style="padding:4px 0;color:#ccc;font-size:11px">${subj}</td>
-          <td style="padding:4px 6px"><input type="number" data-subj="${subj}" data-field="rate_hz"
-              value="${d.rate_hz}" min="0.1" max="10" step="0.1"
-              style="width:58px;background:#2d2d44;color:#e0e0e0;border:1px solid #555;border-radius:3px;padding:2px 4px;font-size:12px"></td>
-          <td style="padding:4px 6px"><input type="text" data-subj="${subj}" data-field="source_id"
-              value="${d.source_id}"
-              style="width:80px;background:#2d2d44;color:#e0e0e0;border:1px solid #555;border-radius:3px;padding:2px 4px;font-size:12px"></td>
-        `;
-        tbody.appendChild(tr);
-      }
-    }
-
-    // Slider live-label updates
-    for (const [id, lblId] of [['sl-roll-amp','lbl-roll-amp'],['sl-roll-period','lbl-roll-period'],['sl-pitch-amp','lbl-pitch-amp'],['sl-pitch-period','lbl-pitch-period'],['sl-loc-noise','lbl-loc-noise']]) {
-      document.getElementById(id).addEventListener('input', function() {
-        document.getElementById(lblId).textContent = this.value;
-      });
-    }
-
-    // Open/close modal
-    document.getElementById('btn-settings').addEventListener('click', function() {
-      document.getElementById('settings-overlay').style.display = 'flex';
-    });
-    document.getElementById('btn-settings-close').addEventListener('click', function() {
-      document.getElementById('settings-overlay').style.display = 'none';
-    });
-    document.getElementById('settings-overlay').addEventListener('click', function(e) {
-      if (e.target === this) this.style.display = 'none';
-    });
-
-    // Save button — build and send update_settings message
-    document.getElementById('btn-settings-save').addEventListener('click', function() {
-      if (!ws || ws.readyState !== WebSocket.OPEN) return;
-      const subjectsPayload = {};
-      for (const inp of document.querySelectorAll('#subject-rows input')) {
-        const subj = inp.dataset.subj;
-        const field = inp.dataset.field;
-        if (!subjectsPayload[subj]) subjectsPayload[subj] = {};
-        subjectsPayload[subj][field] = field === 'rate_hz' ? parseFloat(inp.value) : inp.value;
-      }
-      ws.send(JSON.stringify({
-        type: 'update_settings',
-        subjects: subjectsPayload,
-        roll_amplitude_deg:     parseFloat(document.getElementById('sl-roll-amp').value),
-        roll_period_s:          parseFloat(document.getElementById('sl-roll-period').value),
-        pitch_amplitude_deg:    parseFloat(document.getElementById('sl-pitch-amp').value),
-        pitch_period_s:         parseFloat(document.getElementById('sl-pitch-period').value),
-        location_noise_sigma_m: parseFloat(document.getElementById('sl-loc-noise').value),
-      }));
-      document.getElementById('settings-overlay').style.display = 'none';
-    });
-
-    // ---------------------------------------------------------------------------
-    // Button event handlers
-    // ---------------------------------------------------------------------------
-    btnPlay.addEventListener('click', function() {
-      if (waypoints.length < 2) return;
-      // Only send route on fresh play (not resume from pause)
-      if (simState === 'stopped') {
-        sendRoute();
-      }
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ type: 'play' }));
-      }
-    });
-
-    btnPause.addEventListener('click', function() {
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ type: 'pause' }));
-      }
-    });
-
-    btnStop.addEventListener('click', function() {
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ type: 'stop' }));
-      }
-    });
-
-    btnClear.addEventListener('click', function() {
-      if (simState !== 'stopped') return;
-      waypoints = [];
-      for (let i = 0; i < wpMarkers.length; i++) {
-        wpMarkers[i].remove();
-      }
-      wpMarkers = [];
-      if (routeLayer) {
-        routeLayer.remove();
-        routeLayer = null;
-      }
-      updateControlStates();
-    });
-
-    speedInput.addEventListener('change', function() {
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ type: 'set_speed', value: parseFloat(speedInput.value) }));
-      }
-    });
-
-    // ---------------------------------------------------------------------------
-    // Init
-    // ---------------------------------------------------------------------------
-    document.addEventListener('DOMContentLoaded', function() {
-      connectWS();
-      updateControlStates();
-      buildSubjectRows();
-    });
-  </script>
 </body>
 </html>

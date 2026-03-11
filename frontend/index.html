@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en" data-obc-theme="dusk" class="obc-component-size-regular">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ghost-drone</title>
+
+  <!-- OpenBridge design tokens — all 4 themes, sizing tokens, typography -->
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@oicl/openbridge-webcomponents@0.0.17/src/palettes/variables.css">
+
+  <style>
+    /* Noto Sans — served from the OB package so it always matches */
+    @font-face {
+      font-family: 'Noto Sans';
+      src: url('https://cdn.jsdelivr.net/npm/@oicl/openbridge-webcomponents@0.0.17/dist/NotoSans.ttf')
+           format('truetype');
+    }
+
+    /* =====================================================================
+       Supplemental CSS variables — instrument and overlay colours that are
+       not included in the OB base variables.css but required by this app.
+       One block per theme, matching the OB token naming convention.
+       ===================================================================== */
+    :root,
+    [data-obc-theme="dusk"] {
+      --container-overlay-color:          rgba(0, 0, 0, 0.72);
+      --instrument-enhanced-primary-color: rgb(90, 132, 191);   /* = --data-categorical-01 */
+      --instrument-port-primary-color:    rgb(165, 90, 106);
+      --instrument-starboard-primary-color: rgb(0, 128, 95);
+      --shadow-overlay: 0 8px 32px rgba(0, 0, 0, 0.72);
+    }
+
+    [data-obc-theme="night"] {
+      --container-overlay-color:          rgba(0, 0, 0, 0.90);
+      --instrument-enhanced-primary-color: rgb(200, 148, 0);
+      --instrument-port-primary-color:    rgb(120, 40, 52);
+      --instrument-starboard-primary-color: rgb(0, 82, 58);
+      --shadow-overlay: 0 8px 32px rgba(0, 0, 0, 0.90);
+    }
+
+    [data-obc-theme="day"] {
+      --container-overlay-color:          rgba(80, 80, 90, 0.50);
+      --instrument-enhanced-primary-color: rgb(0, 56, 158);
+      --instrument-port-primary-color:    rgb(165, 90, 106);
+      --instrument-starboard-primary-color: rgb(0, 128, 95);
+      --shadow-overlay: 0 8px 32px rgba(0, 0, 0, 0.38);
+    }
+
+    [data-obc-theme="bright"] {
+      --container-overlay-color:          rgba(60, 62, 70, 0.45);
+      --instrument-enhanced-primary-color: rgb(0, 46, 148);
+      --instrument-port-primary-color:    rgb(165, 90, 106);
+      --instrument-starboard-primary-color: rgb(0, 128, 95);
+      --shadow-overlay: 0 8px 32px rgba(0, 0, 0, 0.32);
+    }
+
+    /* =====================================================================
+       Base reset
+       ===================================================================== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      height: 100vh;
+      overflow: hidden;
+      font-family: 'Noto Sans', sans-serif;
+      font-size: 13px;
+      background-color: var(--container-backdrop-color);
+      color: var(--element-active-color);
+    }
+
+    /* =====================================================================
+       App shell
+       ===================================================================== */
+    #app-wrapper {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* =====================================================================
+       Top bar
+       ===================================================================== */
+    #top-bar {
+      height: 52px;
+      background: var(--container-global-color);
+      border-bottom: 1px solid var(--border-outline-color);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 12px;
+      flex-shrink: 0;
+      z-index: 200;
+    }
+
+    #app-identity {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #app-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--element-active-color);
+      letter-spacing: 0.02em;
+      user-select: none;
+    }
+
+    #app-subtitle {
+      font-size: 11px;
+      color: var(--element-inactive-color);
+      letter-spacing: 0.03em;
+      user-select: none;
+    }
+
+    #top-bar-clock {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--element-neutral-color);
+      letter-spacing: 0.04em;
+      font-variant-numeric: tabular-nums;
+      min-width: 52px;
+    }
+
+    #top-bar-spacer { flex: 1; }
+
+    #top-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Theme selector — OB normal button style */
+    #theme-select {
+      background: var(--normal-enabled-background-color);
+      color: var(--on-normal-active-color);
+      border: 1px solid var(--normal-enabled-border-color, var(--border-outline-color));
+      border-radius: 4px;
+      padding: 5px 8px;
+      font-size: 12px;
+      font-family: 'Noto Sans', sans-serif;
+      cursor: pointer;
+      outline: none;
+    }
+
+    #theme-select:hover { background: var(--normal-hover-background-color); }
+    #theme-select:focus { border-color: var(--border-focus-color); }
+
+    #main-area {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    #map { flex: 1; }
+
+    /* =====================================================================
+       Running-status badge (top bar, centre-right)
+       ===================================================================== */
+    #sim-status-badge {
+      display: none;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--alert-running-color);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0 12px 0 4px;
+    }
+
+    #sim-status-badge.visible { display: flex; }
+    #sim-status-badge.paused  { color: var(--alert-caution-color); }
+
+    #sim-status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: statusPulse 1.4s ease-in-out infinite;
+    }
+
+    #sim-status-badge.paused #sim-status-dot { animation: none; }
+
+    @keyframes statusPulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    /* =====================================================================
+       Telemetry sidebar
+       ===================================================================== */
+    #telemetry-sidebar {
+      width: 220px;
+      background: var(--container-section-color);
+      border-left: 1px solid var(--border-outline-color);
+      overflow-y: auto;
+      padding: 10px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .sidebar-header {
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-divider-color);
+      margin-bottom: 2px;
+    }
+
+    .sidebar-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--element-inactive-color);
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
+    }
+
+    /* Instrument-style gauge block */
+    .gauge-block {
+      background: var(--container-background-color);
+      border: 1px solid var(--border-outline-color);
+      border-radius: 4px;
+      padding: 8px 10px 6px;
+    }
+
+    .gauge-tag {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--element-inactive-color);
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      margin-bottom: 1px;
+    }
+
+    .gauge-row {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      margin-bottom: 5px;
+    }
+
+    .gauge-value {
+      color: var(--instrument-enhanced-primary-color);
+      font-size: 22px;
+      font-weight: 600;
+      font-family: 'Noto Sans', sans-serif;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      min-width: 60px;
+    }
+
+    .gauge-unit {
+      color: var(--element-inactive-color);
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .sparkline-svg { display: block; width: 100%; }
+
+    /* =====================================================================
+       Bottom control bar
+       ===================================================================== */
+    #bottom-bar {
+      height: 52px;
+      background: var(--container-section-color);
+      border-top: 1px solid var(--border-outline-color);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0 12px;
+      flex-shrink: 0;
+    }
+
+    .bar-divider {
+      width: 1px;
+      height: 28px;
+      background: var(--border-divider-color);
+      flex-shrink: 0;
+      margin: 0 4px;
+    }
+
+    .bar-spacer { flex: 1; }
+
+    /* Native buttons styled with OB CSS variables — reliable event handling,
+       no shadow DOM, identical visual result to obc-button */
+    .ctrl-btn {
+      background: var(--normal-enabled-background-color);
+      color: var(--on-normal-active-color);
+      border: 1px solid var(--normal-enabled-border-color, var(--border-outline-color));
+      border-radius: 4px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 12px;
+      font-family: 'Noto Sans', sans-serif;
+      font-weight: 500;
+      line-height: 1;
+      white-space: nowrap;
+      outline: none;
+      transition: background 0.08s ease;
+    }
+
+    .ctrl-btn:disabled {
+      opacity: 0.32;
+      cursor: not-allowed;
+    }
+
+    .ctrl-btn:not(:disabled):hover   { background: var(--normal-hover-background-color); }
+    .ctrl-btn:not(:disabled):active  { background: var(--normal-pressed-background-color); }
+    .ctrl-btn:focus-visible          { outline: 2px solid var(--border-focus-color); outline-offset: 1px; }
+
+    /* variant="check" active state */
+    .ctrl-btn.active {
+      background: var(--selected-enabled-background-color);
+      color: var(--on-selected-active-color);
+      border-color: var(--selected-enabled-background-color);
+    }
+    .ctrl-btn.active:not(:disabled):hover {
+      background: var(--selected-hover-background-color);
+      border-color: var(--selected-hover-background-color);
+    }
+
+    /* variant="raised" */
+    .ctrl-btn.raised {
+      background: var(--raised-enabled-background-color);
+      color: var(--on-raised-active-color);
+      border-color: var(--raised-enabled-border-color, var(--border-outline-color));
+    }
+    .ctrl-btn.raised:not(:disabled):hover { background: var(--raised-hover-background-color); }
+
+    /* variant="flat" */
+    .ctrl-btn.flat {
+      background: transparent;
+      border-color: transparent;
+    }
+    .ctrl-btn.flat:not(:disabled):hover  { background: var(--flat-hover-background-color); }
+    .ctrl-btn.flat:not(:disabled):active { background: var(--flat-pressed-background-color); }
+
+    .speed-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--element-neutral-color);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    #speed-input {
+      width: 58px;
+      background: var(--normal-enabled-background-color);
+      color: var(--on-normal-active-color);
+      border: 1px solid var(--normal-enabled-border-color, var(--border-outline-color));
+      border-radius: 4px;
+      padding: 4px 6px;
+      font-size: 12px;
+      font-family: 'Noto Sans', sans-serif;
+      text-align: right;
+      outline: none;
+    }
+
+    #speed-input:focus { border-color: var(--border-focus-color); }
+
+    /* =====================================================================
+       Settings modal
+       ===================================================================== */
+    #settings-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--container-overlay-color);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #settings-modal {
+      background: var(--container-background-color);
+      border: 1px solid var(--border-outline-color);
+      border-radius: 8px;
+      padding: 20px;
+      width: 440px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-overlay);
+    }
+
+    .modal-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--element-active-color);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border-divider-color);
+    }
+
+    .modal-section-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--element-inactive-color);
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      margin-bottom: 8px;
+      margin-top: 16px;
+    }
+
+    .modal-section-title:first-of-type { margin-top: 0; }
+
+    .settings-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 4px;
+    }
+
+    .settings-table th {
+      color: var(--element-inactive-color);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      text-align: left;
+      padding: 0 4px 6px;
+      border-bottom: 1px solid var(--border-divider-color);
+    }
+
+    .settings-table td {
+      padding: 5px 4px;
+      color: var(--element-neutral-color);
+      font-size: 11px;
+      border-bottom: 1px solid var(--border-divider-color);
+    }
+
+    .settings-table tr:last-child td { border-bottom: none; }
+
+    .settings-input {
+      background: var(--normal-enabled-background-color);
+      color: var(--on-normal-active-color);
+      border: 1px solid var(--normal-enabled-border-color, var(--border-outline-color));
+      border-radius: 3px;
+      padding: 3px 5px;
+      font-size: 12px;
+      font-family: 'Noto Sans', sans-serif;
+      outline: none;
+    }
+
+    .settings-input:focus { border-color: var(--border-focus-color); }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .slider-row label {
+      color: var(--element-neutral-color);
+      font-size: 12px;
+      flex: 1;
+    }
+
+    .slider-row input[type="range"] {
+      flex: 0 0 120px;
+      accent-color: var(--instrument-enhanced-primary-color);
+    }
+
+    .slider-value {
+      color: var(--element-active-color);
+      font-size: 12px;
+      font-weight: 600;
+      min-width: 34px;
+      text-align: right;
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      padding-top: 14px;
+      margin-top: 4px;
+      border-top: 1px solid var(--border-divider-color);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app-wrapper">
+
+    <!-- ================================================================
+         Top bar — native HTML, styled with OB CSS tokens
+         ================================================================ -->
+    <div id="top-bar">
+      <div id="app-identity">
+        <!-- Surface vessel icon -->
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M13 2 L19 9 L18 22 Q13 25 8 22 L7 9 Z"
+                style="fill:var(--instrument-enhanced-primary-color);stroke:var(--border-outline-color);stroke-width:1"
+                stroke-linejoin="round"/>
+          <line x1="13" y1="5" x2="13" y2="18"
+                style="stroke:var(--container-global-color)" stroke-width="0.9" opacity="0.6"/>
+          <rect x="10" y="13" width="6" height="5" rx="1"
+                style="fill:var(--container-backdrop-color)" opacity="0.75"/>
+        </svg>
+        <div>
+          <div id="app-title">ghost-drone</div>
+          <div id="app-subtitle">Surface Vessel Simulator</div>
+        </div>
+      </div>
+
+      <div id="top-bar-spacer"></div>
+
+      <div id="sim-status-badge">
+        <div id="sim-status-dot"></div>
+        <span id="sim-status-text">Running</span>
+      </div>
+
+      <div id="top-bar-right">
+        <span id="top-bar-clock"></span>
+
+        <select id="theme-select" title="Display theme">
+          <option value="bright">Bright</option>
+          <option value="day">Day</option>
+          <option value="dusk" selected>Dusk</option>
+          <option value="night">Night</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- ================================================================
+         Main area: map + telemetry sidebar
+         ================================================================ -->
+    <div id="main-area">
+      <div id="map"></div>
+
+      <div id="telemetry-sidebar">
+        <div class="sidebar-header">
+          <span class="sidebar-label">Telemetry</span>
+        </div>
+
+        <div class="gauge-block">
+          <div class="gauge-tag">HDG</div>
+          <div class="gauge-row">
+            <span class="gauge-value" id="gauge-heading">&mdash;</span>
+            <span class="gauge-unit">&deg;</span>
+          </div>
+          <svg id="spark-heading" class="sparkline-svg" width="196" height="32" stroke-width="1.5"></svg>
+        </div>
+
+        <div class="gauge-block">
+          <div class="gauge-tag">SOG</div>
+          <div class="gauge-row">
+            <span class="gauge-value" id="gauge-speed">&mdash;</span>
+            <span class="gauge-unit">kn</span>
+          </div>
+          <svg id="spark-speed" class="sparkline-svg" width="196" height="32" stroke-width="1.5"></svg>
+        </div>
+
+        <div class="gauge-block">
+          <div class="gauge-tag">ROLL</div>
+          <div class="gauge-row">
+            <span class="gauge-value" id="gauge-roll">&mdash;</span>
+            <span class="gauge-unit">&deg;</span>
+          </div>
+          <svg id="spark-roll" class="sparkline-svg" width="196" height="32" stroke-width="1.5"></svg>
+        </div>
+
+        <div class="gauge-block">
+          <div class="gauge-tag">PITCH</div>
+          <div class="gauge-row">
+            <span class="gauge-value" id="gauge-pitch">&mdash;</span>
+            <span class="gauge-unit">&deg;</span>
+          </div>
+          <svg id="spark-pitch" class="sparkline-svg" width="196" height="32" stroke-width="1.5"></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================================
+         Bottom control bar
+         ================================================================ -->
+    <div id="bottom-bar">
+      <button class="ctrl-btn" id="btn-draw">Draw Route</button>
+
+      <div class="bar-divider"></div>
+
+      <button class="ctrl-btn raised" id="btn-play">&#9654; Play</button>
+      <button class="ctrl-btn" id="btn-pause">&#9646;&#9646; Pause</button>
+      <button class="ctrl-btn" id="btn-stop">&#9632; Stop</button>
+
+      <div class="bar-divider"></div>
+
+      <label class="speed-label">
+        Speed (m/s)
+        <input id="speed-input" type="number" value="10" min="1" max="100" step="1">
+      </label>
+
+      <div class="bar-spacer"></div>
+
+      <button class="ctrl-btn flat" id="btn-settings">&#9881; Settings</button>
+      <button class="ctrl-btn flat" id="btn-clear">Clear</button>
+    </div>
+  </div>
+
+  <!-- ==================================================================
+       Settings modal
+       ================================================================== -->
+  <div id="settings-overlay">
+    <div id="settings-modal">
+      <div class="modal-title">Simulation Settings</div>
+
+      <div class="modal-section-title">Telemetry Subjects</div>
+      <table class="settings-table">
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th>Rate (Hz)</th>
+            <th>Source</th>
+          </tr>
+        </thead>
+        <tbody id="subject-rows"></tbody>
+      </table>
+
+      <div class="modal-section-title">Motion &mdash; Roll</div>
+      <div class="slider-row">
+        <label>Amplitude (deg)</label>
+        <input type="range" id="sl-roll-amp" min="0.1" max="20" step="0.1" value="5.0">
+        <span class="slider-value" id="lbl-roll-amp">5.0</span>
+      </div>
+      <div class="slider-row">
+        <label>Period (s)</label>
+        <input type="range" id="sl-roll-period" min="2" max="30" step="1" value="10">
+        <span class="slider-value" id="lbl-roll-period">10</span>
+      </div>
+
+      <div class="modal-section-title">Motion &mdash; Pitch</div>
+      <div class="slider-row">
+        <label>Amplitude (deg)</label>
+        <input type="range" id="sl-pitch-amp" min="0.1" max="10" step="0.1" value="3.0">
+        <span class="slider-value" id="lbl-pitch-amp">3.0</span>
+      </div>
+      <div class="slider-row">
+        <label>Period (s)</label>
+        <input type="range" id="sl-pitch-period" min="2" max="30" step="1" value="8">
+        <span class="slider-value" id="lbl-pitch-period">8</span>
+      </div>
+
+      <div class="modal-section-title">GNSS Noise</div>
+      <div class="slider-row">
+        <label>Location noise (m)</label>
+        <input type="range" id="sl-loc-noise" min="0" max="5" step="0.1" value="0.5">
+        <span class="slider-value" id="lbl-loc-noise">0.5</span>
+      </div>
+
+      <div class="modal-footer">
+        <button class="ctrl-btn flat"   id="btn-settings-close">Close</button>
+        <button class="ctrl-btn raised" id="btn-settings-save">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

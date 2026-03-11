@@ -84,17 +84,14 @@ RUN ARCH=$(dpkg --print-architecture) && \
 
 # Install zenoh router and bridge-remote-api
 ARG ZENOH_VERSION=1.7.2
-RUN ARCH=$(dpkg --print-architecture) && \
-  if [ "$ARCH" = "amd64" ]; then RUST_ARCH="x86_64-unknown-linux-gnu"; \
-  elif [ "$ARCH" = "arm64" ]; then RUST_ARCH="aarch64-unknown-linux-gnu"; \
-  else echo "Unsupported architecture: $ARCH" && exit 1; fi && \
-  wget -q "https://github.com/eclipse-zenoh/zenoh/releases/download/${ZENOH_VERSION}/zenoh-${ZENOH_VERSION}-${RUST_ARCH}-debian.zip" -O /tmp/zenoh.zip && \
-  wget -q "https://github.com/eclipse-zenoh/zenoh-ts/releases/download/${ZENOH_VERSION}/zenoh-ts-${ZENOH_VERSION}-${RUST_ARCH}-debian.zip" -O /tmp/zenoh-ts.zip && \
-  unzip -o /tmp/zenoh.zip -d /tmp/zenoh-debs && \
-  unzip -o /tmp/zenoh-ts.zip -d /tmp/zenoh-ts-debs && \
-  dpkg -i /tmp/zenoh-debs/zenohd_*.deb && \
-  dpkg -i /tmp/zenoh-ts-debs/zenoh-bridge-remote-api_*.deb && \
-  rm -rf /tmp/zenoh.zip /tmp/zenoh-ts.zip /tmp/zenoh-debs /tmp/zenoh-ts-debs
+
+RUN wget -q https://github.com/eclipse-zenoh/zenoh/releases/download/${ZENOH_VERSION}/zenoh-${ZENOH_VERSION}-x86_64-unknown-linux-gnu-standalone.zip -O /tmp/zenoh.zip && \
+    unzip /tmp/zenoh.zip -d /usr/local/bin && \
+    rm /tmp/zenoh.zip
+
+RUN wget -q https://github.com/eclipse-zenoh/zenoh-ts/releases/download/${ZENOH_VERSION}/zenoh-ts-${ZENOH_VERSION}-x86_64-unknown-linux-gnu-standalone.zip -O /tmp/zenoh-ts.zip && \
+  unzip /tmp/zenoh-ts.zip -d /usr/local/bin && \
+  rm /tmp/zenoh-ts.zip
 
 # Set up non-root user
 USER node
@@ -128,11 +125,15 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
     /home/node/.local/bin/uv tool install black && \
     /home/node/.local/bin/uv tool install pgcli 
 
-# Install Playwright in a dedicated venv
-RUN python3 -m venv /home/node/.playwright-venv && \
-    /home/node/.playwright-venv/bin/pip install --no-cache-dir playwright && \
-    /home/node/.playwright-venv/bin/playwright install chromium && \
-    /home/node/.playwright-venv/bin/playwright install firefox
+# # Install Playwright in a dedicated venv
+# RUN python3 -m venv /home/node/.playwright-venv && \
+#     /home/node/.playwright-venv/bin/pip install --no-cache-dir playwright && \
+#     /home/node/.playwright-venv/bin/playwright install chromium && \
+#     /home/node/.playwright-venv/bin/playwright install firefox
+
+# Install agent-browser
+RUN npm install -g agent-browser
+RUN agent-browser install 
 
 # Add uv, Python tools, and Playwright to PATH
 ENV PATH="/home/node/.cargo/bin:/home/node/.local/bin:/home/node/.playwright-venv/bin:$PATH"

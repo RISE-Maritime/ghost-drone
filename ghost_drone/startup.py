@@ -15,11 +15,16 @@ import keelson
 import zenoh
 
 from ghost_drone.config import AppConfig
+from ghost_drone.proto import register_custom_subjects
 
-# Phase 1 subjects — expand as new phases add publishing.
-# These are checked against the keelson subject registry at startup.
+# Register ghost-drone custom protobuf subjects with keelson
+# so that entity_health is recognised as a well-known subject.
+register_custom_subjects()
+
+# Subjects checked against the keelson subject registry at startup.
 PHASE_SUBJECTS = [
-    "heading_true_north_deg",  # used in the round-trip test helper (Plan 02)
+    "heading_true_north_deg",
+    "entity_health",
 ]
 
 
@@ -38,9 +43,11 @@ def probe_zenoh(endpoint: str) -> None:
         f'"transport": {{"unicast": {{"open_timeout": 3000}}}}}}'
     )
     try:
+        print(f"Connecting to zenoh router at {endpoint} ...")
         conf = zenoh.Config.from_json5(conf_str)
         with zenoh.open(conf):
             pass  # Session opened successfully; close immediately
+        print(f"Connected to zenoh router at {endpoint}")
     except Exception as e:
         sys.exit(
             f"ERROR: Cannot reach zenoh endpoint '{endpoint}'\n"
@@ -50,7 +57,7 @@ def probe_zenoh(endpoint: str) -> None:
         )
 
 
-def print_startup_banner(cfg: AppConfig, host: str, port: int) -> None:
+def print_startup_banner(cfg: AppConfig) -> None:
     """
     Print a 60-character bordered startup banner showing loaded configuration.
 
@@ -58,9 +65,6 @@ def print_startup_banner(cfg: AppConfig, host: str, port: int) -> None:
     a WARNINGS block is included inside the banner. The process continues
     regardless — this is a warning-only path (not a hard exit).
     """
-    display_host = "127.0.0.1" if host == "0.0.0.0" else host
-    url = f"http://{display_host}:{port}"
-
     unknown_subjects = [
         s for s in PHASE_SUBJECTS if not keelson.is_subject_well_known(s)
     ]
@@ -71,7 +75,6 @@ def print_startup_banner(cfg: AppConfig, host: str, port: int) -> None:
     print(f"  Zenoh endpoint : {cfg.zenoh_endpoint}")
     print(f"  Realm          : {cfg.keelson_realm}")
     print(f"  Entity ID      : {cfg.entity_id}")
-    print(f"  Server URL     : {url}")
 
     if unknown_subjects:
         print()

@@ -26,7 +26,7 @@ cp ghost_drone.toml.example ghost_drone.toml
 Edit `ghost_drone.toml`:
 
 ```toml
-zenoh_endpoint = "tcp/127.0.0.1:7447"  # your zenoh router address
+zenoh_endpoint = "tcp/host.docker.internal:7447"  # your zenoh router address
 keelson_realm = "ghost-drone"           # realm name
 entity_id = "sim001"                    # unique drone identity
 ```
@@ -34,25 +34,23 @@ entity_id = "sim001"                    # unique drone identity
 ## Run
 
 1. Start zenohd and zenoh-bridge-remote-api (default port 10001)
-2. Run the server:
+2. Start the simulator:
 
 ```bash
+# Terminal 1: Start the simulator
 uv run ghost-drone
+
+# Terminal 2: Serve the frontend
+cd frontend && npm run build
+cd ../static && python3 -m http.server 8000
 ```
 
-The server starts on `http://localhost:8000` and opens the browser automatically.
+The simulator connects to zenoh and publishes telemetry — it has no built-in web server. Serve the frontend separately using any static file server.
 
 The frontend connects to the zenoh-bridge-remote-api at `ws://localhost:10001` by default. Override via URL parameters:
 
 ```
 http://localhost:8000?remote_api=ws://otherhost:10001&realm=my-realm&entity_id=drone42
-```
-
-### Options
-
-```
---host HOST    Bind host (default: 0.0.0.0)
---port PORT    Bind port (default: 8000)
 ```
 
 ## Architecture

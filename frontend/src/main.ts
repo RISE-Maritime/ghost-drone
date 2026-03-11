@@ -13,8 +13,8 @@ import type { SimFrame, SettingsPayload } from "./types";
 
 // --- Parse config from URL params or use defaults ---
 const params = new URLSearchParams(window.location.search);
-const realm = params.get("realm") ?? "ghost-drone";
-const entityId = params.get("entity_id") ?? "sim001";
+const realm = params.get("realm") ?? "rise";
+const entityId = params.get("entity_id") ?? "ghost-drone";
 const wsHost = ["localhost", "127.0.0.1"].includes(window.location.hostname)
   ? "localhost"
   : window.location.hostname;

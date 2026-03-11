@@ -1,0 +1,90 @@
+"""
+ghost_drone/sim_state.py
+
+Global simulation state container. Holds the single SimEngine instance and
+all publish-related configuration that was previously per-WebSocket-connection.
+
+Thread safety: control commands arrive on the zenoh daemon thread; the tick
+loop runs on asyncio. SimEngine methods do simple attribute assignments
+protected by the GIL. Adequate for single-operator tool.
+"""
+
+import dataclasses
+from typing import Dict
+
+from ghost_drone.simulation.engine import SimEngine
+from ghost_drone.simulation.roll_pitch import RollPitchModel
+from ghost_drone.zenoh_bridge.telemetry import SubjectThrottle
+
+
+@dataclasses.dataclass
+class SubjectConfig:
+    rate_hz: float = 1.0
+    source_id: str = "imu/0"
+
+
+@dataclasses.dataclass
+class PublishSettings:
+    subjects: Dict[str, SubjectConfig] = dataclasses.field(
+        default_factory=lambda: {
+            "location_fix":            SubjectConfig(rate_hz=1.0, source_id="gnss/0"),
+            "heading_true_north_deg":  SubjectConfig(rate_hz=1.0, source_id="imu/0"),
+            "speed_over_ground_knots": SubjectConfig(rate_hz=1.0, source_id="imu/0"),
+            "roll_deg":                SubjectConfig(rate_hz=1.0, source_id="imu/0"),
+            "pitch_deg":               SubjectConfig(rate_hz=1.0, source_id="imu/0"),
+        }
+    )
+    roll_amplitude_deg: float = 5.0
+    roll_period_s: float = 10.0
+    pitch_amplitude_deg: float = 3.0
+    pitch_period_s: float = 8.0
+    location_noise_sigma_m: float = 0.5
+
+    def to_dict(self) -> dict:
+        """Serialise to a JSON-friendly dict for queryable replies."""
+        return {
+            "subjects": {
+                k: {"rate_hz": v.rate_hz, "source_id": v.source_id}
+                for k, v in self.subjects.items()
+            },
+            "roll_amplitude_deg": self.roll_amplitude_deg,
+            "roll_period_s": self.roll_period_s,
+            "pitch_amplitude_deg": self.pitch_amplitude_deg,
+            "pitch_period_s": self.pitch_period_s,
+            "location_noise_sigma_m": self.location_noise_sigma_m,
+        }
+
+
+class SimGlobals:
+    """Single global instance holding all simulation state."""
+
+    def __init__(self) -> None:
+        self.engine = SimEngine()
+        self.cruise_speed_mps: float = 10.0
+        self.settings = PublishSettings()
+        self.roll_pitch = RollPitchModel()
+        self.throttle = SubjectThrottle()
+
+    def apply_settings(self, msg: dict) -> None:
+        """Apply a settings update dict (from frontend or zenoh query)."""
+        for subj, sc_data in msg.get("subjects", {}).items():
+            if subj in self.settings.subjects:
+                if "rate_hz" in sc_data:
+                    self.settings.subjects[subj].rate_hz = float(sc_data["rate_hz"])
+                if "source_id" in sc_data:
+                    self.settings.subjects[subj].source_id = str(sc_data["source_id"])
+        if "roll_amplitude_deg" in msg:
+            self.settings.roll_amplitude_deg = float(msg["roll_amplitude_deg"])
+        if "roll_period_s" in msg:
+            self.settings.roll_period_s = float(msg["roll_period_s"])
+        if "pitch_amplitude_deg" in msg:
+            self.settings.pitch_amplitude_deg = float(msg["pitch_amplitude_deg"])
+        if "pitch_period_s" in msg:
+            self.settings.pitch_period_s = float(msg["pitch_period_s"])
+        if "location_noise_sigma_m" in msg:
+            self.settings.location_noise_sigma_m = float(msg["location_noise_sigma_m"])
+        # Apply to live roll/pitch model
+        self.roll_pitch.roll_amplitude_deg = self.settings.roll_amplitude_deg
+        self.roll_pitch.roll_period_s = self.settings.roll_period_s
+        self.roll_pitch.pitch_amplitude_deg = self.settings.pitch_amplitude_deg
+        self.roll_pitch.pitch_period_s = self.settings.pitch_period_s

@@ -1,0 +1,42 @@
+syntax = "proto3";
+package ghost_drone;
+
+import "google/protobuf/timestamp.proto";
+
+enum HealthLevel {
+  HEALTH_UNKNOWN  = 0;
+  HEALTH_INACTIVE = 1;
+  HEALTH_CRITICAL = 2;
+  HEALTH_DEGRADED = 3;
+  HEALTH_NOMINAL  = 4;
+}
+
+enum OperationMode {
+  MODE_UNKNOWN    = 0;
+  MODE_IDLE       = 1;
+  MODE_MANUAL     = 2;
+  MODE_REMOTE     = 3;
+  MODE_AUTONOMOUS = 4;
+}
+
+message SubsystemHealth {
+  string      name   = 1;
+  HealthLevel level  = 2;
+  string      detail = 3;
+}
+
+message TelemetryExpectation {
+  string subject            = 1;
+  string default_source_id  = 2;
+  float  rate_hz            = 3;
+}
+
+message EntityHealth {
+  google.protobuf.Timestamp       timestamp              = 1;
+  HealthLevel                     level                  = 2;
+  float                           rate_hz                = 3;
+  OperationMode                   operation_mode         = 4;
+  string                          operator               = 5;
+  repeated SubsystemHealth        subsystems             = 6;
+  repeated TelemetryExpectation   telemetry_expectations = 7;
+}

@@ -1,6 +1,7 @@
 import { Config, Session, open, Duration, type Sample, type Reply, type ReplyError } from "@eclipse-zenoh/zenoh-ts";
 import type { SimFrame, SettingsPayload } from "./types";
 
+const KEELSON_VERSION = "v0";
 const QUERY_TIMEOUT = Duration.milliseconds.of(5000);
 
 /**
@@ -28,7 +29,7 @@ export class ZenohClient {
   }
 
   private prefix(): string {
-    return `${this.realm}/@v1/${this.entityId}`;
+    return `${this.realm}/@${KEELSON_VERSION}/${this.entityId}`;
   }
 
   async connect(): Promise<void> {

@@ -1,75 +1,42 @@
 """
 ghost_drone/server.py
 
-FastAPI application definition.
+Pure-Python simulator process (no web framework).
 
-STATIC_DIR resolves relative to this file so it works whether the package is
-installed in a venv or run in-place from the project root.
+The simulator publishes sim_frame at 20 Hz and keelson telemetry when PLAYING,
+all via zenoh pub/sub. Control commands arrive on the zenoh daemon thread;
+the tick loop runs on its own daemon thread.
 
-API routes (including /ws WebSocket) are declared before the static mount
-so they are not shadowed. The static mount at "/" is added last.
-With html=True, GET / serves static/index.html automatically.
-
-The app is created via create_app(cfg: AppConfig) which wires in the
-ZenohPublisher via a FastAPI lifespan context manager (Phase 3).
+Entry points:
+  - start_simulator(cfg)  context manager for tests / embedding
+  - run(cfg)              blocking entry point for CLI use
 """
 
-import asyncio
 import contextlib
-import dataclasses
 import json
 import math
 import random
-import time  # noqa: F401 — used transitively via SubjectThrottle/telemetry
-from pathlib import Path
-from typing import Dict
-
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.staticfiles import StaticFiles
+import signal
+import threading
+import time
 
 from ghost_drone.config import AppConfig
-from ghost_drone.simulation.engine import SimEngine, TICK_HZ
+from ghost_drone.sim_state import SimGlobals
+from ghost_drone.simulation.engine import TICK_HZ
 from ghost_drone.simulation.models import SimState
-from ghost_drone.simulation.roll_pitch import RollPitchModel
+from ghost_drone.zenoh_bridge.control import register_control_handlers
 from ghost_drone.zenoh_bridge.publisher import ZenohPublisher
 from ghost_drone.zenoh_bridge.telemetry import (
+    HEALTH_INACTIVE,
+    HEALTH_NOMINAL,
+    MODE_AUTONOMOUS,
+    MODE_IDLE,
     MPS_TO_KNOTS,
-    SubjectThrottle,
+    encode_entity_health,
     encode_location_fix,
     encode_timestamped_float,
     make_key,
 )
-
-# Resolves to <project-root>/static/ regardless of where the process is invoked from.
-STATIC_DIR = Path(__file__).parent.parent / "static"
-
-
-# ---------------------------------------------------------------------------
-# Publish settings dataclasses
-# ---------------------------------------------------------------------------
-
-@dataclasses.dataclass
-class SubjectConfig:
-    rate_hz: float = 1.0
-    source_id: str = "imu/0"
-
-
-@dataclasses.dataclass
-class PublishSettings:
-    subjects: Dict[str, SubjectConfig] = dataclasses.field(
-        default_factory=lambda: {
-            "location_fix":            SubjectConfig(rate_hz=1.0, source_id="gnss/0"),
-            "heading_true_north_deg":  SubjectConfig(rate_hz=1.0, source_id="imu/0"),
-            "speed_over_ground_knots": SubjectConfig(rate_hz=1.0, source_id="imu/0"),
-            "roll_deg":                SubjectConfig(rate_hz=1.0, source_id="imu/0"),
-            "pitch_deg":               SubjectConfig(rate_hz=1.0, source_id="imu/0"),
-        }
-    )
-    roll_amplitude_deg: float = 5.0
-    roll_period_s: float = 10.0
-    pitch_amplitude_deg: float = 3.0
-    pitch_period_s: float = 8.0
-    location_noise_sigma_m: float = 0.5
 
 
 # ---------------------------------------------------------------------------
@@ -82,14 +49,15 @@ def _publish_telemetry(
     frame,
     roll: float,
     pitch: float,
-    settings: PublishSettings,
-    throttle: SubjectThrottle,
+    sim: SimGlobals,
 ) -> None:
-    """Publish all 5 subjects if their throttle interval has elapsed.
+    """Publish all 5 keelson subjects if their throttle interval has elapsed.
 
-    Called only when the simulation is PLAYING. Applies user-configured
-    Gaussian noise to lat/lng before encoding the location_fix payload.
+    Called only when the simulation is PLAYING.
     """
+    settings = sim.settings
+    throttle = sim.throttle
+
     for subject, encode_fn, value in [
         ("location_fix",            None,                     None),
         ("heading_true_north_deg",  encode_timestamped_float, frame.heading),
@@ -102,9 +70,6 @@ def _publish_telemetry(
             continue
         key = make_key(cfg, subject, sc.source_id)
         if subject == "location_fix":
-            # Apply user-configured Gaussian noise to lat/lng at publish time.
-            # Noise is added here (not in SimEngine) so it is connection-local
-            # and configurable via update_settings without touching internal state.
             lat_noise = random.gauss(0, settings.location_noise_sigma_m / 111_320)
             lng_noise = random.gauss(
                 0,
@@ -119,120 +84,164 @@ def _publish_telemetry(
         publisher.publish(key, payload)
 
 
+HEALTH_SUBJECT = "entity_health"
+HEALTH_SOURCE_ID = "system/0"
+HEALTH_RATE_HZ = 1.0
+
+# Subsystems that the ghost drone reports health for.
+_SUBSYSTEMS = ("position", "heading", "speed")
+
+
+def _publish_health(
+    publisher: ZenohPublisher,
+    cfg: AppConfig,
+    sim: SimGlobals,
+    is_playing: bool,
+) -> None:
+    """Publish an EntityHealth message at a throttled rate."""
+    if not sim.throttle.should_publish(HEALTH_SUBJECT, HEALTH_RATE_HZ):
+        return
+
+    if is_playing:
+        level = HEALTH_NOMINAL
+        operation_mode = MODE_AUTONOMOUS
+        subsystems = [(name, HEALTH_NOMINAL, "") for name in _SUBSYSTEMS]
+    else:
+        level = HEALTH_INACTIVE
+        operation_mode = MODE_IDLE
+        subsystems = [(name, HEALTH_INACTIVE, "") for name in _SUBSYSTEMS]
+
+    telemetry_expectations = [
+        (subject, sc.source_id, sc.rate_hz)
+        for subject, sc in sim.settings.subjects.items()
+    ]
+
+    key = make_key(cfg, HEALTH_SUBJECT, HEALTH_SOURCE_ID)
+    publisher.publish(
+        key,
+        encode_entity_health(
+            level, HEALTH_RATE_HZ, operation_mode, "", subsystems, telemetry_expectations,
+        ),
+    )
+
+
+def _publish_sim_frame(
+    publisher: ZenohPublisher,
+    cfg: AppConfig,
+    frame_dict: dict,
+) -> None:
+    """Publish the sim_frame JSON to the browser via zenoh pub/sub."""
+    key = f"{cfg.keelson_prefix}/pubsub/sim_frame/engine/0"
+    publisher.publish(key, json.dumps(frame_dict).encode())
+
+
 # ---------------------------------------------------------------------------
-# App factory
+# Tick loop (daemon thread)
 # ---------------------------------------------------------------------------
 
-def create_app(cfg: AppConfig) -> FastAPI:
-    """Create and return the FastAPI application wired to the given config.
+def _tick_loop(
+    publisher: ZenohPublisher,
+    cfg: AppConfig,
+    sim: SimGlobals,
+    stop_event: threading.Event,
+) -> None:
+    """Daemon thread body: advance simulation at TICK_HZ, publish frames."""
+    dt = 1.0 / TICK_HZ
+    prev_state = None
 
-    The ZenohPublisher daemon is started at app startup and stopped on shutdown
-    via the FastAPI lifespan context manager. The publisher is attached to
-    app.state.publisher so websocket handlers can access it.
+    while not stop_event.is_set():
+        frame = sim.engine.tick(dt, cruise_speed_mps=sim.cruise_speed_mps)
+        roll, pitch = sim.roll_pitch.tick(dt, frame.state)
+
+        # Reset roll/pitch elapsed time and throttle on STOPPED transition
+        if frame.state == SimState.STOPPED and prev_state != SimState.STOPPED:
+            sim.roll_pitch.reset()
+            sim.throttle.reset()
+        prev_state = frame.state
+
+        # Publish keelson telemetry only when PLAYING
+        if frame.state == SimState.PLAYING:
+            _publish_telemetry(publisher, cfg, frame, roll, pitch, sim)
+
+        # Health is always published (so subscribers know inactive vs nominal)
+        _publish_health(publisher, cfg, sim, frame.state == SimState.PLAYING)
+
+        # Always publish sim_frame for the browser UI
+        frame_dict = frame.to_dict()
+        frame_dict["roll"] = roll
+        frame_dict["pitch"] = pitch
+        _publish_sim_frame(publisher, cfg, frame_dict)
+
+        time.sleep(dt)
+
+
+# ---------------------------------------------------------------------------
+# Simulator handle (returned by start_simulator)
+# ---------------------------------------------------------------------------
+
+class SimHandle:
+    """Holds references to the running simulator components."""
+
+    __slots__ = ("publisher", "sim", "cfg")
+
+    def __init__(self, publisher: ZenohPublisher, sim: SimGlobals, cfg: AppConfig):
+        self.publisher = publisher
+        self.sim = sim
+        self.cfg = cfg
+
+
+# ---------------------------------------------------------------------------
+# Context manager for starting/stopping the simulator
+# ---------------------------------------------------------------------------
+
+@contextlib.contextmanager
+def start_simulator(cfg: AppConfig):
+    """Start the simulator (publisher + tick loop), yield a SimHandle, then clean up.
+
+    Used by tests and by run() for CLI invocation.
     """
+    sim = SimGlobals()
 
-    @contextlib.asynccontextmanager
-    async def lifespan(app: FastAPI):
-        pub = ZenohPublisher(endpoint=cfg.zenoh_endpoint)
-        pub.start()
-        app.state.cfg = cfg
-        app.state.publisher = pub
-        yield
+    def on_session_ready(session):
+        sim.control_handles = register_control_handlers(session, cfg, sim)
+
+    pub = ZenohPublisher(
+        endpoint=cfg.zenoh_endpoint,
+        on_session_ready=on_session_ready,
+    )
+    pub.start()
+
+    tick_stop = threading.Event()
+    tick_thread = threading.Thread(
+        target=_tick_loop, args=(pub, cfg, sim, tick_stop),
+        name="tick-loop", daemon=True,
+    )
+    tick_thread.start()
+
+    try:
+        yield SimHandle(publisher=pub, sim=sim, cfg=cfg)
+    finally:
+        tick_stop.set()
+        tick_thread.join(timeout=2.0)
         pub.stop()
 
-    app = FastAPI(title="ghost-drone", lifespan=lifespan)
 
-    @app.websocket("/ws")
-    async def websocket_endpoint(websocket: WebSocket):
-        await websocket.accept()
-        engine = SimEngine()
-        cruise_speed_mps = 10.0  # default, updated by set_speed messages
+# ---------------------------------------------------------------------------
+# Blocking entry point for CLI
+# ---------------------------------------------------------------------------
 
-        # Per-connection publish state (connection-local as per spec)
-        settings = PublishSettings()
-        roll_pitch = RollPitchModel()
-        throttle = SubjectThrottle()
+def run(cfg: AppConfig) -> None:
+    """Start the simulator and block until interrupted (Ctrl+C)."""
+    stop = threading.Event()
 
-        async def receive_loop():
-            nonlocal cruise_speed_mps
-            try:
-                async for text in websocket.iter_text():
-                    msg = json.loads(text)
-                    t = msg.get("type")
-                    if t == "load_route":
-                        wps = [tuple(p) for p in msg["waypoints"]]
-                        try:
-                            engine.load_route(wps)
-                        except ValueError:
-                            pass  # fewer than 2 waypoints — ignore
-                    elif t == "play":
-                        engine.play()
-                    elif t == "pause":
-                        engine.pause()
-                    elif t == "stop":
-                        engine.stop()
-                    elif t == "set_speed":
-                        cruise_speed_mps = float(msg.get("value", cruise_speed_mps))
-                    elif t == "update_settings":
-                        # Per-subject config updates
-                        for subj, sc_data in msg.get("subjects", {}).items():
-                            if subj in settings.subjects:
-                                if "rate_hz" in sc_data:
-                                    settings.subjects[subj].rate_hz = float(sc_data["rate_hz"])
-                                if "source_id" in sc_data:
-                                    settings.subjects[subj].source_id = str(sc_data["source_id"])
-                        # Global oscillation + noise params
-                        if "roll_amplitude_deg" in msg:
-                            settings.roll_amplitude_deg = float(msg["roll_amplitude_deg"])
-                        if "roll_period_s" in msg:
-                            settings.roll_period_s = float(msg["roll_period_s"])
-                        if "pitch_amplitude_deg" in msg:
-                            settings.pitch_amplitude_deg = float(msg["pitch_amplitude_deg"])
-                        if "pitch_period_s" in msg:
-                            settings.pitch_period_s = float(msg["pitch_period_s"])
-                        if "location_noise_sigma_m" in msg:
-                            settings.location_noise_sigma_m = float(msg["location_noise_sigma_m"])
-                        # Apply updated oscillation params to the live roll/pitch model
-                        roll_pitch.roll_amplitude_deg = settings.roll_amplitude_deg
-                        roll_pitch.roll_period_s = settings.roll_period_s
-                        roll_pitch.pitch_amplitude_deg = settings.pitch_amplitude_deg
-                        roll_pitch.pitch_period_s = settings.pitch_period_s
-            except WebSocketDisconnect:
-                pass
+    def _on_signal(signum, frame):
+        stop.set()
 
-        async def tick_loop():
-            dt = 1.0 / TICK_HZ
-            prev_state = None
-            try:
-                while True:
-                    frame = engine.tick(dt, cruise_speed_mps=cruise_speed_mps)
-                    roll, pitch = roll_pitch.tick(dt, frame.state)
+    signal.signal(signal.SIGINT, _on_signal)
+    signal.signal(signal.SIGTERM, _on_signal)
 
-                    # Reset roll/pitch elapsed time and throttle on STOPPED transition
-                    # (only on the first tick of the STOPPED state, not every tick)
-                    if frame.state == SimState.STOPPED and prev_state != SimState.STOPPED:
-                        roll_pitch.reset()
-                        throttle.reset()
-                    prev_state = frame.state
+    with start_simulator(cfg):
+        print("Simulator running. Press Ctrl+C to stop.")
+        stop.wait()
 
-                    # Publish to zenoh ONLY when PLAYING
-                    if frame.state == SimState.PLAYING:
-                        publisher = websocket.app.state.publisher
-                        _publish_telemetry(publisher, cfg, frame, roll, pitch, settings, throttle)
-
-                    # Send extended frame to browser (always includes roll + pitch)
-                    frame_dict = frame.to_dict()
-                    frame_dict["roll"] = roll
-                    frame_dict["pitch"] = pitch
-                    await websocket.send_text(json.dumps(frame_dict))
-                    await asyncio.sleep(dt)
-            except (WebSocketDisconnect, Exception):
-                pass
-
-        await asyncio.gather(receive_loop(), tick_loop())
-
-    # StaticFiles mount LAST — declared here so the /ws route above is not shadowed.
-    # html=True makes GET / serve static/index.html automatically.
-    app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
-
-    return app
+    print("\nSimulator stopped.")

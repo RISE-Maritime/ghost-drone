@@ -13,6 +13,7 @@ from pathlib import Path
 
 CONFIG_PATH = Path("ghost_drone.toml")
 REQUIRED_KEYS = ("zenoh_endpoint", "keelson_realm", "entity_id")
+KEELSON_VERSION = "v0"
 
 
 @dataclass
@@ -20,6 +21,10 @@ class AppConfig:
     zenoh_endpoint: str
     keelson_realm: str
     entity_id: str
+
+    @property
+    def keelson_prefix(self) -> str:
+        return f"{self.keelson_realm}/@{KEELSON_VERSION}/{self.entity_id}"
 
 
 def load_config() -> AppConfig:

@@ -7,6 +7,7 @@ Provides:
 - MPS_TO_KNOTS: unit conversion constant
 - encode_timestamped_float(): build a keelson-enclosed TimestampedFloat payload
 - encode_location_fix(): build a keelson-enclosed LocationFix payload
+- encode_entity_health(): build a keelson-enclosed EntityHealth payload
 - make_key(): construct a keelson pubsub key expression from AppConfig
 - SubjectThrottle: per-subject rate limiter for publish decisions
 
@@ -17,12 +18,28 @@ is called by the server (03-02). Do NOT call zenoh directly here.
 from __future__ import annotations
 
 import time
+from typing import Sequence
 
 import keelson
 from keelson.payloads.Primitives_pb2 import TimestampedFloat
 from keelson.payloads.foxglove.LocationFix_pb2 import LocationFix
 
 from ghost_drone.config import AppConfig
+from ghost_drone.proto.entity_health_pb2 import (
+    EntityHealth,
+    SubsystemHealth,
+    TelemetryExpectation,
+    HEALTH_UNKNOWN,
+    HEALTH_INACTIVE,
+    HEALTH_CRITICAL,
+    HEALTH_DEGRADED,
+    HEALTH_NOMINAL,
+    MODE_UNKNOWN,
+    MODE_IDLE,
+    MODE_MANUAL,
+    MODE_REMOTE,
+    MODE_AUTONOMOUS,
+)
 
 # SimEngine produces speed in m/s; speed_over_ground_knots subject expects knots.
 MPS_TO_KNOTS: float = 1.94384
@@ -62,6 +79,48 @@ def encode_location_fix(lat: float, lng: float) -> bytes:
     return keelson.enclose(msg.SerializeToString())
 
 
+def encode_entity_health(
+    level: int,
+    rate_hz: float,
+    operation_mode: int,
+    operator: str,
+    subsystems: Sequence[tuple[str, int, str]],
+    telemetry_expectations: Sequence[tuple[str, str, float]],
+) -> bytes:
+    """Encode an EntityHealth message as a keelson-enclosed payload.
+
+    Args:
+        level: Overall health level (one of the HEALTH_* constants).
+        rate_hz: Rate at which this health message is published.
+        operation_mode: Current operation mode (one of the MODE_* constants).
+        operator: Identifier of the current operator (empty if autonomous/idle).
+        subsystems: Sequence of (name, level, detail) tuples describing
+            each subsystem's health.
+        telemetry_expectations: Sequence of (subject, default_source_id, rate_hz)
+            tuples describing expected telemetry outputs.
+
+    Returns:
+        Bytes of the keelson envelope containing the serialised proto.
+    """
+    msg = EntityHealth()
+    msg.timestamp.FromNanoseconds(time.time_ns())
+    msg.level = level
+    msg.rate_hz = rate_hz
+    msg.operation_mode = operation_mode
+    msg.operator = operator
+    for name, sub_level, detail in subsystems:
+        sub = msg.subsystems.add()
+        sub.name = name
+        sub.level = sub_level
+        sub.detail = detail
+    for subject, default_source_id, tel_rate_hz in telemetry_expectations:
+        exp = msg.telemetry_expectations.add()
+        exp.subject = subject
+        exp.default_source_id = default_source_id
+        exp.rate_hz = tel_rate_hz
+    return keelson.enclose(msg.SerializeToString())
+
+
 def make_key(cfg: AppConfig, subject: str, source_id: str) -> str:
     """Construct a keelson pubsub key expression.
 
@@ -73,7 +132,7 @@ def make_key(cfg: AppConfig, subject: str, source_id: str) -> str:
     Returns:
         The full keelson key expression string.
     """
-    return f"{cfg.keelson_realm}/@v1/{cfg.entity_id}/pubsub/{subject}/{source_id}"
+    return f"{cfg.keelson_prefix}/pubsub/{subject}/{source_id}"
 
 
 class SubjectThrottle:

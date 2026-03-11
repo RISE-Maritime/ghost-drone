@@ -1,6 +1,10 @@
 # ghost-drone user config — never commit (contains site-specific endpoints)
 ghost_drone.toml
 
+# Frontend build artifacts
+frontend/node_modules/
+frontend/dist/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
