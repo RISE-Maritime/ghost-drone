@@ -28,8 +28,8 @@ _ROUTER_ENDPOINT = "tcp/127.0.0.1:17447"
 # Two waypoints near the default map centre (Lindholmen, Gothenburg).
 _ROUTE = [[57.7069, 11.9381], [57.7100, 11.9420]]
 
-# Key expression prefix for test config
-_PREFIX = "rise/@v0/ghost-drone"
+# Key expression prefix matching the AppConfig below
+_PREFIX = "ghost-drone/@v0/sim001"
 
 
 @pytest.fixture(scope="module")
@@ -98,7 +98,7 @@ def test_all_five_subjects_published_and_decode(zenoh_router):
             with received_lock:
                 received.setdefault(subject, bytes(sample.payload))
 
-    subscriber = client_session.declare_subscriber("ghost-drone/@v1/**", on_sample)
+    subscriber = client_session.declare_subscriber("ghost-drone/@v0/**", on_sample)
 
     try:
         with start_simulator(cfg) as handle:
@@ -331,13 +331,14 @@ def test_no_messages_published_when_stopped(zenoh_router):
 
     def on_sample(_sample):
         nonlocal keelson_count
-        # Only count keelson subjects, not sim_frame
+        # Only count keelson telemetry subjects, not sim_frame or entity_health.
+        # SPEC: "While stopped, no keelson telemetry is published (entity_health excepted)."
         key = str(_sample.key_expr)
-        if "sim_frame" not in key:
+        if "sim_frame" not in key and "entity_health" not in key:
             with lock:
                 keelson_count += 1
 
-    subscriber = client_session.declare_subscriber("ghost-drone/@v1/**", on_sample)
+    subscriber = client_session.declare_subscriber("ghost-drone/@v0/**", on_sample)
 
     try:
         with start_simulator(cfg) as handle:
