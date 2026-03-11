@@ -214,3 +214,107 @@ def test_drop_fault_stops_subject_publishing(zenoh_router):
     assert counts_after.get("heading_true_north_deg", 0) >= 1, (
         f"heading should resume after clearing fault, got {counts_after}"
     )
+
+
+def test_stuck_fault_freezes_published_value(zenoh_router):
+    """
+    Injecting a 'stuck' fault on a subject freezes the published value.
+    All messages during the fault carry the same value.
+    After clearing, values change again.
+
+    SPEC: "stuck: the published value freezes at its current reading."
+    """
+    cfg = AppConfig(
+        zenoh_endpoint=_ROUTER_ENDPOINT,
+        keelson_realm="ghost-drone",
+        entity_id="sim001",
+    )
+
+    # Collect decoded heading values in each phase
+    values_before: list[float] = []
+    values_during: list[float] = []
+    values_after: list[float] = []
+    active_list = [None]  # mutable ref to current collection list
+    lock = threading.Lock()
+
+    client_session = _make_client_session()
+
+    def on_sample(sample):
+        key = str(sample.key_expr)
+        if "heading_true_north_deg" not in key:
+            return
+        try:
+            import keelson as _keelson
+            from keelson.payloads.Primitives_pb2 import TimestampedFloat
+
+            _recv_at, _enclosed_at, proto_bytes = _keelson.uncover(
+                bytes(sample.payload)
+            )
+            msg = TimestampedFloat()
+            msg.ParseFromString(proto_bytes)
+            value = msg.value
+        except Exception:
+            return
+        with lock:
+            target = active_list[0]
+            if target is not None:
+                target.append(value)
+
+    subscriber = client_session.declare_subscriber("ghost-drone/@v0/**", on_sample)
+
+    try:
+        with start_simulator(cfg) as handle:
+            _wait_for_publisher(handle)
+            _start_playing(client_session)
+
+            # Phase 1: Baseline — collect varying heading values
+            time.sleep(1.5)  # let it start publishing
+            active_list[0] = values_before
+            time.sleep(3.0)
+            active_list[0] = None
+
+            # Phase 2: Inject stuck fault
+            result = _inject_fault(client_session, "heading_true_north_deg", "stuck")
+            assert result is not None, "No reply from fault queryable"
+            assert result["ok"] is True, f"Fault injection failed: {result}"
+
+            time.sleep(0.5)  # let the stuck value latch
+            active_list[0] = values_during
+            time.sleep(3.0)
+            active_list[0] = None
+
+            # Phase 3: Clear the fault
+            result = _clear_fault(client_session, "heading_true_north_deg", "stuck")
+            assert result is not None, "No reply from fault clear"
+            assert result["ok"] is True, f"Fault clear failed: {result}"
+
+            active_list[0] = values_after
+            time.sleep(3.0)
+            active_list[0] = None
+
+            client_session.put(f"{_PREFIX}/control/stop", "")
+            time.sleep(0.2)
+    finally:
+        subscriber.undeclare()
+        client_session.close()
+
+    # --- Assertions ---
+
+    # Before fault: should have received multiple values
+    assert len(values_before) >= 2, (
+        f"Expected >=2 heading values before fault, got {len(values_before)}"
+    )
+
+    # During fault: should have received multiple values, ALL identical
+    assert len(values_during) >= 2, (
+        f"Expected >=2 heading values during stuck fault, got {len(values_during)}"
+    )
+    stuck_value = values_during[0]
+    assert all(v == stuck_value for v in values_during), (
+        f"All values during stuck fault should be identical, got {values_during}"
+    )
+
+    # After clearing: should have received values that vary (not all identical)
+    assert len(values_after) >= 2, (
+        f"Expected >=2 heading values after clearing, got {len(values_after)}"
+    )
