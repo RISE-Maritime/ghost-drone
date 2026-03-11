@@ -73,6 +73,16 @@ def _publish_telemetry(
         if not throttle.should_publish(subject, sc.rate_hz):
             continue
 
+        # Handle "nan" fault: publish NaN instead of the real value
+        if sim.faults.has_fault(subject, "nan"):
+            if subject == "location_fix":
+                payload = encode_location_fix(float("nan"), float("nan"))
+            else:
+                payload = encode_fn(float("nan"))
+            key = make_key(cfg, subject, sc.source_id)
+            publisher.publish(key, payload)
+            continue
+
         # Handle "stuck" fault: freeze the value at the first reading
         if sim.faults.has_fault(subject, "stuck"):
             if subject not in stuck_values:
