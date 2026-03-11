@@ -258,10 +258,11 @@ def _tick_loop(
         frame = sim.engine.tick(dt, cruise_speed_mps=sim.cruise_speed_mps)
         roll, pitch = sim.roll_pitch.tick(dt, frame.state)
 
-        # Reset roll/pitch elapsed time and throttle on STOPPED transition
+        # Reset roll/pitch elapsed time, throttle, and stuck values on STOPPED transition
         if frame.state == SimState.STOPPED and prev_state != SimState.STOPPED:
             sim.roll_pitch.reset()
             sim.throttle.reset()
+            stuck_values.clear()
         prev_state = frame.state
 
         # Publish keelson telemetry only when PLAYING
