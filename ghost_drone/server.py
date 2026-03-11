@@ -70,7 +70,9 @@ def _publish_telemetry(
         if sim.faults.has_fault(subject, "drop"):
             continue
         sc = settings.subjects[subject]
-        if not throttle.should_publish(subject, sc.rate_hz):
+        # "wrong_rate" fault: publish at 2x the configured rate
+        effective_rate = sc.rate_hz * 2 if sim.faults.has_fault(subject, "wrong_rate") else sc.rate_hz
+        if not throttle.should_publish(subject, effective_rate):
             continue
 
         # Handle "nan" fault: publish NaN instead of the real value
