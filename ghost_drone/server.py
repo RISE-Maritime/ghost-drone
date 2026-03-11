@@ -33,6 +33,7 @@ from ghost_drone.zenoh_bridge.telemetry import (
     HEALTH_NOMINAL,
     MODE_AUTONOMOUS,
     MODE_IDLE,
+    MODE_REMOTE,
     MPS_TO_KNOTS,
     encode_entity_health,
     encode_location_fix,
@@ -163,7 +164,7 @@ def _publish_health(
         return
 
     if is_playing:
-        operation_mode = MODE_AUTONOMOUS
+        operation_mode = MODE_REMOTE if sim.engine.is_remote else MODE_AUTONOMOUS
         subsystems = []
         worst_level = HEALTH_NOMINAL
         for name, subject in _SUBSYSTEM_SUBJECT_MAP.items():

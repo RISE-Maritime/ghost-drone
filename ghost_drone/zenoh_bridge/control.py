@@ -52,10 +52,20 @@ def register_control_handlers(
         except Exception:
             logger.warning("control/set_speed: bad payload")
 
+    def on_move(sample: zenoh.Sample) -> None:
+        try:
+            payload = json.loads(bytes(sample.payload))
+            heading_deg = float(payload.get("heading_deg", 0.0))
+            sim.engine.remote_move(heading_deg)
+            logger.debug("control/move -> heading %.1f°", heading_deg)
+        except Exception:
+            logger.warning("control/move: bad payload")
+
     declared.append(session.declare_subscriber(f"{prefix}/control/play", on_play))
     declared.append(session.declare_subscriber(f"{prefix}/control/pause", on_pause))
     declared.append(session.declare_subscriber(f"{prefix}/control/stop", on_stop))
     declared.append(session.declare_subscriber(f"{prefix}/control/set_speed", on_set_speed))
+    declared.append(session.declare_subscriber(f"{prefix}/control/move", on_move))
 
     # --- Queryable: load_route ---
 

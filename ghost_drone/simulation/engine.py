@@ -89,6 +89,7 @@ class SimEngine:
         self._speed: float = 0.0             # current speed m/s
         self._seg_idx: int = 0               # index of current segment start waypoint
         self._seg_progress_m: float = 0.0   # metres travelled into current segment
+        self._remote_heading: float | None = None  # remote heading override
 
     # ------------------------------------------------------------------
     # Public route / lifecycle API
@@ -124,7 +125,25 @@ class SimEngine:
     def stop(self) -> None:
         """Transition any state -> STOPPED and reset drone to first waypoint."""
         self._state = SimState.STOPPED
+        self._remote_heading = None
         self._reset_to_start()
+
+    def remote_move(self, heading_deg: float) -> None:
+        """Override autonomous heading with a remote command.
+
+        The drone will turn toward the given heading instead of following
+        the waypoint route. Only effective while PLAYING.
+        """
+        self._remote_heading = heading_deg % 360
+
+    def cancel_remote(self) -> None:
+        """Clear the remote heading override, resuming autonomous navigation."""
+        self._remote_heading = None
+
+    @property
+    def is_remote(self) -> bool:
+        """True when a remote heading override is active."""
+        return self._remote_heading is not None
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -188,12 +207,15 @@ class SimEngine:
         Called only when state is PLAYING.
         """
         # --- Heading lag (first-order discrete) ---
-        next_wp_idx = min(self._seg_idx + 1, len(self._waypoints) - 1)
-        target_heading = _bearing(
-            self._lat, self._lng,
-            self._waypoints[next_wp_idx][0],
-            self._waypoints[next_wp_idx][1],
-        )
+        if self._remote_heading is not None:
+            target_heading = self._remote_heading
+        else:
+            next_wp_idx = min(self._seg_idx + 1, len(self._waypoints) - 1)
+            target_heading = _bearing(
+                self._lat, self._lng,
+                self._waypoints[next_wp_idx][0],
+                self._waypoints[next_wp_idx][1],
+            )
         alpha = dt / (HEADING_TAU + dt)
         self._heading += alpha * _angle_diff(target_heading, self._heading)
         self._heading = self._heading % 360
