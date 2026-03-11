@@ -193,6 +193,42 @@ def _publish_health(
     )
 
 
+_HEALTH_LEVEL_NAMES = {
+    HEALTH_INACTIVE: "inactive",
+    HEALTH_CRITICAL: "critical",
+    HEALTH_DEGRADED: "degraded",
+    HEALTH_NOMINAL: "nominal",
+}
+
+
+def _compute_health_summary(sim: SimGlobals, is_playing: bool) -> dict:
+    """Return a health summary dict suitable for inclusion in sim_frame JSON."""
+    if is_playing:
+        subsystems = []
+        worst_level = HEALTH_NOMINAL
+        for name, subject in _SUBSYSTEM_SUBJECT_MAP.items():
+            sub_level, detail = _subsystem_health(sim, subject)
+            subsystems.append({
+                "name": name,
+                "level": _HEALTH_LEVEL_NAMES.get(sub_level, "unknown"),
+                "detail": detail,
+            })
+            if sub_level < worst_level:
+                worst_level = sub_level
+        level = worst_level
+    else:
+        level = HEALTH_INACTIVE
+        subsystems = [
+            {"name": name, "level": "inactive", "detail": ""}
+            for name in _SUBSYSTEM_SUBJECT_MAP
+        ]
+
+    return {
+        "level": _HEALTH_LEVEL_NAMES.get(level, "unknown"),
+        "subsystems": subsystems,
+    }
+
+
 def _publish_sim_frame(
     publisher: ZenohPublisher,
     cfg: AppConfig,
@@ -239,6 +275,7 @@ def _tick_loop(
         frame_dict = frame.to_dict()
         frame_dict["roll"] = roll
         frame_dict["pitch"] = pitch
+        frame_dict["health"] = _compute_health_summary(sim, frame.state == SimState.PLAYING)
         _publish_sim_frame(publisher, cfg, frame_dict)
 
         time.sleep(dt)
