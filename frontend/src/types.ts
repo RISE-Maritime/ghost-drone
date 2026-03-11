@@ -1,3 +1,14 @@
+export interface SubsystemHealth {
+  name: string;
+  level: "nominal" | "degraded" | "critical" | "inactive" | "unknown";
+  detail: string;
+}
+
+export interface HealthSummary {
+  level: "nominal" | "degraded" | "critical" | "inactive" | "unknown";
+  subsystems: SubsystemHealth[];
+}
+
 export interface SimFrame {
   lat: number;
   lng: number;
@@ -6,6 +17,7 @@ export interface SimFrame {
   roll: number;
   pitch: number;
   state: "stopped" | "playing" | "paused";
+  health?: HealthSummary;
 }
 
 export interface SettingsPayload {

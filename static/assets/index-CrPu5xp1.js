@@ -29,10 +29,10 @@ var require_stdin = __commonJS({
           fetch(x.href, S);
         }
       })();
-      function El() {
-        const c = document.getElementById("top-bar-clock");
+      function kl() {
+        const h = document.getElementById("top-bar-clock");
         function o() {
-          c.textContent = (/* @__PURE__ */ new Date()).toLocaleTimeString([], {
+          h.textContent = (/* @__PURE__ */ new Date()).toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
             second: "2-digit",
@@ -41,27 +41,27 @@ var require_stdin = __commonJS({
         }
         o(), setInterval(o, 1e3);
       }
-      function Pn(c) {
-        return getComputedStyle(document.documentElement).getPropertyValue(c).trim();
+      function Pn(h) {
+        return getComputedStyle(document.documentElement).getPropertyValue(h).trim();
       }
-      function Ml(c) {
+      function Al(h) {
         document.getElementById("theme-select").addEventListener("change", function() {
-          document.documentElement.setAttribute("data-obc-theme", this.value), c();
+          document.documentElement.setAttribute("data-obc-theme", this.value), h();
         });
       }
       var ya = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : typeof global < "u" ? global : typeof self < "u" ? self : {};
-      function kl(c) {
-        return c && c.__esModule && Object.prototype.hasOwnProperty.call(c, "default") ? c.default : c;
+      function Bl(h) {
+        return h && h.__esModule && Object.prototype.hasOwnProperty.call(h, "default") ? h.default : h;
       }
       var Qr = {
         exports: {}
       };
-      var Al = Qr.exports, du;
-      function Bl() {
-        return du || (du = 1, (function(c, o) {
+      var Pl = Qr.exports, pu;
+      function Tl() {
+        return pu || (pu = 1, (function(h, o) {
           (function(l, g) {
             g(o);
-          })(Al, (function(l) {
+          })(Pl, (function(l) {
             var g = "1.9.4";
             function x(t) {
               var n, a, d, _;
@@ -703,7 +703,7 @@ var require_stdin = __commonJS({
               }
               return a || "M0 0";
             }
-            var In = document.documentElement.style, Ui = "ActiveXObject" in window, as = Ui && !document.addEventListener, os = "msLaunchUri" in navigator && !("documentMode" in document), lr = Ze("webkit"), us = Ze("android"), ls = Ze("android 2") || Ze("android 3"), Ta = parseInt(/WebKit\/([0-9]+)|$/.exec(navigator.userAgent)[1], 10), Sa = us && Ze("Google") && Ta < 537 && !("AudioNode" in window), hr = !!window.opera, hs = !os && Ze("chrome"), cs = Ze("gecko") && !lr && !hr && !Ui, ds = !hs && Ze("safari"), cr = Ze("phantom"), ps = "OTransition" in In, Gi = navigator.platform.indexOf("Win") === 0, fs = Ui && "transition" in In, On = "WebKitCSSMatrix" in window && "m11" in new window.WebKitCSSMatrix() && !ls, Zi = "MozPerspective" in In, _s = !window.L_DISABLE_3D && (fs || On || Zi) && !ps && !cr, Mi = typeof orientation < "u" || Ze("mobile"), Da = Mi && lr, Ia = Mi && On, dr = !window.PointerEvent && window.MSPointerEvent, ms = !!(window.PointerEvent || dr), gs = "ontouchstart" in window || !!window.TouchEvent, Oa = !window.L_NO_TOUCH && (gs || ms), Ra = Mi && hr, ys = Mi && cs, vs = (window.devicePixelRatio || window.screen.deviceXDPI / window.screen.logicalXDPI) > 1, Fa = (function() {
+            var In = document.documentElement.style, Ui = "ActiveXObject" in window, as = Ui && !document.addEventListener, os = "msLaunchUri" in navigator && !("documentMode" in document), lr = Ze("webkit"), us = Ze("android"), ls = Ze("android 2") || Ze("android 3"), Sa = parseInt(/WebKit\/([0-9]+)|$/.exec(navigator.userAgent)[1], 10), Da = us && Ze("Google") && Sa < 537 && !("AudioNode" in window), hr = !!window.opera, hs = !os && Ze("chrome"), cs = Ze("gecko") && !lr && !hr && !Ui, ds = !hs && Ze("safari"), cr = Ze("phantom"), ps = "OTransition" in In, Gi = navigator.platform.indexOf("Win") === 0, fs = Ui && "transition" in In, On = "WebKitCSSMatrix" in window && "m11" in new window.WebKitCSSMatrix() && !ls, Zi = "MozPerspective" in In, _s = !window.L_DISABLE_3D && (fs || On || Zi) && !ps && !cr, Mi = typeof orientation < "u" || Ze("mobile"), Ia = Mi && lr, Oa = Mi && On, dr = !window.PointerEvent && window.MSPointerEvent, ms = !!(window.PointerEvent || dr), gs = "ontouchstart" in window || !!window.TouchEvent, Ra = !window.L_NO_TOUCH && (gs || ms), Fa = Mi && hr, ys = Mi && cs, vs = (window.devicePixelRatio || window.screen.deviceXDPI / window.screen.logicalXDPI) > 1, za = (function() {
               var t = false;
               try {
                 var n = Object.defineProperty({}, "passive", {
@@ -715,12 +715,12 @@ var require_stdin = __commonJS({
               } catch {
               }
               return t;
-            })(), za = (function() {
+            })(), Na = (function() {
               return !!document.createElement("canvas").getContext;
             })(), pr = !!(document.createElementNS && rs("svg").createSVGRect), Ls = !!pr && (function() {
               var t = document.createElement("div");
               return t.innerHTML = "<svg/>", (t.firstChild && t.firstChild.namespaceURI) === "http://www.w3.org/2000/svg";
-            })(), Na = !pr && (function() {
+            })(), Ua = !pr && (function() {
               try {
                 var t = document.createElement("div");
                 t.innerHTML = '<v:shape adj="1"/>';
@@ -729,7 +729,7 @@ var require_stdin = __commonJS({
               } catch {
                 return false;
               }
-            })(), Ua = navigator.platform.indexOf("Mac") === 0, Ga = navigator.platform.indexOf("Linux") === 0;
+            })(), Ga = navigator.platform.indexOf("Mac") === 0, Za = navigator.platform.indexOf("Linux") === 0;
             function Ze(t) {
               return navigator.userAgent.toLowerCase().indexOf(t) >= 0;
             }
@@ -740,7 +740,7 @@ var require_stdin = __commonJS({
               webkit: lr,
               android: us,
               android23: ls,
-              androidStock: Sa,
+              androidStock: Da,
               opera: hr,
               chrome: hs,
               gecko: cs,
@@ -753,54 +753,54 @@ var require_stdin = __commonJS({
               gecko3d: Zi,
               any3d: _s,
               mobile: Mi,
-              mobileWebkit: Da,
-              mobileWebkit3d: Ia,
+              mobileWebkit: Ia,
+              mobileWebkit3d: Oa,
               msPointer: dr,
               pointer: ms,
-              touch: Oa,
+              touch: Ra,
               touchNative: gs,
-              mobileOpera: Ra,
+              mobileOpera: Fa,
               mobileGecko: ys,
               retina: vs,
-              passiveEvents: Fa,
-              canvas: za,
+              passiveEvents: za,
+              canvas: Na,
               svg: pr,
-              vml: Na,
+              vml: Ua,
               inlineSvg: Ls,
-              mac: Ua,
-              linux: Ga
+              mac: Ga,
+              linux: Za
             }, bs = ct.msPointer ? "MSPointerDown" : "pointerdown", ws = ct.msPointer ? "MSPointerMove" : "pointermove", fr = ct.msPointer ? "MSPointerUp" : "pointerup", Cs = ct.msPointer ? "MSPointerCancel" : "pointercancel", _r = {
               touchstart: bs,
               touchmove: ws,
               touchend: fr,
               touchcancel: Cs
             }, xs = {
-              touchstart: Ha,
+              touchstart: Wa,
               touchmove: Fn,
               touchend: Fn,
               touchcancel: Fn
             }, ji = {}, Es = false;
-            function Za(t, n, a) {
+            function ja(t, n, a) {
               return n === "touchstart" && mr(), xs[n] ? (a = xs[n].bind(this, a), t.addEventListener(_r[n], a, false), a) : (console.warn("wrong event specified:", n), ht);
             }
-            function ja(t, n, a) {
+            function qa(t, n, a) {
               if (!_r[n]) {
                 console.warn("wrong event specified:", n);
                 return;
               }
               t.removeEventListener(_r[n], a, false);
             }
-            function qa(t) {
+            function Va(t) {
               ji[t.pointerId] = t;
             }
-            function Va(t) {
+            function Ha(t) {
               ji[t.pointerId] && (ji[t.pointerId] = t);
             }
             function Rn(t) {
               delete ji[t.pointerId];
             }
             function mr() {
-              Es || (document.addEventListener(bs, qa, true), document.addEventListener(ws, Va, true), document.addEventListener(fr, Rn, true), document.addEventListener(Cs, Rn, true), Es = true);
+              Es || (document.addEventListener(bs, Va, true), document.addEventListener(ws, Ha, true), document.addEventListener(fr, Rn, true), document.addEventListener(Cs, Rn, true), Es = true);
             }
             function Fn(t, n) {
               if (n.pointerType !== (n.MSPOINTER_TYPE_MOUSE || "mouse")) {
@@ -811,16 +811,16 @@ var require_stdin = __commonJS({
                 ], t(n);
               }
             }
-            function Ha(t, n) {
+            function Wa(t, n) {
               n.MSPOINTER_TYPE_TOUCH && n.pointerType === n.MSPOINTER_TYPE_TOUCH && ae(n), Fn(t, n);
             }
-            function Wa(t) {
+            function Ka(t) {
               var n = {}, a, d;
               for (d in t) a = t[d], n[d] = a && a.bind ? a.bind(t) : a;
               return t = n, n.type = "dblclick", n.detail = 2, n.isTrusted = false, n._simulated = true, n;
             }
-            var Ka = 200;
-            function Ya(t, n) {
+            var Ya = 200;
+            function Xa(t, n) {
               t.addEventListener("dblclick", n);
               var a = 0, d;
               function _(v) {
@@ -836,7 +836,7 @@ var require_stdin = __commonJS({
                     return q instanceof HTMLInputElement || q instanceof HTMLSelectElement;
                   }))) {
                     var U = Date.now();
-                    U - a <= Ka ? (d++, d === 2 && n(Wa(v))) : d = 1, a = U;
+                    U - a <= Ya ? (d++, d === 2 && n(Ka(v))) : d = 1, a = U;
                   }
                 }
               }
@@ -845,7 +845,7 @@ var require_stdin = __commonJS({
                 simDblclick: _
               };
             }
-            function Xa(t, n) {
+            function Ja(t, n) {
               t.removeEventListener("dblclick", n.dblclick), t.removeEventListener("click", n.simDblclick);
             }
             var gr = Nn([
@@ -913,9 +913,9 @@ var require_stdin = __commonJS({
               return t.correspondingElement && (t = t.correspondingElement), t.className.baseVal === void 0 ? t.className : t.className.baseVal;
             }
             function Te(t, n) {
-              "opacity" in t.style ? t.style.opacity = n : "filter" in t.style && Ja(t, n);
+              "opacity" in t.style ? t.style.opacity = n : "filter" in t.style && Qa(t, n);
             }
-            function Ja(t, n) {
+            function Qa(t, n) {
               var a = false, d = "DXImageTransform.Microsoft.Alpha";
               try {
                 a = t.filters.item(d);
@@ -989,7 +989,7 @@ var require_stdin = __commonJS({
                 boundingClientRect: n
               };
             }
-            var Qa = {
+            var $a = {
               __proto__: null,
               TRANSFORM: gr,
               TRANSITION: _n,
@@ -1059,7 +1059,7 @@ var require_stdin = __commonJS({
               var v = function(U) {
                 return a.call(d || t, U || window.event);
               }, P = v;
-              !ct.touchNative && ct.pointer && n.indexOf("touch") === 0 ? v = Za(t, n, v) : ct.touch && n === "dblclick" ? v = Ya(t, v) : "addEventListener" in t ? n === "touchstart" || n === "touchmove" || n === "wheel" || n === "mousewheel" ? t.addEventListener(Mr[n] || n, v, ct.passiveEvents ? {
+              !ct.touchNative && ct.pointer && n.indexOf("touch") === 0 ? v = ja(t, n, v) : ct.touch && n === "dblclick" ? v = Xa(t, v) : "addEventListener" in t ? n === "touchstart" || n === "touchmove" || n === "wheel" || n === "mousewheel" ? t.addEventListener(Mr[n] || n, v, ct.passiveEvents ? {
                 passive: false
               } : false) : n === "mouseenter" || n === "mouseleave" ? (v = function(U) {
                 U = U || window.event, Zn(t, U) && P(U);
@@ -1069,7 +1069,7 @@ var require_stdin = __commonJS({
               _ = _ || n + et(a) + (d ? "_" + et(d) : "");
               var v = t[Ke] && t[Ke][_];
               if (!v) return this;
-              !ct.touchNative && ct.pointer && n.indexOf("touch") === 0 ? ja(t, n, v) : ct.touch && n === "dblclick" ? Xa(t, v) : "removeEventListener" in t ? t.removeEventListener(Mr[n] || n, v, false) : t.detachEvent("on" + n, v), t[Ke][_] = null;
+              !ct.touchNative && ct.pointer && n.indexOf("touch") === 0 ? qa(t, n, v) : ct.touch && n === "dblclick" ? Ja(t, v) : "removeEventListener" in t ? t.removeEventListener(Mr[n] || n, v, false) : t.detachEvent("on" + n, v), t[Ke][_] = null;
             }
             function Ai(t) {
               return t.stopPropagation ? t.stopPropagation() : t.originalEvent ? t.originalEvent._stopped = true : t.cancelBubble = true, this;
@@ -1096,9 +1096,9 @@ var require_stdin = __commonJS({
               var a = Er(n), d = a.boundingClientRect;
               return new pt((t.clientX - d.left) / a.x - n.clientLeft, (t.clientY - d.top) / a.y - n.clientTop);
             }
-            var $a = ct.linux && ct.chrome ? window.devicePixelRatio : ct.mac ? window.devicePixelRatio * 3 : window.devicePixelRatio > 0 ? 2 * window.devicePixelRatio : 1;
+            var to = ct.linux && ct.chrome ? window.devicePixelRatio : ct.mac ? window.devicePixelRatio * 3 : window.devicePixelRatio > 0 ? 2 * window.devicePixelRatio : 1;
             function Ts(t) {
-              return ct.edge ? t.wheelDeltaY / 2 : t.deltaY && t.deltaMode === 0 ? -t.deltaY / $a : t.deltaY && t.deltaMode === 1 ? -t.deltaY * 20 : t.deltaY && t.deltaMode === 2 ? -t.deltaY * 60 : t.deltaX || t.deltaZ ? 0 : t.wheelDelta ? (t.wheelDeltaY || t.wheelDelta) / 2 : t.detail && Math.abs(t.detail) < 32765 ? -t.detail * 20 : t.detail ? t.detail / -32765 * 60 : 0;
+              return ct.edge ? t.wheelDeltaY / 2 : t.deltaY && t.deltaMode === 0 ? -t.deltaY / to : t.deltaY && t.deltaMode === 1 ? -t.deltaY * 20 : t.deltaY && t.deltaMode === 2 ? -t.deltaY * 60 : t.deltaX || t.deltaZ ? 0 : t.wheelDelta ? (t.wheelDeltaY || t.wheelDelta) / 2 : t.detail && Math.abs(t.detail) < 32765 ? -t.detail * 20 : t.detail ? t.detail / -32765 * 60 : 0;
             }
             function Zn(t, n) {
               var a = n.relatedTarget;
@@ -1286,9 +1286,9 @@ var require_stdin = __commonJS({
                 function qr(Vt) {
                   return 1 - Math.pow(1 - Vt, 1.5);
                 }
-                var yo = Date.now(), ra = (xt(1) - Ce) / at, vo = a.duration ? 1e3 * a.duration : 1e3 * ra * 0.8;
+                var vo = Date.now(), ra = (xt(1) - Ce) / at, Lo = a.duration ? 1e3 * a.duration : 1e3 * ra * 0.8;
                 function sa() {
-                  var Vt = (Date.now() - yo) / vo, ve = qr(Vt) * ra;
+                  var Vt = (Date.now() - vo) / Lo, ve = qr(Vt) * ra;
                   Vt <= 1 ? (this._flyToFrame = Ut(sa, this), this._move(this.unproject(d.add(_.subtract(d).multiplyBy(na(ve) / X)), P), this.getScaleZoom(U / gi(ve), P), {
                     flyTo: true
                   })) : this._move(t, n)._moveEnd(true);
@@ -1981,7 +1981,7 @@ var require_stdin = __commonJS({
             }), kt.addInitHook(function() {
               this.options.zoomControl && (this.zoomControl = new Wi(), this.addControl(this.zoomControl));
             });
-            var to = function(t) {
+            var eo = function(t) {
               return new Wi(t);
             }, ri = je.extend({
               options: {
@@ -2074,10 +2074,10 @@ var require_stdin = __commonJS({
             }), kt.addInitHook(function() {
               this.options.attributionControl && new Tr().addTo(this);
             });
-            var eo = function(t) {
+            var io = function(t) {
               return new Tr(t);
             };
-            je.Layers = Ds, je.Zoom = Wi, je.Scale = ri, je.Attribution = Tr, Hi.layers = Pr, Hi.zoom = to, Hi.scale = Is, Hi.attribution = eo;
+            je.Layers = Ds, je.Zoom = Wi, je.Scale = ri, je.Attribution = Tr, Hi.layers = Pr, Hi.zoom = eo, Hi.scale = Is, Hi.attribution = io;
             var Ye = Ue.extend({
               initialize: function(t) {
                 this._map = t;
@@ -2095,7 +2095,7 @@ var require_stdin = __commonJS({
             Ye.addTo = function(t, n) {
               return t.addHandler(n, this), this;
             };
-            var io = {
+            var no = {
               Events: _e
             }, Os = ct.touch ? "touchstart mousedown" : "mousedown", pi = Ei.extend({
               options: {
@@ -2214,7 +2214,7 @@ var require_stdin = __commonJS({
             function Ns(t, n) {
               if (!n || !t.length) return t.slice();
               var a = n * n;
-              return t = Yi(t, a), t = no(t, a), t;
+              return t = Yi(t, a), t = ro(t, a), t;
             }
             function re(t, n, a) {
               return Math.sqrt(Ji(t, n, a, true));
@@ -2222,7 +2222,7 @@ var require_stdin = __commonJS({
             function ke(t, n, a) {
               return Ji(t, n, a);
             }
-            function no(t, n) {
+            function ro(t, n) {
               var a = t.length, d = typeof Uint8Array < "u" ? Uint8Array : Array, _ = new d(a);
               _[0] = _[a - 1] = 1, Xe(t, _, n, 0, a - 1);
               var v, P = [];
@@ -2355,7 +2355,7 @@ var require_stdin = __commonJS({
               LonLat: Hn,
               Mercator: Dr,
               SphericalMercator: ar
-            }, ro = x({}, We, {
+            }, so = x({}, We, {
               code: "EPSG:3395",
               projection: Dr,
               transformation: (function() {
@@ -2366,7 +2366,7 @@ var require_stdin = __commonJS({
               code: "EPSG:4326",
               projection: Hn,
               transformation: fn(1 / 180, 1, -1 / 180, 0.5)
-            }), so = x({}, Ge, {
+            }), ao = x({}, Ge, {
               projection: Hn,
               transformation: fn(1, 0, -1, 0),
               scale: function(t) {
@@ -2381,7 +2381,7 @@ var require_stdin = __commonJS({
               },
               infinite: true
             });
-            Ge.Earth = We, Ge.EPSG3395 = ro, Ge.EPSG3857 = ur, Ge.EPSG900913 = ns, Ge.EPSG4326 = Ir, Ge.Simple = so;
+            Ge.Earth = We, Ge.EPSG3395 = so, Ge.EPSG3857 = ur, Ge.EPSG900913 = ns, Ge.EPSG4326 = Ir, Ge.Simple = ao;
             var we = Ei.extend({
               options: {
                 pane: "overlayPane",
@@ -2544,7 +2544,7 @@ var require_stdin = __commonJS({
                 }
                 return t;
               }
-            }), ao = function(t, n) {
+            }), oo = function(t, n) {
               return new Je(t, n);
             }, Qi = Ue.extend({
               options: {
@@ -2592,7 +2592,7 @@ var require_stdin = __commonJS({
                 return ct.retina && this.options[t + "RetinaUrl"] || this.options[t + "Url"];
               }
             });
-            function oo(t) {
+            function uo(t) {
               return new Qi(t);
             }
             var Cn = Qi.extend({
@@ -2963,7 +2963,7 @@ var require_stdin = __commonJS({
                 this._updateBounds();
               }
             });
-            function uo(t, n, a) {
+            function lo(t, n, a) {
               return new $i(t, n, a);
             }
             var ai = Ie.extend({
@@ -3265,7 +3265,7 @@ var require_stdin = __commonJS({
             function Hs(t, n) {
               return new oi(t, n);
             }
-            var lo = Hs, tn = we.extend({
+            var ho = Hs, tn = we.extend({
               options: {
                 opacity: 1,
                 alt: "",
@@ -3348,7 +3348,7 @@ var require_stdin = __commonJS({
               getCenter: function() {
                 return this._bounds.getCenter();
               }
-            }), ho = function(t, n, a) {
+            }), co = function(t, n, a) {
               return new tn(t, n, a);
             }, Ws = tn.extend({
               options: {
@@ -3376,7 +3376,7 @@ var require_stdin = __commonJS({
                 }
               }
             });
-            function co(t, n, a) {
+            function po(t, n, a) {
               return new Ws(t, n, a);
             }
             var Ur = tn.extend({
@@ -3385,7 +3385,7 @@ var require_stdin = __commonJS({
                 bt(t, "leaflet-image-layer"), this._zoomAnimated && bt(t, "leaflet-zoom-animated"), this.options.className && bt(t, this.options.className), t.onselectstart = ht, t.onmousemove = ht;
               }
             });
-            function po(t, n, a) {
+            function fo(t, n, a) {
               return new Ur(t, n, a);
             }
             var Qe = we.extend({
@@ -3593,7 +3593,7 @@ var require_stdin = __commonJS({
                   0
                 ]);
               }
-            }), fo = function(t, n) {
+            }), _o = function(t, n) {
               return new En(t, n);
             };
             kt.mergeOptions({
@@ -3717,7 +3717,7 @@ var require_stdin = __commonJS({
                   0
                 ]);
               }
-            }), _o = function(t, n) {
+            }), mo = function(t, n) {
               return new Jn(t, n);
             };
             kt.include({
@@ -4514,7 +4514,7 @@ var require_stdin = __commonJS({
               return function(t) {
                 return document.createElement("<" + t + ' xmlns="urn:schemas-microsoft.com:vml" class="lvml">');
               };
-            })(), mo = {
+            })(), go = {
               _initContainer: function() {
                 this._container = Pt("div", "leaflet-vml-container");
               },
@@ -4603,7 +4603,7 @@ var require_stdin = __commonJS({
                 Vi(t._path);
               }
             });
-            ct.vml && Qt.include(mo);
+            ct.vml && Qt.include(go);
             function Qs(t) {
               return ct.svg || ct.vml ? new Qt(t) : null;
             }
@@ -4639,7 +4639,7 @@ var require_stdin = __commonJS({
                 ];
               }
             });
-            function go(t, n) {
+            function yo(t, n) {
               return new $n(t, n);
             }
             Qt.create = Oe, Qt.pointsToPath = ss, oi.geometryToLayer = xn, oi.coordsToLatLng = zr, oi.coordsToLatLngs = Ae, oi.latLngToCoords = ui, oi.latLngsToCoords = Pi, oi.getFeature = Ti, oi.asFeature = Xn, kt.mergeOptions({
@@ -5033,7 +5033,7 @@ var require_stdin = __commonJS({
                 this._zooming = false, ce(this._animRequest), St(document, "touchmove", this._onTouchMove, this), St(document, "touchend touchcancel", this._onTouchEnd, this), this._map.options.zoomAnimation ? this._map._animateZoom(this._center, this._map._limitZoom(this._zoom), true, this._map.options.zoomSnap) : this._map._resetView(this._center, this._map._limitZoom(this._zoom));
               }
             });
-            kt.addInitHook("addHandler", "touchZoom", jr), kt.BoxZoom = en, kt.DoubleClickZoom = $s, kt.Drag = ta, kt.Keyboard = ea, kt.ScrollWheelZoom = Di, kt.TapHold = Zr, kt.TouchZoom = jr, l.Bounds = Mt, l.Browser = ct, l.CRS = Ge, l.Canvas = Qn, l.Circle = $i, l.CircleMarker = Yn, l.Class = Ue, l.Control = je, l.DivIcon = _i, l.DivOverlay = Qe, l.DomEvent = At, l.DomUtil = Qa, l.Draggable = pi, l.Evented = Ei, l.FeatureGroup = Je, l.GeoJSON = oi, l.GridLayer = kn, l.Handler = Ye, l.Icon = Qi, l.ImageOverlay = tn, l.LatLng = Bt, l.LatLngBounds = jt, l.Layer = we, l.LayerGroup = si, l.LineUtil = Vn, l.Map = kt, l.Marker = Kn, l.Mixin = io, l.Path = Ie, l.Point = pt, l.PolyUtil = zs, l.Polygon = me, l.Polyline = ai, l.Popup = En, l.PosAnimation = Ss, l.Projection = Zs, l.Rectangle = $n, l.Renderer = $e, l.SVG = Qt, l.SVGOverlay = Ur, l.TileLayer = mi, l.Tooltip = Jn, l.Transformation = or, l.Util = xi, l.VideoOverlay = Ws, l.bind = M, l.bounds = Kt, l.canvas = Gr, l.circle = uo, l.circleMarker = Or, l.control = Hi, l.divIcon = Mn, l.extend = x, l.featureGroup = ao, l.geoJSON = Hs, l.geoJson = lo, l.gridLayer = Ks, l.icon = oo, l.imageOverlay = ho, l.latLng = Ct, l.latLngBounds = Ot, l.layerGroup = Wn, l.map = jn, l.marker = qs, l.point = dt, l.polygon = Fr, l.polyline = Rr, l.popup = fo, l.rectangle = go, l.setOptions = gt, l.stamp = et, l.svg = Qs, l.svgOverlay = po, l.tileLayer = Ys, l.tooltip = _o, l.transformation = fn, l.version = g, l.videoOverlay = co;
+            kt.addInitHook("addHandler", "touchZoom", jr), kt.BoxZoom = en, kt.DoubleClickZoom = $s, kt.Drag = ta, kt.Keyboard = ea, kt.ScrollWheelZoom = Di, kt.TapHold = Zr, kt.TouchZoom = jr, l.Bounds = Mt, l.Browser = ct, l.CRS = Ge, l.Canvas = Qn, l.Circle = $i, l.CircleMarker = Yn, l.Class = Ue, l.Control = je, l.DivIcon = _i, l.DivOverlay = Qe, l.DomEvent = At, l.DomUtil = $a, l.Draggable = pi, l.Evented = Ei, l.FeatureGroup = Je, l.GeoJSON = oi, l.GridLayer = kn, l.Handler = Ye, l.Icon = Qi, l.ImageOverlay = tn, l.LatLng = Bt, l.LatLngBounds = jt, l.Layer = we, l.LayerGroup = si, l.LineUtil = Vn, l.Map = kt, l.Marker = Kn, l.Mixin = no, l.Path = Ie, l.Point = pt, l.PolyUtil = zs, l.Polygon = me, l.Polyline = ai, l.Popup = En, l.PosAnimation = Ss, l.Projection = Zs, l.Rectangle = $n, l.Renderer = $e, l.SVG = Qt, l.SVGOverlay = Ur, l.TileLayer = mi, l.Tooltip = Jn, l.Transformation = or, l.Util = xi, l.VideoOverlay = Ws, l.bind = M, l.bounds = Kt, l.canvas = Gr, l.circle = lo, l.circleMarker = Or, l.control = Hi, l.divIcon = Mn, l.extend = x, l.featureGroup = oo, l.geoJSON = Hs, l.geoJson = ho, l.gridLayer = Ks, l.icon = uo, l.imageOverlay = co, l.latLng = Ct, l.latLngBounds = Ot, l.layerGroup = Wn, l.map = jn, l.marker = qs, l.point = dt, l.polygon = Fr, l.polyline = Rr, l.popup = _o, l.rectangle = yo, l.setOptions = gt, l.stamp = et, l.svg = Qs, l.svgOverlay = fo, l.tileLayer = Ys, l.tooltip = mo, l.transformation = fn, l.version = g, l.videoOverlay = po;
             var ge = window.L;
             l.noConflict = function() {
               return window.L = ge, this;
@@ -5041,13 +5041,13 @@ var require_stdin = __commonJS({
           }));
         })(Qr, Qr.exports)), Qr.exports;
       }
-      var Pl = Bl();
-      const sn = kl(Pl);
-      var pu = {}, fu;
-      function Tl() {
-        return fu || (fu = 1, (() => {
+      var Sl = Tl();
+      const sn = Bl(Sl);
+      var fu = {}, _u;
+      function Dl() {
+        return _u || (_u = 1, (() => {
           var _a2, _b;
-          var c = Object.create, o = Object.defineProperty, l = Object.getOwnPropertyDescriptor, g = Object.getOwnPropertyNames, x = Object.getPrototypeOf, S = Object.prototype.hasOwnProperty, M = (e, i) => () => (i || e((i = {
+          var h = Object.create, o = Object.defineProperty, l = Object.getOwnPropertyDescriptor, g = Object.getOwnPropertyNames, x = Object.getPrototypeOf, S = Object.prototype.hasOwnProperty, M = (e, i) => () => (i || e((i = {
             exports: {}
           }).exports, i), i.exports), J = (e, i, r, s) => {
             if (i && typeof i == "object" || typeof i == "function") for (let u of g(i)) !S.call(e, u) && u !== r && o(e, u, {
@@ -5055,7 +5055,7 @@ var require_stdin = __commonJS({
               enumerable: !(s = l(i, u)) || s.enumerable
             });
             return e;
-          }, et = (e, i, r) => (r = e != null ? c(x(e)) : {}, J(i || !e || !e.__esModule ? o(r, "default", {
+          }, et = (e, i, r) => (r = e != null ? h(x(e)) : {}, J(i || !e || !e.__esModule ? o(r, "default", {
             value: e,
             enumerable: true
           }) : r, e)), _t = M((e, i) => {
@@ -5070,25 +5070,25 @@ var require_stdin = __commonJS({
             i.exports = r;
           }), ht = M((e, i) => {
             var r = wt();
-            function s(u, h) {
-              for (var p = u.length; p--; ) if (r(u[p][0], h)) return p;
+            function s(u, c) {
+              for (var p = u.length; p--; ) if (r(u[p][0], c)) return p;
               return -1;
             }
             i.exports = s;
           }), Nt = M((e, i) => {
             var r = ht(), s = Array.prototype, u = s.splice;
-            function h(p) {
+            function c(p) {
               var f = this.__data__, m = r(f, p);
               if (m < 0) return false;
               var y = f.length - 1;
               return m == y ? f.pop() : u.call(f, m, 1), --this.size, true;
             }
-            i.exports = h;
+            i.exports = c;
           }), ie = M((e, i) => {
             var r = ht();
             function s(u) {
-              var h = this.__data__, p = r(h, u);
-              return p < 0 ? void 0 : h[p][1];
+              var c = this.__data__, p = r(c, u);
+              return p < 0 ? void 0 : c[p][1];
             }
             i.exports = s;
           }), ne = M((e, i) => {
@@ -5099,16 +5099,16 @@ var require_stdin = __commonJS({
             i.exports = s;
           }), gt = M((e, i) => {
             var r = ht();
-            function s(u, h) {
+            function s(u, c) {
               var p = this.__data__, f = r(p, u);
               return f < 0 ? (++this.size, p.push([
                 u,
-                h
-              ])) : p[f][1] = h, this;
+                c
+              ])) : p[f][1] = c, this;
             }
             i.exports = s;
           }), le = M((e, i) => {
-            var r = _t(), s = Nt(), u = ie(), h = ne(), p = gt();
+            var r = _t(), s = Nt(), u = ie(), c = ne(), p = gt();
             function f(m) {
               var y = -1, A = m == null ? 0 : m.length;
               for (this.clear(); ++y < A; ) {
@@ -5116,7 +5116,7 @@ var require_stdin = __commonJS({
                 this.set(C[0], C[1]);
               }
             }
-            f.prototype.clear = r, f.prototype.delete = s, f.prototype.get = u, f.prototype.has = h, f.prototype.set = p, i.exports = f;
+            f.prototype.clear = r, f.prototype.delete = s, f.prototype.get = u, f.prototype.has = c, f.prototype.set = p, i.exports = f;
           }), Zt = M((e, i) => {
             var r = le();
             function s() {
@@ -5125,8 +5125,8 @@ var require_stdin = __commonJS({
             i.exports = s;
           }), yt = M((e, i) => {
             function r(s) {
-              var u = this.__data__, h = u.delete(s);
-              return this.size = u.size, h;
+              var u = this.__data__, c = u.delete(s);
+              return this.size = u.size, c;
             }
             i.exports = r;
           }), W = M((e, i) => {
@@ -5149,7 +5149,7 @@ var require_stdin = __commonJS({
             var r = Pe(), s = r.Symbol;
             i.exports = s;
           }), Ci = M((e, i) => {
-            var r = Ne(), s = Object.prototype, u = s.hasOwnProperty, h = s.toString, p = r ? r.toStringTag : void 0;
+            var r = Ne(), s = Object.prototype, u = s.hasOwnProperty, c = s.toString, p = r ? r.toStringTag : void 0;
             function f(m) {
               var y = u.call(m, p), A = m[p];
               try {
@@ -5157,20 +5157,20 @@ var require_stdin = __commonJS({
                 var C = true;
               } catch {
               }
-              var O = h.call(m);
+              var O = c.call(m);
               return C && (y ? m[p] = A : delete m[p]), O;
             }
             i.exports = f;
           }), li = M((e, i) => {
             var r = Object.prototype, s = r.toString;
-            function u(h) {
-              return s.call(h);
+            function u(c) {
+              return s.call(c);
             }
             i.exports = u;
           }), G = M((e, i) => {
-            var r = Ne(), s = Ci(), u = li(), h = "[object Null]", p = "[object Undefined]", f = r ? r.toStringTag : void 0;
+            var r = Ne(), s = Ci(), u = li(), c = "[object Null]", p = "[object Undefined]", f = r ? r.toStringTag : void 0;
             function m(y) {
-              return y == null ? y === void 0 ? p : h : f && f in Object(y) ? s(y) : u(y);
+              return y == null ? y === void 0 ? p : c : f && f in Object(y) ? s(y) : u(y);
             }
             i.exports = m;
           }), Ut = M((e, i) => {
@@ -5180,11 +5180,11 @@ var require_stdin = __commonJS({
             }
             i.exports = r;
           }), ce = M((e, i) => {
-            var r = G(), s = Ut(), u = "[object AsyncFunction]", h = "[object Function]", p = "[object GeneratorFunction]", f = "[object Proxy]";
+            var r = G(), s = Ut(), u = "[object AsyncFunction]", c = "[object Function]", p = "[object GeneratorFunction]", f = "[object Proxy]";
             function m(y) {
               if (!s(y)) return false;
               var A = r(y);
-              return A == h || A == p || A == u || A == f;
+              return A == c || A == p || A == u || A == f;
             }
             i.exports = m;
           }), xi = M((e, i) => {
@@ -5192,23 +5192,23 @@ var require_stdin = __commonJS({
             i.exports = s;
           }), Ue = M((e, i) => {
             var r = xi(), s = (function() {
-              var h = /[^.]+$/.exec(r && r.keys && r.keys.IE_PROTO || "");
-              return h ? "Symbol(src)_1." + h : "";
+              var c = /[^.]+$/.exec(r && r.keys && r.keys.IE_PROTO || "");
+              return c ? "Symbol(src)_1." + c : "";
             })();
-            function u(h) {
-              return !!s && s in h;
+            function u(c) {
+              return !!s && s in c;
             }
             i.exports = u;
           }), dn = M((e, i) => {
             var r = Function.prototype, s = r.toString;
-            function u(h) {
-              if (h != null) {
+            function u(c) {
+              if (c != null) {
                 try {
-                  return s.call(h);
+                  return s.call(c);
                 } catch {
                 }
                 try {
-                  return h + "";
+                  return c + "";
                 } catch {
                 }
               }
@@ -5216,11 +5216,11 @@ var require_stdin = __commonJS({
             }
             i.exports = u;
           }), _e = M((e, i) => {
-            var r = ce(), s = Ue(), u = Ut(), h = dn(), p = /[\\^$.*+?()[\]{}|]/g, f = /^\[object .+?Constructor\]$/, m = Function.prototype, y = Object.prototype, A = m.toString, C = y.hasOwnProperty, O = RegExp("^" + A.call(C).replace(p, "\\$&").replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, "$1.*?") + "$");
+            var r = ce(), s = Ue(), u = Ut(), c = dn(), p = /[\\^$.*+?()[\]{}|]/g, f = /^\[object .+?Constructor\]$/, m = Function.prototype, y = Object.prototype, A = m.toString, C = y.hasOwnProperty, O = RegExp("^" + A.call(C).replace(p, "\\$&").replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, "$1.*?") + "$");
             function R(H) {
               if (!u(H) || s(H)) return false;
               var K = r(H) ? O : f;
-              return K.test(h(H));
+              return K.test(c(H));
             }
             i.exports = R;
           }), Ei = M((e, i) => {
@@ -5230,8 +5230,8 @@ var require_stdin = __commonJS({
             i.exports = r;
           }), pt = M((e, i) => {
             var r = _e(), s = Ei();
-            function u(h, p) {
-              var f = s(h, p);
+            function u(c, p) {
+              var f = s(c, p);
               return r(f) ? f : void 0;
             }
             i.exports = u;
@@ -5254,32 +5254,32 @@ var require_stdin = __commonJS({
             }
             i.exports = r;
           }), jt = M((e, i) => {
-            var r = dt(), s = "__lodash_hash_undefined__", u = Object.prototype, h = u.hasOwnProperty;
+            var r = dt(), s = "__lodash_hash_undefined__", u = Object.prototype, c = u.hasOwnProperty;
             function p(f) {
               var m = this.__data__;
               if (r) {
                 var y = m[f];
                 return y === s ? void 0 : y;
               }
-              return h.call(m, f) ? m[f] : void 0;
+              return c.call(m, f) ? m[f] : void 0;
             }
             i.exports = p;
           }), Ot = M((e, i) => {
             var r = dt(), s = Object.prototype, u = s.hasOwnProperty;
-            function h(p) {
+            function c(p) {
               var f = this.__data__;
               return r ? f[p] !== void 0 : u.call(f, p);
             }
-            i.exports = h;
+            i.exports = c;
           }), Bt = M((e, i) => {
             var r = dt(), s = "__lodash_hash_undefined__";
-            function u(h, p) {
+            function u(c, p) {
               var f = this.__data__;
-              return this.size += this.has(h) ? 0 : 1, f[h] = r && p === void 0 ? s : p, this;
+              return this.size += this.has(c) ? 0 : 1, f[c] = r && p === void 0 ? s : p, this;
             }
             i.exports = u;
           }), Ct = M((e, i) => {
-            var r = Mt(), s = Kt(), u = jt(), h = Ot(), p = Bt();
+            var r = Mt(), s = Kt(), u = jt(), c = Ot(), p = Bt();
             function f(m) {
               var y = -1, A = m == null ? 0 : m.length;
               for (this.clear(); ++y < A; ) {
@@ -5287,17 +5287,17 @@ var require_stdin = __commonJS({
                 this.set(C[0], C[1]);
               }
             }
-            f.prototype.clear = r, f.prototype.delete = s, f.prototype.get = u, f.prototype.has = h, f.prototype.set = p, i.exports = f;
+            f.prototype.clear = r, f.prototype.delete = s, f.prototype.get = u, f.prototype.has = c, f.prototype.set = p, i.exports = f;
           }), Ge = M((e, i) => {
             var r = Ct(), s = le(), u = hi();
-            function h() {
+            function c() {
               this.size = 0, this.__data__ = {
                 hash: new r(),
                 map: new (u || s)(),
                 string: new r()
               };
             }
-            i.exports = h;
+            i.exports = c;
           }), We = M((e, i) => {
             function r(s) {
               var u = typeof s;
@@ -5306,16 +5306,16 @@ var require_stdin = __commonJS({
             i.exports = r;
           }), pn = M((e, i) => {
             var r = We();
-            function s(u, h) {
+            function s(u, c) {
               var p = u.__data__;
-              return r(h) ? p[typeof h == "string" ? "string" : "hash"] : p.map;
+              return r(c) ? p[typeof c == "string" ? "string" : "hash"] : p.map;
             }
             i.exports = s;
           }), ar = M((e, i) => {
             var r = pn();
             function s(u) {
-              var h = r(this, u).delete(u);
-              return this.size -= h ? 1 : 0, h;
+              var c = r(this, u).delete(u);
+              return this.size -= c ? 1 : 0, c;
             }
             i.exports = s;
           }), or = M((e, i) => {
@@ -5332,13 +5332,13 @@ var require_stdin = __commonJS({
             i.exports = s;
           }), ur = M((e, i) => {
             var r = pn();
-            function s(u, h) {
+            function s(u, c) {
               var p = r(this, u), f = p.size;
-              return p.set(u, h), this.size += p.size == f ? 0 : 1, this;
+              return p.set(u, c), this.size += p.size == f ? 0 : 1, this;
             }
             i.exports = s;
           }), ns = M((e, i) => {
-            var r = Ge(), s = ar(), u = or(), h = fn(), p = ur();
+            var r = Ge(), s = ar(), u = or(), c = fn(), p = ur();
             function f(m) {
               var y = -1, A = m == null ? 0 : m.length;
               for (this.clear(); ++y < A; ) {
@@ -5346,14 +5346,14 @@ var require_stdin = __commonJS({
                 this.set(C[0], C[1]);
               }
             }
-            f.prototype.clear = r, f.prototype.delete = s, f.prototype.get = u, f.prototype.has = h, f.prototype.set = p, i.exports = f;
+            f.prototype.clear = r, f.prototype.delete = s, f.prototype.get = u, f.prototype.has = c, f.prototype.set = p, i.exports = f;
           }), rs = M((e, i) => {
-            var r = le(), s = hi(), u = ns(), h = 200;
+            var r = le(), s = hi(), u = ns(), c = 200;
             function p(f, m) {
               var y = this.__data__;
               if (y instanceof r) {
                 var A = y.__data__;
-                if (!s || A.length < h - 1) return A.push([
+                if (!s || A.length < c - 1) return A.push([
                   f,
                   m
                 ]), this.size = ++y.size, this;
@@ -5363,12 +5363,12 @@ var require_stdin = __commonJS({
             }
             i.exports = p;
           }), ss = M((e, i) => {
-            var r = le(), s = Zt(), u = yt(), h = W(), p = ot(), f = rs();
+            var r = le(), s = Zt(), u = yt(), c = W(), p = ot(), f = rs();
             function m(y) {
               var A = this.__data__ = new r(y);
               this.size = A.size;
             }
-            m.prototype.clear = s, m.prototype.delete = u, m.prototype.get = h, m.prototype.has = p, m.prototype.set = f, i.exports = m;
+            m.prototype.clear = s, m.prototype.delete = u, m.prototype.get = c, m.prototype.has = p, m.prototype.set = f, i.exports = m;
           }), In = M((e, i) => {
             var r = pt(), s = (function() {
               try {
@@ -5380,27 +5380,27 @@ var require_stdin = __commonJS({
             i.exports = s;
           }), Ui = M((e, i) => {
             var r = In();
-            function s(u, h, p) {
-              h == "__proto__" && r ? r(u, h, {
+            function s(u, c, p) {
+              c == "__proto__" && r ? r(u, c, {
                 configurable: true,
                 enumerable: true,
                 value: p,
                 writable: true
-              }) : u[h] = p;
+              }) : u[c] = p;
             }
             i.exports = s;
           }), as = M((e, i) => {
             var r = Ui(), s = wt();
-            function u(h, p, f) {
-              (f !== void 0 && !s(h[p], f) || f === void 0 && !(p in h)) && r(h, p, f);
+            function u(c, p, f) {
+              (f !== void 0 && !s(c[p], f) || f === void 0 && !(p in c)) && r(c, p, f);
             }
             i.exports = u;
           }), os = M((e, i) => {
             function r(s) {
-              return function(u, h, p) {
+              return function(u, c, p) {
                 for (var f = -1, m = Object(u), y = p(u), A = y.length; A--; ) {
                   var C = y[s ? A : ++f];
-                  if (h(m[C], C, m) === false) break;
+                  if (c(m[C], C, m) === false) break;
                 }
                 return u;
               };
@@ -5410,7 +5410,7 @@ var require_stdin = __commonJS({
             var r = os(), s = r();
             i.exports = s;
           }), us = M((e, i) => {
-            var r = Pe(), s = typeof e == "object" && e && !e.nodeType && e, u = s && typeof i == "object" && i && !i.nodeType && i, h = u && u.exports === s, p = h ? r.Buffer : void 0, f = p ? p.allocUnsafe : void 0;
+            var r = Pe(), s = typeof e == "object" && e && !e.nodeType && e, u = s && typeof i == "object" && i && !i.nodeType && i, c = u && u.exports === s, p = c ? r.Buffer : void 0, f = p ? p.allocUnsafe : void 0;
             function m(y, A) {
               if (A) return y.slice();
               var C = y.length, O = f ? f(C) : new y.constructor(C);
@@ -5420,44 +5420,44 @@ var require_stdin = __commonJS({
           }), ls = M((e, i) => {
             var r = Pe(), s = r.Uint8Array;
             i.exports = s;
-          }), Ta = M((e, i) => {
+          }), Sa = M((e, i) => {
             var r = ls();
             function s(u) {
-              var h = new u.constructor(u.byteLength);
-              return new r(h).set(new r(u)), h;
+              var c = new u.constructor(u.byteLength);
+              return new r(c).set(new r(u)), c;
             }
             i.exports = s;
-          }), Sa = M((e, i) => {
-            var r = Ta();
-            function s(u, h) {
-              var p = h ? r(u.buffer) : u.buffer;
+          }), Da = M((e, i) => {
+            var r = Sa();
+            function s(u, c) {
+              var p = c ? r(u.buffer) : u.buffer;
               return new u.constructor(p, u.byteOffset, u.length);
             }
             i.exports = s;
           }), hr = M((e, i) => {
             function r(s, u) {
-              var h = -1, p = s.length;
-              for (u || (u = Array(p)); ++h < p; ) u[h] = s[h];
+              var c = -1, p = s.length;
+              for (u || (u = Array(p)); ++c < p; ) u[c] = s[c];
               return u;
             }
             i.exports = r;
           }), hs = M((e, i) => {
             var r = Ut(), s = Object.create, u = /* @__PURE__ */ (function() {
-              function h() {
+              function c() {
               }
               return function(p) {
                 if (!r(p)) return {};
                 if (s) return s(p);
-                h.prototype = p;
-                var f = new h();
-                return h.prototype = void 0, f;
+                c.prototype = p;
+                var f = new c();
+                return c.prototype = void 0, f;
               };
             })();
             i.exports = u;
           }), cs = M((e, i) => {
             function r(s, u) {
-              return function(h) {
-                return s(u(h));
+              return function(c) {
+                return s(u(c));
               };
             }
             i.exports = r;
@@ -5467,16 +5467,16 @@ var require_stdin = __commonJS({
           }), cr = M((e, i) => {
             var r = Object.prototype;
             function s(u) {
-              var h = u && u.constructor, p = typeof h == "function" && h.prototype || r;
+              var c = u && u.constructor, p = typeof c == "function" && c.prototype || r;
               return u === p;
             }
             i.exports = s;
           }), ps = M((e, i) => {
             var r = hs(), s = ds(), u = cr();
-            function h(p) {
+            function c(p) {
               return typeof p.constructor == "function" && !u(p) ? r(s(p)) : {};
             }
-            i.exports = h;
+            i.exports = c;
           }), Gi = M((e, i) => {
             function r(s) {
               return s != null && typeof s == "object";
@@ -5484,15 +5484,15 @@ var require_stdin = __commonJS({
             i.exports = r;
           }), fs = M((e, i) => {
             var r = G(), s = Gi(), u = "[object Arguments]";
-            function h(p) {
+            function c(p) {
               return s(p) && r(p) == u;
             }
-            i.exports = h;
+            i.exports = c;
           }), On = M((e, i) => {
-            var r = fs(), s = Gi(), u = Object.prototype, h = u.hasOwnProperty, p = u.propertyIsEnumerable, f = r(/* @__PURE__ */ (function() {
+            var r = fs(), s = Gi(), u = Object.prototype, c = u.hasOwnProperty, p = u.propertyIsEnumerable, f = r(/* @__PURE__ */ (function() {
               return arguments;
             })()) ? r : function(m) {
-              return s(m) && h.call(m, "callee") && !p.call(m, "callee");
+              return s(m) && c.call(m, "callee") && !p.call(m, "callee");
             };
             i.exports = f;
           }), Zi = M((e, i) => {
@@ -5506,28 +5506,28 @@ var require_stdin = __commonJS({
             i.exports = s;
           }), Mi = M((e, i) => {
             var r = ce(), s = _s();
-            function u(h) {
-              return h != null && s(h.length) && !r(h);
-            }
-            i.exports = u;
-          }), Da = M((e, i) => {
-            var r = Mi(), s = Gi();
-            function u(h) {
-              return s(h) && r(h);
+            function u(c) {
+              return c != null && s(c.length) && !r(c);
             }
             i.exports = u;
           }), Ia = M((e, i) => {
+            var r = Mi(), s = Gi();
+            function u(c) {
+              return s(c) && r(c);
+            }
+            i.exports = u;
+          }), Oa = M((e, i) => {
             function r() {
               return false;
             }
             i.exports = r;
           }), dr = M((e, i) => {
-            var r = Pe(), s = Ia(), u = typeof e == "object" && e && !e.nodeType && e, h = u && typeof i == "object" && i && !i.nodeType && i, p = h && h.exports === u, f = p ? r.Buffer : void 0, m = f ? f.isBuffer : void 0, y = m || s;
+            var r = Pe(), s = Oa(), u = typeof e == "object" && e && !e.nodeType && e, c = u && typeof i == "object" && i && !i.nodeType && i, p = c && c.exports === u, f = p ? r.Buffer : void 0, m = f ? f.isBuffer : void 0, y = m || s;
             i.exports = y;
           }), ms = M((e, i) => {
-            var r = G(), s = ds(), u = Gi(), h = "[object Object]", p = Function.prototype, f = Object.prototype, m = p.toString, y = f.hasOwnProperty, A = m.call(Object);
+            var r = G(), s = ds(), u = Gi(), c = "[object Object]", p = Function.prototype, f = Object.prototype, m = p.toString, y = f.hasOwnProperty, A = m.call(Object);
             function C(O) {
-              if (!u(O) || r(O) != h) return false;
+              if (!u(O) || r(O) != c) return false;
               var R = s(O);
               if (R === null) return true;
               var H = y.call(R, "constructor") && R.constructor;
@@ -5535,21 +5535,21 @@ var require_stdin = __commonJS({
             }
             i.exports = C;
           }), gs = M((e, i) => {
-            var r = G(), s = _s(), u = Gi(), h = "[object Arguments]", p = "[object Array]", f = "[object Boolean]", m = "[object Date]", y = "[object Error]", A = "[object Function]", C = "[object Map]", O = "[object Number]", R = "[object Object]", H = "[object RegExp]", K = "[object Set]", it = "[object String]", st = "[object WeakMap]", k = "[object ArrayBuffer]", z = "[object DataView]", V = "[object Float32Array]", tt = "[object Float64Array]", Q = "[object Int8Array]", $ = "[object Int16Array]", b = "[object Int32Array]", w = "[object Uint8Array]", E = "[object Uint8ClampedArray]", D = "[object Uint16Array]", T = "[object Uint32Array]", B = {};
-            B[V] = B[tt] = B[Q] = B[$] = B[b] = B[w] = B[E] = B[D] = B[T] = true, B[h] = B[p] = B[k] = B[f] = B[z] = B[m] = B[y] = B[A] = B[C] = B[O] = B[R] = B[H] = B[K] = B[it] = B[st] = false;
+            var r = G(), s = _s(), u = Gi(), c = "[object Arguments]", p = "[object Array]", f = "[object Boolean]", m = "[object Date]", y = "[object Error]", A = "[object Function]", C = "[object Map]", O = "[object Number]", R = "[object Object]", H = "[object RegExp]", K = "[object Set]", it = "[object String]", st = "[object WeakMap]", k = "[object ArrayBuffer]", z = "[object DataView]", V = "[object Float32Array]", tt = "[object Float64Array]", Q = "[object Int8Array]", $ = "[object Int16Array]", b = "[object Int32Array]", w = "[object Uint8Array]", E = "[object Uint8ClampedArray]", D = "[object Uint16Array]", T = "[object Uint32Array]", B = {};
+            B[V] = B[tt] = B[Q] = B[$] = B[b] = B[w] = B[E] = B[D] = B[T] = true, B[c] = B[p] = B[k] = B[f] = B[z] = B[m] = B[y] = B[A] = B[C] = B[O] = B[R] = B[H] = B[K] = B[it] = B[st] = false;
             function N(I) {
               return u(I) && s(I.length) && !!B[r(I)];
             }
             i.exports = N;
-          }), Oa = M((e, i) => {
+          }), Ra = M((e, i) => {
             function r(s) {
               return function(u) {
                 return s(u);
               };
             }
             i.exports = r;
-          }), Ra = M((e, i) => {
-            var r = he(), s = typeof e == "object" && e && !e.nodeType && e, u = s && typeof i == "object" && i && !i.nodeType && i, h = u && u.exports === s, p = h && r.process, f = (function() {
+          }), Fa = M((e, i) => {
+            var r = he(), s = typeof e == "object" && e && !e.nodeType && e, u = s && typeof i == "object" && i && !i.nodeType && i, c = u && u.exports === s, p = c && r.process, f = (function() {
               try {
                 var m = u && u.require && u.require("util").types;
                 return m || p && p.binding && p.binding("util");
@@ -5558,62 +5558,62 @@ var require_stdin = __commonJS({
             })();
             i.exports = f;
           }), ys = M((e, i) => {
-            var r = gs(), s = Oa(), u = Ra(), h = u && u.isTypedArray, p = h ? s(h) : r;
+            var r = gs(), s = Ra(), u = Fa(), c = u && u.isTypedArray, p = c ? s(c) : r;
             i.exports = p;
           }), vs = M((e, i) => {
             function r(s, u) {
               if (!(u === "constructor" && typeof s[u] == "function") && u != "__proto__") return s[u];
             }
             i.exports = r;
-          }), Fa = M((e, i) => {
-            var r = Ui(), s = wt(), u = Object.prototype, h = u.hasOwnProperty;
+          }), za = M((e, i) => {
+            var r = Ui(), s = wt(), u = Object.prototype, c = u.hasOwnProperty;
             function p(f, m, y) {
               var A = f[m];
-              (!(h.call(f, m) && s(A, y)) || y === void 0 && !(m in f)) && r(f, m, y);
+              (!(c.call(f, m) && s(A, y)) || y === void 0 && !(m in f)) && r(f, m, y);
             }
             i.exports = p;
-          }), za = M((e, i) => {
-            var r = Fa(), s = Ui();
-            function u(h, p, f, m) {
+          }), Na = M((e, i) => {
+            var r = za(), s = Ui();
+            function u(c, p, f, m) {
               var y = !f;
               f || (f = {});
               for (var A = -1, C = p.length; ++A < C; ) {
-                var O = p[A], R = m ? m(f[O], h[O], O, f, h) : void 0;
-                R === void 0 && (R = h[O]), y ? s(f, O, R) : r(f, O, R);
+                var O = p[A], R = m ? m(f[O], c[O], O, f, c) : void 0;
+                R === void 0 && (R = c[O]), y ? s(f, O, R) : r(f, O, R);
               }
               return f;
             }
             i.exports = u;
           }), pr = M((e, i) => {
             function r(s, u) {
-              for (var h = -1, p = Array(s); ++h < s; ) p[h] = u(h);
+              for (var c = -1, p = Array(s); ++c < s; ) p[c] = u(c);
               return p;
             }
             i.exports = r;
           }), Ls = M((e, i) => {
             var r = 9007199254740991, s = /^(?:0|[1-9]\d*)$/;
-            function u(h, p) {
-              var f = typeof h;
-              return p = p ?? r, !!p && (f == "number" || f != "symbol" && s.test(h)) && h > -1 && h % 1 == 0 && h < p;
+            function u(c, p) {
+              var f = typeof c;
+              return p = p ?? r, !!p && (f == "number" || f != "symbol" && s.test(c)) && c > -1 && c % 1 == 0 && c < p;
             }
             i.exports = u;
-          }), Na = M((e, i) => {
-            var r = pr(), s = On(), u = Zi(), h = dr(), p = Ls(), f = ys(), m = Object.prototype, y = m.hasOwnProperty;
+          }), Ua = M((e, i) => {
+            var r = pr(), s = On(), u = Zi(), c = dr(), p = Ls(), f = ys(), m = Object.prototype, y = m.hasOwnProperty;
             function A(C, O) {
-              var R = u(C), H = !R && s(C), K = !R && !H && h(C), it = !R && !H && !K && f(C), st = R || H || K || it, k = st ? r(C.length, String) : [], z = k.length;
+              var R = u(C), H = !R && s(C), K = !R && !H && c(C), it = !R && !H && !K && f(C), st = R || H || K || it, k = st ? r(C.length, String) : [], z = k.length;
               for (var V in C) (O || y.call(C, V)) && !(st && (V == "length" || K && (V == "offset" || V == "parent") || it && (V == "buffer" || V == "byteLength" || V == "byteOffset") || p(V, z))) && k.push(V);
               return k;
             }
             i.exports = A;
-          }), Ua = M((e, i) => {
+          }), Ga = M((e, i) => {
             function r(s) {
               var u = [];
-              if (s != null) for (var h in Object(s)) u.push(h);
+              if (s != null) for (var c in Object(s)) u.push(c);
               return u;
             }
             i.exports = r;
-          }), Ga = M((e, i) => {
-            var r = Ut(), s = cr(), u = Ua(), h = Object.prototype, p = h.hasOwnProperty;
+          }), Za = M((e, i) => {
+            var r = Ut(), s = cr(), u = Ga(), c = Object.prototype, p = c.hasOwnProperty;
             function f(m) {
               if (!r(m)) return u(m);
               var y = s(m), A = [];
@@ -5622,19 +5622,19 @@ var require_stdin = __commonJS({
             }
             i.exports = f;
           }), Ze = M((e, i) => {
-            var r = Na(), s = Ga(), u = Mi();
-            function h(p) {
+            var r = Ua(), s = Za(), u = Mi();
+            function c(p) {
               return u(p) ? r(p, true) : s(p);
             }
-            i.exports = h;
+            i.exports = c;
           }), ct = M((e, i) => {
-            var r = za(), s = Ze();
-            function u(h) {
-              return r(h, s(h));
+            var r = Na(), s = Ze();
+            function u(c) {
+              return r(c, s(c));
             }
             i.exports = u;
           }), bs = M((e, i) => {
-            var r = as(), s = us(), u = Sa(), h = hr(), p = ps(), f = On(), m = Zi(), y = Da(), A = dr(), C = ce(), O = Ut(), R = ms(), H = ys(), K = vs(), it = ct();
+            var r = as(), s = us(), u = Da(), c = hr(), p = ps(), f = On(), m = Zi(), y = Ia(), A = dr(), C = ce(), O = Ut(), R = ms(), H = ys(), K = vs(), it = ct();
             function st(k, z, V, tt, Q, $, b) {
               var w = K(k, V), E = K(z, V), D = b.get(E);
               if (D) {
@@ -5644,16 +5644,16 @@ var require_stdin = __commonJS({
               var T = $ ? $(w, E, V + "", k, z, b) : void 0, B = T === void 0;
               if (B) {
                 var N = m(E), I = !N && A(E), F = !N && !I && H(E);
-                T = E, N || I || F ? m(w) ? T = w : y(w) ? T = h(w) : I ? (B = false, T = s(E, true)) : F ? (B = false, T = u(E, true)) : T = [] : R(E) || f(E) ? (T = w, f(w) ? T = it(w) : (!O(w) || C(w)) && (T = p(E))) : B = false;
+                T = E, N || I || F ? m(w) ? T = w : y(w) ? T = c(w) : I ? (B = false, T = s(E, true)) : F ? (B = false, T = u(E, true)) : T = [] : R(E) || f(E) ? (T = w, f(w) ? T = it(w) : (!O(w) || C(w)) && (T = p(E))) : B = false;
               }
               B && (b.set(E, T), Q(T, E, tt, $, b), b.delete(E)), r(k, V, T);
             }
             i.exports = st;
           }), ws = M((e, i) => {
-            var r = ss(), s = as(), u = lr(), h = bs(), p = Ut(), f = Ze(), m = vs();
+            var r = ss(), s = as(), u = lr(), c = bs(), p = Ut(), f = Ze(), m = vs();
             function y(A, C, O, R, H) {
               A !== C && u(C, function(K, it) {
-                if (H || (H = new r()), p(K)) h(A, C, it, O, y, R, H);
+                if (H || (H = new r()), p(K)) c(A, C, it, O, y, R, H);
                 else {
                   var st = R ? R(m(A, it), K, it + "", A, C, H) : void 0;
                   st === void 0 && (st = K), s(A, it, st);
@@ -5667,28 +5667,28 @@ var require_stdin = __commonJS({
             }
             i.exports = r;
           }), Cs = M((e, i) => {
-            function r(s, u, h) {
-              switch (h.length) {
+            function r(s, u, c) {
+              switch (c.length) {
                 case 0:
                   return s.call(u);
                 case 1:
-                  return s.call(u, h[0]);
+                  return s.call(u, c[0]);
                 case 2:
-                  return s.call(u, h[0], h[1]);
+                  return s.call(u, c[0], c[1]);
                 case 3:
-                  return s.call(u, h[0], h[1], h[2]);
+                  return s.call(u, c[0], c[1], c[2]);
               }
-              return s.apply(u, h);
+              return s.apply(u, c);
             }
             i.exports = r;
           }), _r = M((e, i) => {
             var r = Cs(), s = Math.max;
-            function u(h, p, f) {
-              return p = s(p === void 0 ? h.length - 1 : p, 0), function() {
+            function u(c, p, f) {
+              return p = s(p === void 0 ? c.length - 1 : p, 0), function() {
                 for (var m = arguments, y = -1, A = s(m.length - p, 0), C = Array(A); ++y < A; ) C[y] = m[p + y];
                 y = -1;
                 for (var O = Array(p + 1); ++y < p; ) O[y] = m[y];
-                return O[p] = f(C), r(h, this, O);
+                return O[p] = f(C), r(c, this, O);
               };
             }
             i.exports = u;
@@ -5700,7 +5700,7 @@ var require_stdin = __commonJS({
             }
             i.exports = r;
           }), ji = M((e, i) => {
-            var r = xs(), s = In(), u = fr(), h = s ? function(p, f) {
+            var r = xs(), s = In(), u = fr(), c = s ? function(p, f) {
               return s(p, "toString", {
                 configurable: true,
                 enumerable: false,
@@ -5708,10 +5708,10 @@ var require_stdin = __commonJS({
                 writable: true
               });
             } : u;
-            i.exports = h;
+            i.exports = c;
           }), Es = M((e, i) => {
             var r = 800, s = 16, u = Date.now;
-            function h(p) {
+            function c(p) {
               var f = 0, m = 0;
               return function() {
                 var y = u(), A = s - (y - m);
@@ -5721,136 +5721,136 @@ var require_stdin = __commonJS({
                 return p.apply(void 0, arguments);
               };
             }
-            i.exports = h;
-          }), Za = M((e, i) => {
+            i.exports = c;
+          }), ja = M((e, i) => {
             var r = ji(), s = Es(), u = s(r);
             i.exports = u;
-          }), ja = M((e, i) => {
-            var r = fr(), s = _r(), u = Za();
-            function h(p, f) {
+          }), qa = M((e, i) => {
+            var r = fr(), s = _r(), u = ja();
+            function c(p, f) {
               return u(s(p, f, r), p + "");
             }
-            i.exports = h;
-          }), qa = M((e, i) => {
-            var r = wt(), s = Mi(), u = Ls(), h = Ut();
+            i.exports = c;
+          }), Va = M((e, i) => {
+            var r = wt(), s = Mi(), u = Ls(), c = Ut();
             function p(f, m, y) {
-              if (!h(y)) return false;
+              if (!c(y)) return false;
               var A = typeof m;
               return (A == "number" ? s(y) && u(m, y.length) : A == "string" && m in y) ? r(y[m], f) : false;
             }
             i.exports = p;
-          }), Va = M((e, i) => {
-            var r = ja(), s = qa();
-            function u(h) {
+          }), Ha = M((e, i) => {
+            var r = qa(), s = Va();
+            function u(c) {
               return r(function(p, f) {
                 var m = -1, y = f.length, A = y > 1 ? f[y - 1] : void 0, C = y > 2 ? f[2] : void 0;
-                for (A = h.length > 3 && typeof A == "function" ? (y--, A) : void 0, C && s(f[0], f[1], C) && (A = y < 3 ? void 0 : A, y = 1), p = Object(p); ++m < y; ) {
+                for (A = c.length > 3 && typeof A == "function" ? (y--, A) : void 0, C && s(f[0], f[1], C) && (A = y < 3 ? void 0 : A, y = 1), p = Object(p); ++m < y; ) {
                   var O = f[m];
-                  O && h(p, O, m, A);
+                  O && c(p, O, m, A);
                 }
                 return p;
               });
             }
             i.exports = u;
           }), Rn = M((e, i) => {
-            var r = ws(), s = Va(), u = s(function(h, p, f) {
-              r(h, p, f);
+            var r = ws(), s = Ha(), u = s(function(c, p, f) {
+              r(c, p, f);
             });
             i.exports = u;
           }), mr = M((e, i) => {
             var r = G(), s = Gi(), u = "[object Symbol]";
-            function h(p) {
+            function c(p) {
               return typeof p == "symbol" || s(p) && r(p) == u;
             }
-            i.exports = h;
+            i.exports = c;
           }), Fn = M((e, i) => {
-            var r = Zi(), s = mr(), u = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/, h = /^\w*$/;
+            var r = Zi(), s = mr(), u = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/, c = /^\w*$/;
             function p(f, m) {
               if (r(f)) return false;
               var y = typeof f;
-              return y == "number" || y == "symbol" || y == "boolean" || f == null || s(f) ? true : h.test(f) || !u.test(f) || m != null && f in Object(m);
+              return y == "number" || y == "symbol" || y == "boolean" || f == null || s(f) ? true : c.test(f) || !u.test(f) || m != null && f in Object(m);
             }
             i.exports = p;
-          }), Ha = M((e, i) => {
+          }), Wa = M((e, i) => {
             var r = ns(), s = "Expected a function";
-            function u(h, p) {
-              if (typeof h != "function" || p != null && typeof p != "function") throw new TypeError(s);
+            function u(c, p) {
+              if (typeof c != "function" || p != null && typeof p != "function") throw new TypeError(s);
               var f = function() {
                 var m = arguments, y = p ? p.apply(this, m) : m[0], A = f.cache;
                 if (A.has(y)) return A.get(y);
-                var C = h.apply(this, m);
+                var C = c.apply(this, m);
                 return f.cache = A.set(y, C) || A, C;
               };
               return f.cache = new (u.Cache || r)(), f;
             }
             u.Cache = r, i.exports = u;
-          }), Wa = M((e, i) => {
-            var r = Ha(), s = 500;
-            function u(h) {
-              var p = r(h, function(m) {
+          }), Ka = M((e, i) => {
+            var r = Wa(), s = 500;
+            function u(c) {
+              var p = r(c, function(m) {
                 return f.size === s && f.clear(), m;
               }), f = p.cache;
               return p;
             }
             i.exports = u;
-          }), Ka = M((e, i) => {
-            var r = Wa(), s = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g, u = /\\(\\)?/g, h = r(function(p) {
+          }), Ya = M((e, i) => {
+            var r = Ka(), s = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g, u = /\\(\\)?/g, c = r(function(p) {
               var f = [];
               return p.charCodeAt(0) === 46 && f.push(""), p.replace(s, function(m, y, A, C) {
                 f.push(A ? C.replace(u, "$1") : y || m);
               }), f;
             });
-            i.exports = h;
-          }), Ya = M((e, i) => {
+            i.exports = c;
+          }), Xa = M((e, i) => {
             function r(s, u) {
-              for (var h = -1, p = s == null ? 0 : s.length, f = Array(p); ++h < p; ) f[h] = u(s[h], h, s);
+              for (var c = -1, p = s == null ? 0 : s.length, f = Array(p); ++c < p; ) f[c] = u(s[c], c, s);
               return f;
             }
             i.exports = r;
-          }), Xa = M((e, i) => {
-            var r = Ne(), s = Ya(), u = Zi(), h = mr(), p = r ? r.prototype : void 0, f = p ? p.toString : void 0;
+          }), Ja = M((e, i) => {
+            var r = Ne(), s = Xa(), u = Zi(), c = mr(), p = r ? r.prototype : void 0, f = p ? p.toString : void 0;
             function m(y) {
               if (typeof y == "string") return y;
               if (u(y)) return s(y, m) + "";
-              if (h(y)) return f ? f.call(y) : "";
+              if (c(y)) return f ? f.call(y) : "";
               var A = y + "";
               return A == "0" && 1 / y == -1 / 0 ? "-0" : A;
             }
             i.exports = m;
           }), gr = M((e, i) => {
-            var r = Xa();
+            var r = Ja();
             function s(u) {
               return u == null ? "" : r(u);
             }
             i.exports = s;
           }), _n = M((e, i) => {
-            var r = Zi(), s = Fn(), u = Ka(), h = gr();
+            var r = Zi(), s = Fn(), u = Ya(), c = gr();
             function p(f, m) {
               return r(f) ? f : s(f, m) ? [
                 f
-              ] : u(h(f));
+              ] : u(c(f));
             }
             i.exports = p;
           }), Ms = M((e, i) => {
             var r = mr();
             function s(u) {
               if (typeof u == "string" || r(u)) return u;
-              var h = u + "";
-              return h == "0" && 1 / u == -1 / 0 ? "-0" : h;
+              var c = u + "";
+              return c == "0" && 1 / u == -1 / 0 ? "-0" : c;
             }
             i.exports = s;
           }), ks = M((e, i) => {
             var r = _n(), s = Ms();
-            function u(h, p) {
-              p = r(p, h);
-              for (var f = 0, m = p.length; h != null && f < m; ) h = h[s(p[f++])];
-              return f && f == m ? h : void 0;
+            function u(c, p) {
+              p = r(p, c);
+              for (var f = 0, m = p.length; c != null && f < m; ) c = c[s(p[f++])];
+              return f && f == m ? c : void 0;
             }
             i.exports = u;
           }), ci = M((e, i) => {
             var r = ks();
-            function s(u, h, p) {
-              var f = u == null ? void 0 : r(u, h);
+            function s(u, c, p) {
+              var f = u == null ? void 0 : r(u, c);
               return f === void 0 ? p : f;
             }
             i.exports = s;
@@ -5881,7 +5881,7 @@ var require_stdin = __commonJS({
               function u(k, z) {
                 return k < z ? -1 : k > z ? 1 : 0;
               }
-              var h = function(k) {
+              var c = function(k) {
                 k === void 0 && (k = 9), this._maxEntries = Math.max(4, k), this._minEntries = Math.max(2, Math.ceil(0.4 * this._maxEntries)), this.clear();
               };
               function p(k, z, V) {
@@ -5941,9 +5941,9 @@ var require_stdin = __commonJS({
                   r(k, b, z, V, Q), $.push(z, b, b, V);
                 }
               }
-              return h.prototype.all = function() {
+              return c.prototype.all = function() {
                 return this._all(this.data, []);
-              }, h.prototype.search = function(k) {
+              }, c.prototype.search = function(k) {
                 var z = this.data, V = [];
                 if (!K(k, z)) return V;
                 for (var tt = this.toBBox, Q = []; z; ) {
@@ -5954,7 +5954,7 @@ var require_stdin = __commonJS({
                   z = Q.pop();
                 }
                 return V;
-              }, h.prototype.collides = function(k) {
+              }, c.prototype.collides = function(k) {
                 var z = this.data;
                 if (!K(k, z)) return false;
                 for (var V = []; z; ) {
@@ -5968,7 +5968,7 @@ var require_stdin = __commonJS({
                   z = V.pop();
                 }
                 return false;
-              }, h.prototype.load = function(k) {
+              }, c.prototype.load = function(k) {
                 if (!k || !k.length) return this;
                 if (k.length < this._minEntries) {
                   for (var z = 0; z < k.length; z++) this.insert(k[z]);
@@ -5985,11 +5985,11 @@ var require_stdin = __commonJS({
                 }
                 else this.data = V;
                 return this;
-              }, h.prototype.insert = function(k) {
+              }, c.prototype.insert = function(k) {
                 return k && this._insert(k, this.data.height - 1), this;
-              }, h.prototype.clear = function() {
+              }, c.prototype.clear = function() {
                 return this.data = it([]), this;
-              }, h.prototype.remove = function(k, z) {
+              }, c.prototype.remove = function(k, z) {
                 if (!k) return this;
                 for (var V, tt, Q, $ = this.data, b = this.toBBox(k), w = [], E = []; $ || w.length; ) {
                   if ($ || ($ = w.pop(), tt = w[w.length - 1], V = E.pop(), Q = true), $.leaf) {
@@ -5999,20 +5999,20 @@ var require_stdin = __commonJS({
                   Q || $.leaf || !H($, b) ? tt ? (V++, $ = tt.children[V], Q = false) : $ = null : (w.push($), E.push(V), V = 0, tt = $, $ = $.children[0]);
                 }
                 return this;
-              }, h.prototype.toBBox = function(k) {
+              }, c.prototype.toBBox = function(k) {
                 return k;
-              }, h.prototype.compareMinX = function(k, z) {
+              }, c.prototype.compareMinX = function(k, z) {
                 return k.minX - z.minX;
-              }, h.prototype.compareMinY = function(k, z) {
+              }, c.prototype.compareMinY = function(k, z) {
                 return k.minY - z.minY;
-              }, h.prototype.toJSON = function() {
+              }, c.prototype.toJSON = function() {
                 return this.data;
-              }, h.prototype.fromJSON = function(k) {
+              }, c.prototype.fromJSON = function(k) {
                 return this.data = k, this;
-              }, h.prototype._all = function(k, z) {
+              }, c.prototype._all = function(k, z) {
                 for (var V = []; k; ) k.leaf ? z.push.apply(z, k.children) : V.push.apply(V, k.children), k = V.pop();
                 return z;
-              }, h.prototype._build = function(k, z, V, tt) {
+              }, c.prototype._build = function(k, z, V, tt) {
                 var Q, $ = V - z + 1, b = this._maxEntries;
                 if ($ <= b) return f(Q = it(k.slice(z, V + 1)), this.toBBox), Q;
                 tt || (tt = Math.ceil(Math.log($) / Math.log(b)), b = Math.ceil($ / Math.pow(b, tt - 1))), (Q = it([])).leaf = false, Q.height = tt;
@@ -6027,7 +6027,7 @@ var require_stdin = __commonJS({
                   }
                 }
                 return f(Q, this.toBBox), Q;
-              }, h.prototype._chooseSubtree = function(k, z, V, tt) {
+              }, c.prototype._chooseSubtree = function(k, z, V, tt) {
                 for (; tt.push(z), !z.leaf && tt.length - 1 !== V; ) {
                   for (var Q = 1 / 0, $ = 1 / 0, b = void 0, w = 0; w < z.children.length; w++) {
                     var E = z.children[w], D = O(E), T = (B = k, N = E, (Math.max(N.maxX, B.maxX) - Math.min(N.minX, B.minX)) * (Math.max(N.maxY, B.maxY) - Math.min(N.minY, B.minY)) - D);
@@ -6037,30 +6037,30 @@ var require_stdin = __commonJS({
                 }
                 var B, N;
                 return z;
-              }, h.prototype._insert = function(k, z, V) {
+              }, c.prototype._insert = function(k, z, V) {
                 var tt = V ? k : this.toBBox(k), Q = [], $ = this._chooseSubtree(tt, this.data, z, Q);
                 for ($.children.push(k), y($, tt); z >= 0 && Q[z].children.length > this._maxEntries; ) this._split(Q, z), z--;
                 this._adjustParentBBoxes(tt, Q, z);
-              }, h.prototype._split = function(k, z) {
+              }, c.prototype._split = function(k, z) {
                 var V = k[z], tt = V.children.length, Q = this._minEntries;
                 this._chooseSplitAxis(V, Q, tt);
                 var $ = this._chooseSplitIndex(V, Q, tt), b = it(V.children.splice($, V.children.length - $));
                 b.height = V.height, b.leaf = V.leaf, f(V, this.toBBox), f(b, this.toBBox), z ? k[z - 1].children.push(b) : this._splitRoot(V, b);
-              }, h.prototype._splitRoot = function(k, z) {
+              }, c.prototype._splitRoot = function(k, z) {
                 this.data = it([
                   k,
                   z
                 ]), this.data.height = k.height + 1, this.data.leaf = false, f(this.data, this.toBBox);
-              }, h.prototype._chooseSplitIndex = function(k, z, V) {
+              }, c.prototype._chooseSplitIndex = function(k, z, V) {
                 for (var tt, Q, $, b, w, E, D, T = 1 / 0, B = 1 / 0, N = z; N <= V - z; N++) {
                   var I = m(k, 0, N, this.toBBox), F = m(k, N, V, this.toBBox), j = (Q = I, $ = F, b = void 0, w = void 0, E = void 0, D = void 0, b = Math.max(Q.minX, $.minX), w = Math.max(Q.minY, $.minY), E = Math.min(Q.maxX, $.maxX), D = Math.min(Q.maxY, $.maxY), Math.max(0, E - b) * Math.max(0, D - w)), Z = O(I) + O(F);
                   j < T ? (T = j, tt = N, B = Z < B ? Z : B) : j === T && Z < B && (B = Z, tt = N);
                 }
                 return tt || V - z;
-              }, h.prototype._chooseSplitAxis = function(k, z, V) {
+              }, c.prototype._chooseSplitAxis = function(k, z, V) {
                 var tt = k.leaf ? this.compareMinX : A, Q = k.leaf ? this.compareMinY : C;
                 this._allDistMargin(k, z, V, tt) < this._allDistMargin(k, z, V, Q) && k.children.sort(tt);
-              }, h.prototype._allDistMargin = function(k, z, V, tt) {
+              }, c.prototype._allDistMargin = function(k, z, V, tt) {
                 k.children.sort(tt);
                 for (var Q = this.toBBox, $ = m(k, 0, z, Q), b = m(k, V - z, V, Q), w = R($) + R(b), E = z; E < V - z; E++) {
                   var D = k.children[E];
@@ -6071,11 +6071,11 @@ var require_stdin = __commonJS({
                   y(b, k.leaf ? Q(B) : B), w += R(b);
                 }
                 return w;
-              }, h.prototype._adjustParentBBoxes = function(k, z, V) {
+              }, c.prototype._adjustParentBBoxes = function(k, z, V) {
                 for (var tt = V; tt >= 0; tt--) y(z[tt], k);
-              }, h.prototype._condense = function(k) {
+              }, c.prototype._condense = function(k) {
                 for (var z = k.length - 1, V = void 0; z >= 0; z--) k[z].children.length === 0 ? z > 0 ? (V = k[z - 1].children).splice(V.indexOf(k[z]), 1) : this.clear() : f(k[z], this.toBBox);
-              }, h;
+              }, c;
             });
           });
           Array.prototype.findIndex = Array.prototype.findIndex || function(e) {
@@ -6087,8 +6087,8 @@ var require_stdin = __commonJS({
             if (this === null) throw new TypeError("Array.prototype.find called on null or undefined");
             if (typeof e != "function") throw new TypeError("callback must be a function");
             for (var i = Object(this), r = i.length >>> 0, s = arguments[1], u = 0; u < r; u++) {
-              var h = i[u];
-              if (e.call(s, h, u, i)) return h;
+              var c = i[u];
+              if (e.call(s, c, u, i)) return c;
             }
           }, typeof Object.assign != "function" && (Object.assign = function(e) {
             if (e == null) throw new TypeError("Cannot convert undefined or null to object");
@@ -6118,13 +6118,13 @@ var require_stdin = __commonJS({
               if (this == null) throw new TypeError('"this" is null or not defined');
               var r = Object(this), s = r.length >>> 0;
               if (s === 0) return false;
-              var u = i | 0, h = Math.max(u >= 0 ? u : s - Math.abs(u), 0);
+              var u = i | 0, c = Math.max(u >= 0 ? u : s - Math.abs(u), 0);
               function p(f, m) {
                 return f === m || typeof f == "number" && typeof m == "number" && isNaN(f) && isNaN(m);
               }
-              for (; h < s; ) {
-                if (p(r[h], e)) return true;
-                h++;
+              for (; c < s; ) {
+                if (p(r[c], e)) return true;
+                c++;
               }
               return false;
             }
@@ -6430,7 +6430,7 @@ var require_stdin = __commonJS({
               pinningButton: "Speld gedeelde hoekpunten samen",
               rotateButton: "Laag roteren"
             }
-          }, Ja = {
+          }, Qa = {
             tooltips: {
               placeMarker: "Cliquez pour placer un marqueur",
               placeMarkerTouch: "Appuyez sur la carte pour placer un marqueur",
@@ -7070,7 +7070,7 @@ var require_stdin = __commonJS({
               rotateButton: "K\xE4\xE4nn\xE4",
               drawTextButton: "Piirr\xE4 teksti\xE4"
             }
-          }, Qa = {
+          }, $a = {
             tooltips: {
               placeMarker: "\uB9C8\uCEE4 \uC704\uCE58\uB97C \uD074\uB9AD\uD558\uC138\uC694",
               placeMarkerTouch: "\uC9C0\uB3C4\uB97C \uD0ED\uD558\uC5EC \uB9C8\uCEE4\uB97C \uBC30\uCE58\uD558\uC138\uC694",
@@ -7162,7 +7162,7 @@ var require_stdin = __commonJS({
             ru: vr,
             es: zn,
             nl: Te,
-            fr: Ja,
+            fr: Qa,
             pt: Ke,
             pt_br: Jt,
             pt_pt: di,
@@ -7180,7 +7180,7 @@ var require_stdin = __commonJS({
             cz: Gn,
             ja: As,
             fi: Er,
-            ko: Qa,
+            ko: $a,
             ky: vt
           }, Bs = {
             _globalEditModeEnabled: false,
@@ -7540,7 +7540,7 @@ var require_stdin = __commonJS({
                 originLatLngs: i
               }, r, s);
             },
-            _fireRotation(e, i, r, s = this._rotationLayer, u = "Rotation", h = {}) {
+            _fireRotation(e, i, r, s = this._rotationLayer, u = "Rotation", c = {}) {
               this.__fire(e, "pm:rotate", {
                 layer: s,
                 helpLayer: this._layer,
@@ -7549,7 +7549,7 @@ var require_stdin = __commonJS({
                 angleDiff: i,
                 oldLatLngs: r,
                 newLatLngs: s.getLatLngs()
-              }, u, h);
+              }, u, c);
             },
             _fireRotationEnd(e, i, r, s = "Rotation", u = {}) {
               this.__fire(e, "pm:rotateend", {
@@ -7575,13 +7575,13 @@ var require_stdin = __commonJS({
                 button: i
               }, r, s);
             },
-            _fireLangChange(e, i, r, s, u = "Global", h = {}) {
+            _fireLangChange(e, i, r, s, u = "Global", c = {}) {
               this.__fire(this.map, "pm:langchange", {
                 oldLang: e,
                 activeLang: i,
                 fallback: r,
                 translations: s
-              }, u, h);
+              }, u, c);
             },
             _fireGlobalDragModeToggled(e, i = "Global", r = {}) {
               this.__fire(this.map, "pm:globaldragmodetoggled", {
@@ -7638,7 +7638,7 @@ var require_stdin = __commonJS({
                 source: s
               }), L.PM.Utils._fireEvent(e, i, r);
             }
-          }, bn = Ps, $a = () => ({
+          }, bn = Ps, to = () => ({
             _lastEvents: {
               keydown: void 0,
               keyup: void 0,
@@ -7720,7 +7720,7 @@ var require_stdin = __commonJS({
               var _a3;
               return (_a3 = this._lastEvents.current) == null ? void 0 : _a3.event.key;
             }
-          }), Ts = $a, Zn = et(ci());
+          }), Ts = to, Zn = et(ci());
           function At(e) {
             let i = L.PM.activeLang;
             return (0, Zn.default)(St[i], e) || (0, Zn.default)(St.en, e) || e;
@@ -7751,19 +7751,19 @@ var require_stdin = __commonJS({
               a: L.CRS.Earth.R,
               b: 63567523142e-4,
               f: 0.0033528106647474805
-            }, { a: u, b: h, f: p } = s, f = e.lng, m = e.lat, y = r, A = Math.PI, C = i * A / 180, O = Math.sin(C), R = Math.cos(C), H = (1 - p) * Math.tan(m * A / 180), K = 1 / Math.sqrt(1 + H * H), it = H * K, st = Math.atan2(H, R), k = K * O, z = 1 - k * k, V = z * (u * u - h * h) / (h * h), tt = 1 + V / 16384 * (4096 + V * (-768 + V * (320 - 175 * V))), Q = V / 1024 * (256 + V * (-128 + V * (74 - 47 * V))), $ = y / (h * tt), b = 2 * Math.PI, w, E, D;
+            }, { a: u, b: c, f: p } = s, f = e.lng, m = e.lat, y = r, A = Math.PI, C = i * A / 180, O = Math.sin(C), R = Math.cos(C), H = (1 - p) * Math.tan(m * A / 180), K = 1 / Math.sqrt(1 + H * H), it = H * K, st = Math.atan2(H, R), k = K * O, z = 1 - k * k, V = z * (u * u - c * c) / (c * c), tt = 1 + V / 16384 * (4096 + V * (-768 + V * (320 - 175 * V))), Q = V / 1024 * (256 + V * (-128 + V * (74 - 47 * V))), $ = y / (c * tt), b = 2 * Math.PI, w, E, D;
             for (; Math.abs($ - b) > 1e-12; ) {
               w = Math.cos(2 * st + $), E = Math.sin($), D = Math.cos($);
               let Y = Q * E * (w + Q / 4 * (D * (-1 + 2 * w * w) - Q / 6 * w * (-3 + 4 * E * E) * (-3 + 4 * w * w)));
-              b = $, $ = y / (h * tt) + Y;
+              b = $, $ = y / (c * tt) + Y;
             }
             let T = it * E - K * D * R, B = Math.atan2(it * D + K * E * R, (1 - p) * Math.sqrt(k * k + T * T)), N = Math.atan2(E * O, K * D - it * E * R), I = p / 16 * z * (4 + p * (4 - 3 * z)), F = N - (1 - I) * p * k * ($ + I * E * (w + I * D * (-1 + 2 * w * w))), j = f + F * 180 / A, Z = B * 180 / A;
             return L.latLng(j, Z);
           }
           function Hi(e, i, r, s, u = true) {
-            let h, p, f, m = [];
+            let c, p, f, m = [];
             for (let y = 0; y < r; y += 1) {
-              if (u) h = y * 360 / r + s, p = je(e, h, i), f = L.latLng(p.lng, p.lat);
+              if (u) c = y * 360 / r + s, p = je(e, c, i), f = L.latLng(p.lng, p.lat);
               else {
                 let A = e.lat + Math.cos(2 * y * Math.PI / r) * i, C = e.lng + Math.sin(2 * y * Math.PI / r) * i;
                 f = L.latLng(A, C);
@@ -7774,7 +7774,7 @@ var require_stdin = __commonJS({
           }
           function Ds(e, i, r) {
             i = (i + 360) % 360;
-            let s = Math.PI / 180, u = 180 / Math.PI, { R: h } = L.CRS.Earth, p = e.lng * s, f = e.lat * s, m = i * s, y = Math.sin(f), A = Math.cos(f), C = Math.cos(r / h), O = Math.sin(r / h), R = Math.asin(y * C + A * O * Math.cos(m)), H = p + Math.atan2(Math.sin(m) * O * A, C - y * Math.sin(R));
+            let s = Math.PI / 180, u = 180 / Math.PI, { R: c } = L.CRS.Earth, p = e.lng * s, f = e.lat * s, m = i * s, y = Math.sin(f), A = Math.cos(f), C = Math.cos(r / c), O = Math.sin(r / c), R = Math.asin(y * C + A * O * Math.cos(m)), H = p + Math.atan2(Math.sin(m) * O * A, C - y * Math.sin(R));
             H *= u;
             let K = H - 360, it = H < -180 ? H + 360 : H;
             return H = H > 180 ? K : it, L.latLng([
@@ -7783,17 +7783,17 @@ var require_stdin = __commonJS({
             ]);
           }
           function Pr(e, i, r) {
-            let s = e.latLngToContainerPoint(i), u = e.latLngToContainerPoint(r), h = Math.atan2(u.y - s.y, u.x - s.x) * 180 / Math.PI + 90;
-            return h += h < 0 ? 360 : 0, h;
+            let s = e.latLngToContainerPoint(i), u = e.latLngToContainerPoint(r), c = Math.atan2(u.y - s.y, u.x - s.x) * 180 / Math.PI + 90;
+            return c += c < 0 ? 360 : 0, c;
           }
           function Wi(e, i, r, s) {
             let u = Pr(e, i, r);
             return Ds(i, u, s);
           }
-          function to(e, i, r = "asc") {
+          function eo(e, i, r = "asc") {
             if (!i || Object.keys(i).length === 0) return (m, y) => m - y;
-            let s = Object.keys(i), u, h = s.length - 1, p = {};
-            for (; h >= 0; ) u = s[h], p[u.toLowerCase()] = i[u], h -= 1;
+            let s = Object.keys(i), u, c = s.length - 1, p = {};
+            for (; c >= 0; ) u = s[c], p[u.toLowerCase()] = i[u], c -= 1;
             function f(m) {
               if (m instanceof L.Marker) return "Marker";
               if (m instanceof L.Circle) return "Circle";
@@ -7833,7 +7833,7 @@ var require_stdin = __commonJS({
             }
             return e;
           }
-          var eo = L.Class.extend({
+          var io = L.Class.extend({
             includes: [
               Mr,
               Ar,
@@ -7987,7 +7987,7 @@ var require_stdin = __commonJS({
               }
               return r;
             }
-          }), Ye = eo, io = L.Control.extend({
+          }), Ye = io, no = L.Control.extend({
             includes: [
               bn
             ],
@@ -8046,7 +8046,7 @@ var require_stdin = __commonJS({
               e.title && r.setAttribute("title", e.title);
               let s = L.DomUtil.create("a", "leaflet-buttons-control-button", r);
               s.setAttribute("role", "button"), s.setAttribute("tabindex", "0"), s.href = "#";
-              let u = L.DomUtil.create("div", `leaflet-pm-actions-container ${i}`, r), h = e.actions, p = {
+              let u = L.DomUtil.create("div", `leaflet-pm-actions-container ${i}`, r), c = e.actions, p = {
                 cancel: {
                   text: At("actions.cancel"),
                   title: At("actions.cancel"),
@@ -8076,7 +8076,7 @@ var require_stdin = __commonJS({
                   }
                 }
               };
-              e._preparedActions = h.map((m) => {
+              e._preparedActions = c.map((m) => {
                 let y = typeof m == "string" ? m : m.name, A;
                 if (p[y]) A = p[y];
                 else if (m.text) A = m;
@@ -8126,7 +8126,7 @@ var require_stdin = __commonJS({
                 (i == null ? void 0 : i._node) && (i.isActive && i.isActive.call(this) ? L.DomUtil.addClass(i._node, "active-action") : L.DomUtil.removeClass(i._node, "active-action"));
               });
             }
-          }), Os = io;
+          }), Os = no;
           L.Control.PMButton = Os;
           var pi = L.Class.extend({
             options: {
@@ -8316,7 +8316,7 @@ var require_stdin = __commonJS({
                 actions: [
                   "cancel"
                 ]
-              }, h = {
+              }, c = {
                 title: At("buttonTitles.drawRectButton"),
                 className: "control-icon leaflet-pm-icon-rectangle",
                 jsClass: "Rectangle",
@@ -8436,7 +8436,7 @@ var require_stdin = __commonJS({
                   "cancel"
                 ]
               };
-              this._addButton("drawMarker", new L.Control.PMButton(e)), this._addButton("drawPolyline", new L.Control.PMButton(r)), this._addButton("drawRectangle", new L.Control.PMButton(h)), this._addButton("drawPolygon", new L.Control.PMButton(i)), this._addButton("drawCircle", new L.Control.PMButton(s)), this._addButton("drawCircleMarker", new L.Control.PMButton(u)), this._addButton("drawText", new L.Control.PMButton(C)), this._addButton("editMode", new L.Control.PMButton(p)), this._addButton("dragMode", new L.Control.PMButton(f)), this._addButton("cutPolygon", new L.Control.PMButton(m)), this._addButton("removalMode", new L.Control.PMButton(y)), this._addButton("rotateMode", new L.Control.PMButton(A));
+              this._addButton("drawMarker", new L.Control.PMButton(e)), this._addButton("drawPolyline", new L.Control.PMButton(r)), this._addButton("drawRectangle", new L.Control.PMButton(c)), this._addButton("drawPolygon", new L.Control.PMButton(i)), this._addButton("drawCircle", new L.Control.PMButton(s)), this._addButton("drawCircleMarker", new L.Control.PMButton(u)), this._addButton("drawText", new L.Control.PMButton(C)), this._addButton("editMode", new L.Control.PMButton(p)), this._addButton("dragMode", new L.Control.PMButton(f)), this._addButton("cutPolygon", new L.Control.PMButton(m)), this._addButton("removalMode", new L.Control.PMButton(y)), this._addButton("rotateMode", new L.Control.PMButton(A));
             },
             _showHideButtons() {
               if (!this.isVisible) return;
@@ -8518,22 +8518,22 @@ var require_stdin = __commonJS({
             },
             changeControlOrder(e = []) {
               let i = this._shapeMapping(), r = [];
-              e.forEach((h) => {
-                i[h] ? r.push(i[h]) : r.push(h);
+              e.forEach((c) => {
+                i[c] ? r.push(i[c]) : r.push(c);
               });
               let s = this.getButtons(), u = {};
-              r.forEach((h) => {
-                s[h] && (u[h] = s[h]);
-              }), Object.keys(s).filter((h) => !s[h]._button.tool || s[h]._button.tool === "draw").forEach((h) => {
-                r.indexOf(h) === -1 && (u[h] = s[h]);
-              }), Object.keys(s).filter((h) => s[h]._button.tool === "edit").forEach((h) => {
-                r.indexOf(h) === -1 && (u[h] = s[h]);
-              }), Object.keys(s).filter((h) => s[h]._button.tool === "options").forEach((h) => {
-                r.indexOf(h) === -1 && (u[h] = s[h]);
-              }), Object.keys(s).filter((h) => s[h]._button.tool === "custom").forEach((h) => {
-                r.indexOf(h) === -1 && (u[h] = s[h]);
-              }), Object.keys(s).forEach((h) => {
-                r.indexOf(h) === -1 && (u[h] = s[h]);
+              r.forEach((c) => {
+                s[c] && (u[c] = s[c]);
+              }), Object.keys(s).filter((c) => !s[c]._button.tool || s[c]._button.tool === "draw").forEach((c) => {
+                r.indexOf(c) === -1 && (u[c] = s[c]);
+              }), Object.keys(s).filter((c) => s[c]._button.tool === "edit").forEach((c) => {
+                r.indexOf(c) === -1 && (u[c] = s[c]);
+              }), Object.keys(s).filter((c) => s[c]._button.tool === "options").forEach((c) => {
+                r.indexOf(c) === -1 && (u[c] = s[c]);
+              }), Object.keys(s).filter((c) => s[c]._button.tool === "custom").forEach((c) => {
+                r.indexOf(c) === -1 && (u[c] = s[c]);
+              }), Object.keys(s).forEach((c) => {
+                r.indexOf(c) === -1 && (u[c] = s[c]);
               }), this.map.pm.Toolbar.buttons = u, this._showHideButtons();
             },
             getControlOrder() {
@@ -8613,8 +8613,8 @@ var require_stdin = __commonJS({
               if (s.length <= 0) return false;
               let u = this._calcClosestLayer(r.getLatLng(), s);
               if (Object.keys(u).length === 0) return false;
-              let h = u.layer instanceof L.Marker || u.layer instanceof L.CircleMarker || !this.options.snapSegment, p;
-              h ? p = u.latlng : p = this._checkPrioritiySnapping(u);
+              let c = u.layer instanceof L.Marker || u.layer instanceof L.CircleMarker || !this.options.snapSegment, p;
+              c ? p = u.latlng : p = this._checkPrioritiySnapping(u);
               let f = this.options.snapDistance, m = {
                 marker: r,
                 shape: this._shape,
@@ -8683,26 +8683,26 @@ var require_stdin = __commonJS({
                 }
                 r === 1 && (u.distance === void 0 || m.distance - 5 <= u.distance) ? (m.distance + 5 < u.distance && (s = []), u = m, u.layer = p, s.push(u)) : r !== 1 && (u = {}, u = m, u.layer = p, s.push(u));
               }), r !== 1 && (s = s.sort((p, f) => p.distance - f.distance)), r === -1 && (r = s.length);
-              let h = this._getClosestLayerByPriority(s, r);
-              return L.Util.isArray(h) ? h : [
-                h
+              let c = this._getClosestLayerByPriority(s, r);
+              return L.Util.isArray(c) ? c : [
+                c
               ];
             },
             _calcLayerDistances(e, i) {
-              let r = this._map, s = i instanceof L.Marker || i instanceof L.CircleMarker, u = i instanceof L.Polygon, h = e;
+              let r = this._map, s = i instanceof L.Marker || i instanceof L.CircleMarker, u = i instanceof L.Polygon, c = e;
               if (s) {
                 let p = i.getLatLng();
                 return {
                   latlng: {
                     ...p
                   },
-                  distance: this._getDistance(r, p, h)
+                  distance: this._getDistance(r, p, c)
                 };
               }
-              return this._calcLatLngDistances(h, i.getLatLngs(), r, u);
+              return this._calcLatLngDistances(c, i.getLatLngs(), r, u);
             },
             _calcLatLngDistances(e, i, r, s = false) {
-              let u, h, p, f = (m) => {
+              let u, c, p, f = (m) => {
                 m.forEach((y, A) => {
                   if (Array.isArray(y)) {
                     f(y);
@@ -8714,14 +8714,14 @@ var require_stdin = __commonJS({
                     let R = m[O];
                     if (R) {
                       let H = this._getDistanceToSegment(r, e, C, R);
-                      (h === void 0 || H < h) && (h = H, p = [
+                      (c === void 0 || H < c) && (c = H, p = [
                         C,
                         R
                       ]);
                     }
                   } else {
                     let C = this._getDistance(r, e, y);
-                    (h === void 0 || C < h) && (h = C, u = y);
+                    (c === void 0 || C < c) && (c = C, u = y);
                   }
                 });
               };
@@ -8730,10 +8730,10 @@ var require_stdin = __commonJS({
                   ...this._getClosestPointOnSegment(r, e, p[0], p[1])
                 },
                 segment: p,
-                distance: h
+                distance: c
               } : {
                 latlng: u,
-                distance: h
+                distance: c
               };
             },
             _getClosestLayerByPriority(e, i = 1) {
@@ -8745,13 +8745,13 @@ var require_stdin = __commonJS({
                 "Line",
                 "Polygon",
                 "Rectangle"
-              ], s = this._map.pm.globalOptions.snappingOrder || [], u = 0, h = {};
+              ], s = this._map.pm.globalOptions.snappingOrder || [], u = 0, c = {};
               return s.concat(r).forEach((p) => {
-                h[p] || (u += 1, h[p] = u);
-              }), e.sort(to("instanceofShape", h)), i === 1 ? e[0] || {} : e.slice(0, i);
+                c[p] || (u += 1, c[p] = u);
+              }), e.sort(eo("instanceofShape", c)), i === 1 ? e[0] || {} : e.slice(0, i);
             },
             _checkPrioritiySnapping(e) {
-              let i = this._map, r = e.segment[0], s = e.segment[1], u = e.latlng, h = u;
+              let i = this._map, r = e.segment[0], s = e.segment[1], u = e.latlng, c = u;
               if (this.options.snapVertex) {
                 let p = this._getDistance(i, r, u), f = this._getDistance(i, s, u), m = p < f ? r : s, y = p < f ? p : f;
                 if (this.options.snapMiddle) {
@@ -8759,10 +8759,10 @@ var require_stdin = __commonJS({
                   O < p && O < f && (m = C, y = O);
                 }
                 let A = this.options.snapDistance;
-                y < A && (h = m);
+                y < A && (c = m);
               }
               return {
-                ...h
+                ...c
               };
             },
             _unsnap() {
@@ -8771,12 +8771,12 @@ var require_stdin = __commonJS({
             _getClosestPointOnSegment(e, i, r, s) {
               let u = e.getMaxZoom();
               u === 1 / 0 && (u = e.getZoom());
-              let h = e.project(i, u), p = e.project(r, u), f = e.project(s, u), m = L.LineUtil.closestPointOnSegment(h, p, f);
+              let c = e.project(i, u), p = e.project(r, u), f = e.project(s, u), m = L.LineUtil.closestPointOnSegment(c, p, f);
               return e.unproject(m, u);
             },
             _getDistanceToSegment(e, i, r, s) {
-              let u = e.latLngToContainerPoint(i), h = e.latLngToContainerPoint(r), p = e.latLngToContainerPoint(s);
-              return L.LineUtil.pointToSegmentDistance(u, h, p);
+              let u = e.latLngToContainerPoint(i), c = e.latLngToContainerPoint(r), p = e.latLngToContainerPoint(s);
+              return L.LineUtil.pointToSegmentDistance(u, c, p);
             },
             _getDistance(e, i, r) {
               return e.latLngToContainerPoint(i).distanceTo(e.latLngToContainerPoint(r));
@@ -8986,7 +8986,7 @@ var require_stdin = __commonJS({
               this._touchHint && this._touchHint.parentNode && (this._touchHint.parentNode.removeChild(this._touchHint), this._touchHint = null);
             }
           });
-          var ke = 63710088e-1, no = {
+          var ke = 63710088e-1, ro = {
             centimeters: ke * 100,
             centimetres: ke * 100,
             degrees: 360 / (2 * Math.PI),
@@ -9033,7 +9033,7 @@ var require_stdin = __commonJS({
             return i.id && (r.id = i.id), i.bbox && (r.bbox = i.bbox), r.features = e, r;
           }
           function qn(e, i = "kilometers") {
-            let r = no[i];
+            let r = ro[i];
             if (!r) throw new Error(i + " units is invalid");
             return e * r;
           }
@@ -9062,10 +9062,10 @@ var require_stdin = __commonJS({
             else if (r.type === "Polygon") i = r.coordinates;
             else throw new Error("Input must be a LineString, MultiLineString, Polygon, or MultiPolygon Feature or Geometry");
             return i.forEach((u) => {
-              i.forEach((h) => {
-                for (let p = 0; p < u.length - 1; p++) for (let f = p; f < h.length - 1; f++) {
-                  if (u === h && (Math.abs(p - f) === 1 || p === 0 && f === u.length - 2 && u[p][0] === u[u.length - 1][0] && u[p][1] === u[u.length - 1][1])) continue;
-                  let m = Gs(u[p][0], u[p][1], u[p + 1][0], u[p + 1][1], h[f][0], h[f][1], h[f + 1][0], h[f + 1][1]);
+              i.forEach((c) => {
+                for (let p = 0; p < u.length - 1; p++) for (let f = p; f < c.length - 1; f++) {
+                  if (u === c && (Math.abs(p - f) === 1 || p === 0 && f === u.length - 2 && u[p][0] === u[u.length - 1][0] && u[p][1] === u[u.length - 1][1])) continue;
+                  let m = Gs(u[p][0], u[p][1], u[p + 1][0], u[p + 1][1], c[f][0], c[f][1], c[f + 1][0], c[f + 1][1]);
                   m && s.features.push(Yi([
                     m[0],
                     m[1]
@@ -9074,14 +9074,14 @@ var require_stdin = __commonJS({
               });
             }), s;
           }
-          function Gs(e, i, r, s, u, h, p, f) {
+          function Gs(e, i, r, s, u, c, p, f) {
             let m, y, A, C, O, R = {
               x: null,
               y: null,
               onLine1: false,
               onLine2: false
             };
-            return m = (f - h) * (r - e) - (p - u) * (s - i), m === 0 ? R.x !== null && R.y !== null ? R : false : (y = i - h, A = e - u, C = (p - u) * y - (f - h) * A, O = (r - e) * y - (s - i) * A, y = C / m, A = O / m, R.x = e + y * (r - e), R.y = i + y * (s - i), y >= 0 && y <= 1 && (R.onLine1 = true), A >= 0 && A <= 1 && (R.onLine2 = true), R.onLine1 && R.onLine2 ? [
+            return m = (f - c) * (r - e) - (p - u) * (s - i), m === 0 ? R.x !== null && R.y !== null ? R : false : (y = i - c, A = e - u, C = (p - u) * y - (f - c) * A, O = (r - e) * y - (s - i) * A, y = C / m, A = O / m, R.x = e + y * (r - e), R.y = i + y * (s - i), y >= 0 && y <= 1 && (R.onLine1 = true), A >= 0 && A <= 1 && (R.onLine2 = true), R.onLine1 && R.onLine2 ? [
               R.x,
               R.y
             ] : false);
@@ -9179,8 +9179,8 @@ var require_stdin = __commonJS({
               }
               let i = this._layer.getLatLngs(), r = e[e.length - 1], { indexPath: s } = L.PM.Utils.findDeepMarkerIndex(e, r);
               e.pop(), this._layerGroup.removeLayer(r);
-              let u = e[e.length - 1], h = i.indexOf(u.getLatLng());
-              i = i.slice(0, h + 1), this._layer.setLatLngs(i), this._layer._latlngInfo.pop(), this._syncHintLine(), this._setTooltipText(), this._fireVertexRemoved(r, s, "Draw"), this._change(this._layer.getLatLngs());
+              let u = e[e.length - 1], c = i.indexOf(u.getLatLng());
+              i = i.slice(0, c + 1), this._layer.setLatLngs(i), this._layer._latlngInfo.pop(), this._syncHintLine(), this._setTooltipText(), this._fireVertexRemoved(r, s, "Draw"), this._change(this._layer.getLatLngs());
             },
             _finishShape() {
               if (!this.options.allowSelfIntersection && (this._handleSelfIntersection(false), this._doesSelfIntersect) || this.options.requireSnapToFinish && !this._hintMarker._snapped && !this._isFirstLayer()) return;
@@ -9325,9 +9325,9 @@ var require_stdin = __commonJS({
                 let s = [];
                 r.forEach((u) => {
                   !u.equals(e, 1e-8) && !u.equals(i, 1e-8) && s.push(u);
-                }), s.forEach((u, h) => {
+                }), s.forEach((u, c) => {
                   try {
-                    this._styleMarkers[h].setLatLng(u);
+                    this._styleMarkers[c].setLatLng(u);
                   } catch {
                   }
                 });
@@ -9346,8 +9346,8 @@ var require_stdin = __commonJS({
                 i
               ], this.options.pathOptions);
               if (this.options.rectangleAngle) {
-                let h = L.PM.Utils._getRotatedRectangle(r, i, this.options.rectangleAngle || 0, this._map);
-                s.setLatLngs(h), s.pm && s.pm._setAngle(this.options.rectangleAngle || 0);
+                let c = L.PM.Utils._getRotatedRectangle(r, i, this.options.rectangleAngle || 0, this._map);
+                s.setLatLngs(c), s.pm && s.pm._setAngle(this.options.rectangleAngle || 0);
               }
               this._setPane(s, "layerPane"), this._finishLayer(s), s.addTo(this._map.pm._getContainingLayer()), this._fireCreate(s);
               let u = this._hintMarker.getLatLng();
@@ -9468,8 +9468,8 @@ var require_stdin = __commonJS({
                 radius: r
               }, u = new this._BaseCircleClass(i, s);
               this._setPane(u, "layerPane"), this._finishLayer(u), u.addTo(this._map.pm._getContainingLayer()), u.pm && u.pm._updateHiddenPolyCircle(), this._fireCreate(u);
-              let h = this._hintMarker.getLatLng();
-              this.disable(), this.options.continueDrawing && (this.enable(), this._hintMarker.setLatLng(h));
+              let c = this._hintMarker.getLatLng();
+              this.disable(), this.options.continueDrawing && (this.enable(), this._hintMarker.setLatLng(c));
             },
             _getNewDestinationOfHintMarker() {
               let e = this._hintMarker.getLatLng();
@@ -9543,18 +9543,18 @@ var require_stdin = __commonJS({
             _up(e) {
               let { data: i, compare: r } = this, s = i[e];
               for (; e > 0; ) {
-                let u = e - 1 >> 1, h = i[u];
-                if (r(s, h) >= 0) break;
-                i[e] = h, e = u;
+                let u = e - 1 >> 1, c = i[u];
+                if (r(s, c) >= 0) break;
+                i[e] = c, e = u;
               }
               i[e] = s;
             }
             _down(e) {
               let { data: i, compare: r } = this, s = this.length >> 1, u = i[e];
               for (; e < s; ) {
-                let h = (e << 1) + 1, p = i[h], f = h + 1;
-                if (f < this.length && r(i[f], p) < 0 && (h = f, p = i[f]), r(p, u) >= 0) break;
-                i[e] = p, e = h;
+                let c = (e << 1) + 1, p = i[c], f = c + 1;
+                if (f < this.length && r(i[f], p) < 0 && (c = f, p = i[f]), r(p, u) >= 0) break;
+                i[e] = p, e = c;
               }
               i[e] = u;
             }
@@ -9565,7 +9565,7 @@ var require_stdin = __commonJS({
           function Zs(e, i) {
             return e.p.x > i.p.x ? 1 : e.p.x < i.p.x ? -1 : e.p.y !== i.p.y ? e.p.y > i.p.y ? 1 : -1 : 1;
           }
-          function ro(e, i) {
+          function so(e, i) {
             return e.rightSweepEvent.p.x > i.rightSweepEvent.p.x ? 1 : e.rightSweepEvent.p.x < i.rightSweepEvent.p.x ? -1 : e.rightSweepEvent.p.y !== i.rightSweepEvent.p.y ? e.rightSweepEvent.p.y < i.rightSweepEvent.p.y ? 1 : -1 : 1;
           }
           var Ir = class {
@@ -9579,7 +9579,7 @@ var require_stdin = __commonJS({
               return this.p.x === e.p.x && this.p.y === e.p.y;
             }
           };
-          function so(e, i) {
+          function ao(e, i) {
             if (e.type === "FeatureCollection") {
               let r = e.features;
               for (let s = 0; s < r.length; s++) Je(r[s], i);
@@ -9595,29 +9595,29 @@ var require_stdin = __commonJS({
                 s
               ]
             ]);
-            for (let u = 0; u < s.length; u++) for (let h = 0; h < s[u].length; h++) {
-              let p = s[u][h][0], f = null;
+            for (let u = 0; u < s.length; u++) for (let c = 0; c < s[u].length; c++) {
+              let p = s[u][c][0], f = null;
               si = si + 1;
-              for (let m = 0; m < s[u][h].length - 1; m++) {
-                f = s[u][h][m + 1];
+              for (let m = 0; m < s[u][c].length - 1; m++) {
+                f = s[u][c][m + 1];
                 let y = new Ir(p, we, si, Wn), A = new Ir(f, we, si, Wn + 1);
                 y.otherEvent = A, A.otherEvent = y, Zs(y, A) > 0 ? (A.isLeftEndpoint = true, y.isLeftEndpoint = false) : (y.isLeftEndpoint = true, A.isLeftEndpoint = false), i.push(y), i.push(A), p = f, Wn = Wn + 1;
               }
             }
             we = we + 1;
           }
-          var ao = class {
+          var oo = class {
             constructor(e) {
               this.leftSweepEvent = e, this.rightSweepEvent = e.otherEvent;
             }
           };
           function Qi(e, i) {
             if (e === null || i === null || e.leftSweepEvent.ringId === i.leftSweepEvent.ringId && (e.rightSweepEvent.isSamePoint(i.leftSweepEvent) || e.rightSweepEvent.isSamePoint(i.leftSweepEvent) || e.rightSweepEvent.isSamePoint(i.rightSweepEvent) || e.leftSweepEvent.isSamePoint(i.leftSweepEvent) || e.leftSweepEvent.isSamePoint(i.rightSweepEvent))) return false;
-            let r = e.leftSweepEvent.p.x, s = e.leftSweepEvent.p.y, u = e.rightSweepEvent.p.x, h = e.rightSweepEvent.p.y, p = i.leftSweepEvent.p.x, f = i.leftSweepEvent.p.y, m = i.rightSweepEvent.p.x, y = i.rightSweepEvent.p.y, A = (y - f) * (u - r) - (m - p) * (h - s), C = (m - p) * (s - f) - (y - f) * (r - p), O = (u - r) * (s - f) - (h - s) * (r - p);
+            let r = e.leftSweepEvent.p.x, s = e.leftSweepEvent.p.y, u = e.rightSweepEvent.p.x, c = e.rightSweepEvent.p.y, p = i.leftSweepEvent.p.x, f = i.leftSweepEvent.p.y, m = i.rightSweepEvent.p.x, y = i.rightSweepEvent.p.y, A = (y - f) * (u - r) - (m - p) * (c - s), C = (m - p) * (s - f) - (y - f) * (r - p), O = (u - r) * (s - f) - (c - s) * (r - p);
             if (A === 0) return false;
             let R = C / A, H = O / A;
             if (R >= 0 && R <= 1 && H >= 0 && H <= 1) {
-              let K = r + R * (u - r), it = s + R * (h - s);
+              let K = r + R * (u - r), it = s + R * (c - s);
               return [
                 K,
                 it
@@ -9625,33 +9625,33 @@ var require_stdin = __commonJS({
             }
             return false;
           }
-          function oo(e, i) {
+          function uo(e, i) {
             i = i || false;
-            let r = [], s = new Hn([], ro);
+            let r = [], s = new Hn([], so);
             for (; e.length; ) {
               let u = e.pop();
               if (u.isLeftEndpoint) {
-                let h = new ao(u);
+                let c = new oo(u);
                 for (let p = 0; p < s.data.length; p++) {
                   let f = s.data[p];
                   if (i && f.leftSweepEvent.featureId === u.featureId) continue;
-                  let m = Qi(h, f);
+                  let m = Qi(c, f);
                   m !== false && r.push(m);
                 }
-                s.push(h);
+                s.push(c);
               } else u.isLeftEndpoint === false && s.pop();
             }
             return r;
           }
           function Cn(e, i) {
             let r = new Hn([], Zs);
-            return so(e, r), oo(r, i);
+            return ao(e, r), uo(r, i);
           }
           var js = Cn, Kn = js;
           function qs(e, i, r = {}) {
-            let { removeDuplicates: s = true, ignoreSelfIntersections: u = true } = r, h = [];
-            e.type === "FeatureCollection" ? h = h.concat(e.features) : e.type === "Feature" ? h.push(e) : (e.type === "LineString" || e.type === "Polygon" || e.type === "MultiLineString" || e.type === "MultiPolygon") && h.push(Xe(e)), i.type === "FeatureCollection" ? h = h.concat(i.features) : i.type === "Feature" ? h.push(i) : (i.type === "LineString" || i.type === "Polygon" || i.type === "MultiLineString" || i.type === "MultiPolygon") && h.push(Xe(i));
-            let p = Kn(Se(h), u), f = [];
+            let { removeDuplicates: s = true, ignoreSelfIntersections: u = true } = r, c = [];
+            e.type === "FeatureCollection" ? c = c.concat(e.features) : e.type === "Feature" ? c.push(e) : (e.type === "LineString" || e.type === "Polygon" || e.type === "MultiLineString" || e.type === "MultiPolygon") && c.push(Xe(e)), i.type === "FeatureCollection" ? c = c.concat(i.features) : i.type === "Feature" ? c.push(i) : (i.type === "LineString" || i.type === "Polygon" || i.type === "MultiLineString" || i.type === "MultiPolygon") && c.push(Xe(i));
+            let p = Kn(Se(c), u), f = [];
             if (s) {
               let m = {};
               p.forEach((y) => {
@@ -9663,7 +9663,7 @@ var require_stdin = __commonJS({
           }
           var Ie = qs, Yn = et(Pt(), 1);
           function Or(e, i, r) {
-            if (e !== null) for (var s, u, h, p, f, m, y, A = 0, C = 0, O, R = e.type, H = R === "FeatureCollection", K = R === "Feature", it = H ? e.features.length : 1, st = 0; st < it; st++) {
+            if (e !== null) for (var s, u, c, p, f, m, y, A = 0, C = 0, O, R = e.type, H = R === "FeatureCollection", K = R === "Feature", it = H ? e.features.length : 1, st = 0; st < it; st++) {
               y = H ? e.features[st].geometry : K ? e.geometry : e, O = y ? y.type === "GeometryCollection" : false, f = O ? y.geometries.length : 1;
               for (var k = 0; k < f; k++) {
                 var z = 0, V = 0;
@@ -9699,8 +9699,8 @@ var require_stdin = __commonJS({
                     case "MultiPolygon":
                       for (s = 0; s < m.length; s++) {
                         for (V = 0, u = 0; u < m[s].length; u++) {
-                          for (h = 0; h < m[s][u].length - A; h++) {
-                            if (i(m[s][u][h], C, st, z, V) === false) return false;
+                          for (c = 0; c < m[s][u].length - A; c++) {
+                            if (i(m[s][u][c], C, st, z, V) === false) return false;
                             C++;
                           }
                           V++;
@@ -9722,32 +9722,32 @@ var require_stdin = __commonJS({
             if (e.type === "Feature") i(e, 0);
             else if (e.type === "FeatureCollection") for (var r = 0; r < e.features.length && i(e.features[r], r) !== false; r++) ;
           }
-          function uo(e, i, r) {
+          function lo(e, i, r) {
             var s = r;
-            return $i(e, function(u, h) {
-              h === 0 && r === void 0 ? s = u : s = i(s, u, h);
+            return $i(e, function(u, c) {
+              c === 0 && r === void 0 ? s = u : s = i(s, u, c);
             }), s;
           }
           function ai(e, i) {
-            var r, s, u, h, p, f, m, y, A, C, O = 0, R = e.type === "FeatureCollection", H = e.type === "Feature", K = R ? e.features.length : 1;
+            var r, s, u, c, p, f, m, y, A, C, O = 0, R = e.type === "FeatureCollection", H = e.type === "Feature", K = R ? e.features.length : 1;
             for (r = 0; r < K; r++) {
               for (f = R ? e.features[r].geometry : H ? e.geometry : e, y = R ? e.features[r].properties : H ? e.properties : {}, A = R ? e.features[r].bbox : H ? e.bbox : void 0, C = R ? e.features[r].id : H ? e.id : void 0, m = f ? f.type === "GeometryCollection" : false, p = m ? f.geometries.length : 1, u = 0; u < p; u++) {
-                if (h = m ? f.geometries[u] : f, h === null) {
+                if (c = m ? f.geometries[u] : f, c === null) {
                   if (i(null, O, y, A, C) === false) return false;
                   continue;
                 }
-                switch (h.type) {
+                switch (c.type) {
                   case "Point":
                   case "LineString":
                   case "MultiPoint":
                   case "Polygon":
                   case "MultiLineString":
                   case "MultiPolygon": {
-                    if (i(h, O, y, A, C) === false) return false;
+                    if (i(c, O, y, A, C) === false) return false;
                     break;
                   }
                   case "GeometryCollection": {
-                    for (s = 0; s < h.geometries.length; s++) if (i(h.geometries[s], O, y, A, C) === false) return false;
+                    for (s = 0; s < c.geometries.length; s++) if (i(c.geometries[s], O, y, A, C) === false) return false;
                     break;
                   }
                   default:
@@ -9758,7 +9758,7 @@ var require_stdin = __commonJS({
             }
           }
           function Rr(e, i) {
-            ai(e, function(r, s, u, h, p) {
+            ai(e, function(r, s, u, c, p) {
               var f = r === null ? null : r.type;
               switch (f) {
                 case null:
@@ -9766,7 +9766,7 @@ var require_stdin = __commonJS({
                 case "LineString":
                 case "Polygon":
                   return i(Xe(r, u, {
-                    bbox: h,
+                    bbox: c,
                     id: p
                   }), s, 0) === false ? false : void 0;
               }
@@ -9876,9 +9876,9 @@ var require_stdin = __commonJS({
             if (typeof r != "number") throw new Error("<precision> must be a number");
             if (typeof s != "number") throw new Error("<coordinates> must be a number");
             (u === false || u === void 0) && (e = JSON.parse(JSON.stringify(e)));
-            var h = Math.pow(10, r);
+            var c = Math.pow(10, r);
             return Or(e, function(p) {
-              zr(p, h, s);
+              zr(p, c, s);
             }), e;
           }
           function zr(e, i, r) {
@@ -9934,8 +9934,8 @@ var require_stdin = __commonJS({
                   ];
               }
               r.forEach((u) => {
-                Hs(u, e.properties).forEach((h) => {
-                  h.id = i.length, i.push(h);
+                Hs(u, e.properties).forEach((c) => {
+                  c.id = i.length, i.push(c);
                 });
               });
             }
@@ -9943,15 +9943,15 @@ var require_stdin = __commonJS({
           function Hs(e, i) {
             let r = [];
             return e.reduce((s, u) => {
-              let h = wn([
+              let c = wn([
                 s,
                 u
               ], i);
-              return h.bbox = lo(s, u), r.push(h), u;
+              return c.bbox = ho(s, u), r.push(c), u;
             }), r;
           }
-          function lo(e, i) {
-            let r = e[0], s = e[1], u = i[0], h = i[1], p = r < u ? r : u, f = s < h ? s : h, m = r > u ? r : u, y = s > h ? s : h;
+          function ho(e, i) {
+            let r = e[0], s = e[1], u = i[0], c = i[1], p = r < u ? r : u, f = s < c ? s : c, m = r > u ? r : u, y = s > c ? s : c;
             return [
               p,
               f,
@@ -9960,20 +9960,20 @@ var require_stdin = __commonJS({
             ];
           }
           function tn(e, i, r = {}) {
-            var s = Ae(e), u = Ae(i), h = Xi(u[1] - s[1]), p = Xi(u[0] - s[0]), f = Xi(s[1]), m = Xi(u[1]), y = Math.pow(Math.sin(h / 2), 2) + Math.pow(Math.sin(p / 2), 2) * Math.cos(f) * Math.cos(m);
+            var s = Ae(e), u = Ae(i), c = Xi(u[1] - s[1]), p = Xi(u[0] - s[0]), f = Xi(s[1]), m = Xi(u[1]), y = Math.pow(Math.sin(c / 2), 2) + Math.pow(Math.sin(p / 2), 2) * Math.cos(f) * Math.cos(m);
             return qn(2 * Math.atan2(Math.sqrt(y), Math.sqrt(1 - y)), r.units);
           }
-          var ho = Object.defineProperty, Ws = Object.defineProperties, co = Object.getOwnPropertyDescriptors, Ur = Object.getOwnPropertySymbols, po = Object.prototype.hasOwnProperty, Qe = Object.prototype.propertyIsEnumerable, En = (e, i, r) => i in e ? ho(e, i, {
+          var co = Object.defineProperty, Ws = Object.defineProperties, po = Object.getOwnPropertyDescriptors, Ur = Object.getOwnPropertySymbols, fo = Object.prototype.hasOwnProperty, Qe = Object.prototype.propertyIsEnumerable, En = (e, i, r) => i in e ? co(e, i, {
             enumerable: true,
             configurable: true,
             writable: true,
             value: r
-          }) : e[i] = r, fo = (e, i) => {
-            for (var r in i || (i = {})) po.call(i, r) && En(e, r, i[r]);
+          }) : e[i] = r, _o = (e, i) => {
+            for (var r in i || (i = {})) fo.call(i, r) && En(e, r, i[r]);
             if (Ur) for (var r of Ur(i)) Qe.call(i, r) && En(e, r, i[r]);
             return e;
-          }, Jn = (e, i) => Ws(e, co(i));
-          function _o(e, i, r = {}) {
+          }, Jn = (e, i) => Ws(e, po(i));
+          function mo(e, i, r = {}) {
             if (!e || !i) throw new Error("lines and inputPoint are required arguments");
             let s = Ae(i), u = Yi([
               1 / 0,
@@ -9989,7 +9989,7 @@ var require_stdin = __commonJS({
               index: -1,
               location: -1,
               dist: 1 / 0
-            }), h = 0, p = 0, f = -1;
+            }), c = 0, p = 0, f = -1;
             return Rr(e, function(m, y, A) {
               f !== A && (f = A, p = 0);
               let C = ui(m), O = C.length - 2;
@@ -10008,7 +10008,7 @@ var require_stdin = __commonJS({
                   u = Yi(z, {
                     lineStringIndex: A,
                     segmentIndex: V && R + 1 <= O ? R + 1 : R,
-                    totalDistance: h + Q,
+                    totalDistance: c + Q,
                     lineDistance: p + Q,
                     segmentDistance: Q,
                     pointDistance: tt,
@@ -10016,27 +10016,27 @@ var require_stdin = __commonJS({
                     index: -1,
                     location: -1,
                     dist: 1 / 0
-                  }), u.properties = Jn(fo({}, u.properties), {
+                  }), u.properties = Jn(_o({}, u.properties), {
                     multiFeatureIndex: u.properties.lineStringIndex,
                     index: u.properties.segmentIndex,
                     location: u.properties.totalDistance,
                     dist: u.properties.pointDistance
                   });
                 }
-                h += k, p += k;
+                c += k, p += k;
               }
             }), u;
           }
           function _i(e, i) {
-            let [r, s, u] = e, [h, p, f] = i;
-            return r * h + s * p + u * f;
+            let [r, s, u] = e, [c, p, f] = i;
+            return r * c + s * p + u * f;
           }
           function Mn(e, i) {
-            let [r, s, u] = e, [h, p, f] = i;
+            let [r, s, u] = e, [c, p, f] = i;
             return [
               s * f - u * p,
-              u * h - r * f,
-              r * p - s * h
+              u * c - r * f,
+              r * p - s * c
             ];
           }
           function kn(e) {
@@ -10059,14 +10059,14 @@ var require_stdin = __commonJS({
             ];
           }
           function Ys(e) {
-            let [i, r, s] = e, u = Math.min(Math.max(s, -1), 1), h = fi(Math.asin(u));
+            let [i, r, s] = e, u = Math.min(Math.max(s, -1), 1), c = fi(Math.asin(u));
             return [
               fi(Math.atan2(r, i)),
-              h
+              c
             ];
           }
           function Xs(e, i, r) {
-            let s = mi(e), u = mi(i), h = mi(r), p = Mn(s, u);
+            let s = mi(e), u = mi(i), c = mi(r), p = Mn(s, u);
             if (p[0] === 0 && p[1] === 0 && p[2] === 0) return _i(s, u) > 0 ? [
               [
                 ...i
@@ -10078,7 +10078,7 @@ var require_stdin = __commonJS({
               ],
               false
             ];
-            let f = Mn(p, h);
+            let f = Mn(p, c);
             if (f[0] === 0 && f[1] === 0 && f[2] === 0) return [
               [
                 ...i
@@ -10089,11 +10089,11 @@ var require_stdin = __commonJS({
               -y[0],
               -y[1],
               -y[2]
-            ], C = _i(h, y) > _i(h, A) ? y : A, O = Ks(p), R = _i(Mn(s, C), O), H = _i(Mn(C, u), O);
+            ], C = _i(c, y) > _i(c, A) ? y : A, O = Ks(p), R = _i(Mn(s, C), O), H = _i(Mn(C, u), O);
             return R >= 0 && H >= 0 ? [
               Ys(C),
               false
-            ] : _i(s, h) > _i(u, h) ? [
+            ] : _i(s, c) > _i(u, c) ? [
               [
                 ...e
               ],
@@ -10136,9 +10136,9 @@ var require_stdin = __commonJS({
                 f.id = m;
               }), !r.length) r = Qn(e, u).features, s.load(Se(r));
               else {
-                var h = s.search(u);
-                if (h.features.length) {
-                  var p = Gr(u, h);
+                var c = s.search(u);
+                if (c.features.length) {
+                  var p = Gr(u, c);
                   r = r.filter(function(f) {
                     return f.id !== p.id;
                   }), s.remove(p), $i(Qn(p, u), function(f) {
@@ -10153,15 +10153,15 @@ var require_stdin = __commonJS({
             if (Si(s, Ae(i)) || Si(u, Ae(i))) return Se([
               e
             ]);
-            var h = xn(), p = Xn(e);
-            h.load(p);
-            var f = h.search(i);
+            var c = xn(), p = Xn(e);
+            c.load(p);
+            var f = c.search(i);
             if (!f.features.length) return Se([
               e
             ]);
             var m = Gr(i, f), y = [
               s
-            ], A = uo(p, function(C, O, R) {
+            ], A = lo(p, function(C, O, R) {
               var H = ui(O)[1], K = Ae(i);
               return R === m.id ? (C.push(K), r.push(wn(C)), Si(K, H) ? [
                 K
@@ -10177,24 +10177,24 @@ var require_stdin = __commonJS({
             if (i.features.length === 1) return i.features[0];
             var r, s = 1 / 0;
             return $i(i, function(u) {
-              var h = _o(u, e), p = h.properties.dist;
+              var c = mo(u, e), p = c.properties.dist;
               p < s && (r = u, s = p);
             }), r;
           }
           function Si(e, i) {
             return e[0] === i[0] && e[1] === i[1];
           }
-          var mo = Js, Oe = 11102230246251565e-32, Qt = 134217729, Qs = (3 + 8 * Oe) * Oe;
+          var go = Js, Oe = 11102230246251565e-32, Qt = 134217729, Qs = (3 + 8 * Oe) * Oe;
           function $n(e, i, r, s, u) {
-            let h, p, f, m, y = i[0], A = s[0], C = 0, O = 0;
-            A > y == A > -y ? (h = y, y = i[++C]) : (h = A, A = s[++O]);
+            let c, p, f, m, y = i[0], A = s[0], C = 0, O = 0;
+            A > y == A > -y ? (c = y, y = i[++C]) : (c = A, A = s[++O]);
             let R = 0;
-            if (C < e && O < r) for (A > y == A > -y ? (p = y + h, f = h - (p - y), y = i[++C]) : (p = A + h, f = h - (p - A), A = s[++O]), h = p, f !== 0 && (u[R++] = f); C < e && O < r; ) A > y == A > -y ? (p = h + y, m = p - h, f = h - (p - m) + (y - m), y = i[++C]) : (p = h + A, m = p - h, f = h - (p - m) + (A - m), A = s[++O]), h = p, f !== 0 && (u[R++] = f);
-            for (; C < e; ) p = h + y, m = p - h, f = h - (p - m) + (y - m), y = i[++C], h = p, f !== 0 && (u[R++] = f);
-            for (; O < r; ) p = h + A, m = p - h, f = h - (p - m) + (A - m), A = s[++O], h = p, f !== 0 && (u[R++] = f);
-            return (h !== 0 || R === 0) && (u[R++] = h), R;
+            if (C < e && O < r) for (A > y == A > -y ? (p = y + c, f = c - (p - y), y = i[++C]) : (p = A + c, f = c - (p - A), A = s[++O]), c = p, f !== 0 && (u[R++] = f); C < e && O < r; ) A > y == A > -y ? (p = c + y, m = p - c, f = c - (p - m) + (y - m), y = i[++C]) : (p = c + A, m = p - c, f = c - (p - m) + (A - m), A = s[++O]), c = p, f !== 0 && (u[R++] = f);
+            for (; C < e; ) p = c + y, m = p - c, f = c - (p - m) + (y - m), y = i[++C], c = p, f !== 0 && (u[R++] = f);
+            for (; O < r; ) p = c + A, m = p - c, f = c - (p - m) + (A - m), A = s[++O], c = p, f !== 0 && (u[R++] = f);
+            return (c !== 0 || R === 0) && (u[R++] = c), R;
           }
-          function go(e, i) {
+          function yo(e, i) {
             let r = i[0];
             for (let s = 1; s < e; s++) r += i[s];
             return r;
@@ -10203,11 +10203,11 @@ var require_stdin = __commonJS({
             return new Float64Array(e);
           }
           var $s = (3 + 16 * Oe) * Oe, ta = (2 + 12 * Oe) * Oe, ea = (9 + 64 * Oe) * Oe * Oe, Di = en(4), ia = en(8), Zr = en(12), jr = en(16), ge = en(4);
-          function t(e, i, r, s, u, h, p) {
-            let f, m, y, A, C, O, R, H, K, it, st, k, z, V, tt, Q, $, b, w = e - u, E = r - u, D = i - h, T = s - h;
+          function t(e, i, r, s, u, c, p) {
+            let f, m, y, A, C, O, R, H, K, it, st, k, z, V, tt, Q, $, b, w = e - u, E = r - u, D = i - c, T = s - c;
             V = w * T, O = Qt * w, R = O - (O - w), H = w - R, O = Qt * T, K = O - (O - T), it = T - K, tt = H * it - (V - R * K - H * K - R * it), Q = D * E, O = Qt * D, R = O - (O - D), H = D - R, O = Qt * E, K = O - (O - E), it = E - K, $ = H * it - (Q - R * K - H * K - R * it), st = tt - $, C = tt - st, Di[0] = tt - (st + C) + (C - $), k = V + st, C = k - V, z = V - (k - C) + (st - C), st = z - Q, C = z - st, Di[1] = z - (st + C) + (C - Q), b = k + st, C = b - k, Di[2] = k - (b - C) + (st - C), Di[3] = b;
-            let B = go(4, Di), N = ta * p;
-            if (B >= N || -B >= N || (C = e - w, f = e - (w + C) + (C - u), C = r - E, y = r - (E + C) + (C - u), C = i - D, m = i - (D + C) + (C - h), C = s - T, A = s - (T + C) + (C - h), f === 0 && m === 0 && y === 0 && A === 0) || (N = ea * p + Qs * Math.abs(B), B += w * A + T * f - (D * y + E * m), B >= N || -B >= N)) return B;
+            let B = yo(4, Di), N = ta * p;
+            if (B >= N || -B >= N || (C = e - w, f = e - (w + C) + (C - u), C = r - E, y = r - (E + C) + (C - u), C = i - D, m = i - (D + C) + (C - c), C = s - T, A = s - (T + C) + (C - c), f === 0 && m === 0 && y === 0 && A === 0) || (N = ea * p + Qs * Math.abs(B), B += w * A + T * f - (D * y + E * m), B >= N || -B >= N)) return B;
             V = f * T, O = Qt * f, R = O - (O - f), H = f - R, O = Qt * T, K = O - (O - T), it = T - K, tt = H * it - (V - R * K - H * K - R * it), Q = m * E, O = Qt * m, R = O - (O - m), H = m - R, O = Qt * E, K = O - (O - E), it = E - K, $ = H * it - (Q - R * K - H * K - R * it), st = tt - $, C = tt - st, ge[0] = tt - (st + C) + (C - $), k = V + st, C = k - V, z = V - (k - C) + (st - C), st = z - Q, C = z - st, ge[1] = z - (st + C) + (C - Q), b = k + st, C = b - k, ge[2] = k - (b - C) + (st - C), ge[3] = b;
             let I = $n(4, Di, 4, ge, ia);
             V = w * A, O = Qt * w, R = O - (O - w), H = w - R, O = Qt * A, K = O - (O - A), it = A - K, tt = H * it - (V - R * K - H * K - R * it), Q = D * y, O = Qt * D, R = O - (O - D), H = D - R, O = Qt * y, K = O - (O - y), it = y - K, $ = H * it - (Q - R * K - H * K - R * it), st = tt - $, C = tt - st, ge[0] = tt - (st + C) + (C - $), k = V + st, C = k - V, z = V - (k - C) + (st - C), st = z - Q, C = z - st, ge[1] = z - (st + C) + (C - Q), b = k + st, C = b - k, ge[2] = k - (b - C) + (st - C), ge[3] = b;
@@ -10216,12 +10216,12 @@ var require_stdin = __commonJS({
             let j = $n(F, Zr, 4, ge, jr);
             return jr[j - 1];
           }
-          function n(e, i, r, s, u, h) {
-            let p = (i - h) * (r - u), f = (e - u) * (s - h), m = p - f, y = Math.abs(p + f);
-            return Math.abs(m) >= $s * y ? m : -t(e, i, r, s, u, h, y);
+          function n(e, i, r, s, u, c) {
+            let p = (i - c) * (r - u), f = (e - u) * (s - c), m = p - f, y = Math.abs(p + f);
+            return Math.abs(m) >= $s * y ? m : -t(e, i, r, s, u, c, y);
           }
           function a(e, i) {
-            var r, s, u = 0, h, p, f, m, y, A, C, O = e[0], R = e[1], H = i.length;
+            var r, s, u = 0, c, p, f, m, y, A, C, O = e[0], R = e[1], H = i.length;
             for (r = 0; r < H; r++) {
               s = 0;
               var K = i[r], it = K.length - 1;
@@ -10230,8 +10230,8 @@ var require_stdin = __commonJS({
                 if (C = K[s + 1], m = C[0] - O, y = C[1] - R, f === 0 && y === 0) {
                   if (m <= 0 && p >= 0 || p <= 0 && m >= 0) return 0;
                 } else if (y >= 0 && f <= 0 || y <= 0 && f >= 0) {
-                  if (h = n(p, m, f, y, 0, 0), h === 0) return 0;
-                  (h > 0 && y > 0 && f <= 0 || h < 0 && y <= 0 && f > 0) && u++;
+                  if (c = n(p, m, f, y, 0, 0), c === 0) return 0;
+                  (c > 0 && y > 0 && f <= 0 || c < 0 && y <= 0 && f > 0) && u++;
                 }
                 A = C, f = y, p = m;
               }
@@ -10241,9 +10241,9 @@ var require_stdin = __commonJS({
           function d(e, i, r = {}) {
             if (!e) throw new Error("point is required");
             if (!i) throw new Error("polygon is required");
-            let s = Ae(e), u = Pi(i), h = u.type, p = i.bbox, f = u.coordinates;
+            let s = Ae(e), u = Pi(i), c = u.type, p = i.bbox, f = u.coordinates;
             if (p && _(s, p) === false) return false;
-            h === "Polygon" && (f = [
+            c === "Polygon" && (f = [
               f
             ]);
             let m = false;
@@ -10259,42 +10259,42 @@ var require_stdin = __commonJS({
           }
           function v(e, i, r = {}) {
             let s = Ae(e), u = ui(i);
-            for (let h = 0; h < u.length - 1; h++) {
+            for (let c = 0; c < u.length - 1; c++) {
               let p = false;
-              if (r.ignoreEndVertices && (h === 0 && (p = "start"), h === u.length - 2 && (p = "end"), h === 0 && h + 1 === u.length - 1 && (p = "both")), P(u[h], u[h + 1], s, p, typeof r.epsilon > "u" ? null : r.epsilon)) return true;
+              if (r.ignoreEndVertices && (c === 0 && (p = "start"), c === u.length - 2 && (p = "end"), c === 0 && c + 1 === u.length - 1 && (p = "both")), P(u[c], u[c + 1], s, p, typeof r.epsilon > "u" ? null : r.epsilon)) return true;
             }
             return false;
           }
           function P(e, i, r, s, u) {
-            let h = r[0], p = r[1], f = e[0], m = e[1], y = i[0], A = i[1], C = r[0] - f, O = r[1] - m, R = y - f, H = A - m, K = C * H - O * R;
+            let c = r[0], p = r[1], f = e[0], m = e[1], y = i[0], A = i[1], C = r[0] - f, O = r[1] - m, R = y - f, H = A - m, K = C * H - O * R;
             if (u !== null) {
               if (Math.abs(K) > u) return false;
             } else if (K !== 0) return false;
             if (Math.abs(R) === Math.abs(H) && Math.abs(R) === 0) return s ? false : r[0] === e[0] && r[1] === e[1];
             if (s) {
-              if (s === "start") return Math.abs(R) >= Math.abs(H) ? R > 0 ? f < h && h <= y : y <= h && h < f : H > 0 ? m < p && p <= A : A <= p && p < m;
-              if (s === "end") return Math.abs(R) >= Math.abs(H) ? R > 0 ? f <= h && h < y : y < h && h <= f : H > 0 ? m <= p && p < A : A < p && p <= m;
-              if (s === "both") return Math.abs(R) >= Math.abs(H) ? R > 0 ? f < h && h < y : y < h && h < f : H > 0 ? m < p && p < A : A < p && p < m;
-            } else return Math.abs(R) >= Math.abs(H) ? R > 0 ? f <= h && h <= y : y <= h && h <= f : H > 0 ? m <= p && p <= A : A <= p && p <= m;
+              if (s === "start") return Math.abs(R) >= Math.abs(H) ? R > 0 ? f < c && c <= y : y <= c && c < f : H > 0 ? m < p && p <= A : A <= p && p < m;
+              if (s === "end") return Math.abs(R) >= Math.abs(H) ? R > 0 ? f <= c && c < y : y < c && c <= f : H > 0 ? m <= p && p < A : A < p && p <= m;
+              if (s === "both") return Math.abs(R) >= Math.abs(H) ? R > 0 ? f < c && c < y : y < c && c < f : H > 0 ? m < p && p < A : A < p && p < m;
+            } else return Math.abs(R) >= Math.abs(H) ? R > 0 ? f <= c && c <= y : y <= c && c <= f : H > 0 ? m <= p && p <= A : A <= p && p <= m;
             return false;
           }
           function U(e, i) {
-            let r = Pi(e), s = Pi(i), u = r.type, h = s.type, p = r.coordinates, f = s.coordinates;
+            let r = Pi(e), s = Pi(i), u = r.type, c = s.type, p = r.coordinates, f = s.coordinates;
             switch (u) {
               case "Point":
-                if (h === "Point") return qr(p, f);
-                throw new Error("feature2 " + h + " geometry not supported");
+                if (c === "Point") return qr(p, f);
+                throw new Error("feature2 " + c + " geometry not supported");
               case "MultiPoint":
-                switch (h) {
+                switch (c) {
                   case "Point":
                     return at(r, s);
                   case "MultiPoint":
                     return ft(r, s);
                   default:
-                    throw new Error("feature2 " + h + " geometry not supported");
+                    throw new Error("feature2 " + c + " geometry not supported");
                 }
               case "LineString":
-                switch (h) {
+                switch (c) {
                   case "Point":
                     return v(s, r, {
                       ignoreEndVertices: true
@@ -10304,10 +10304,10 @@ var require_stdin = __commonJS({
                   case "MultiPoint":
                     return xt(r, s);
                   default:
-                    throw new Error("feature2 " + h + " geometry not supported");
+                    throw new Error("feature2 " + c + " geometry not supported");
                 }
               case "Polygon":
-                switch (h) {
+                switch (c) {
                   case "Point":
                     return d(s, r, {
                       ignoreBoundary: true
@@ -10321,11 +10321,11 @@ var require_stdin = __commonJS({
                   case "MultiPolygon":
                     return X(r, s);
                   default:
-                    throw new Error("feature2 " + h + " geometry not supported");
+                    throw new Error("feature2 " + c + " geometry not supported");
                 }
               case "MultiPolygon":
-                if (h === "Polygon") return q(r, s);
-                throw new Error("feature2 " + h + " geometry not supported");
+                if (c === "Polygon") return q(r, s);
+                throw new Error("feature2 " + c + " geometry not supported");
               default:
                 throw new Error("feature1 " + u + " geometry not supported");
             }
@@ -10392,11 +10392,11 @@ var require_stdin = __commonJS({
           function Re(e, i) {
             let r = e.coordinates, s = [];
             for (let u = 0; u < r.length - 1; u++) {
-              let h = wn([
+              let c = wn([
                 r[u],
                 r[u + 1]
-              ]), p = Js(h, Xe(i));
-              p.features.length === 0 ? s.push(h) : s.push(...p.features);
+              ]), p = Js(c, Xe(i));
+              p.features.length === 0 ? s.push(c) : s.push(...p.features);
             }
             return Se(s);
           }
@@ -10404,9 +10404,9 @@ var require_stdin = __commonJS({
             let r = me(e), s = me(i);
             if (!na(r, s)) return false;
             for (let p of i.coordinates) if (!d(p, e)) return false;
-            let u = false, h = Re(i, e);
-            for (let p of h.features) {
-              let f = yo(p.geometry.coordinates[0], p.geometry.coordinates[1]);
+            let u = false, c = Re(i, e);
+            for (let p of c.features) {
+              let f = vo(p.geometry.coordinates[0], p.geometry.coordinates[1]);
               if (!d(f, e)) return false;
               !u && d(f, e, {
                 ignoreBoundary: true
@@ -10419,7 +10419,7 @@ var require_stdin = __commonJS({
             let r = me(e), s = me(i);
             if (!na(r, s)) return false;
             let u = Pi(i).coordinates;
-            for (let h of u) for (let p of h) if (!d(p, e)) return false;
+            for (let c of u) for (let p of c) if (!d(p, e)) return false;
             return true;
           }
           function na(e, i) {
@@ -10428,13 +10428,13 @@ var require_stdin = __commonJS({
           function qr(e, i) {
             return e[0] === i[0] && e[1] === i[1];
           }
-          function yo(e, i) {
+          function vo(e, i) {
             return [
               (e[0] + i[0]) / 2,
               (e[1] + i[1]) / 2
             ];
           }
-          var ra = U, vo = et(ci()), sa = /^-?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i, Vt = Math.ceil, ve = Math.floor, xe = "[BigNumber Error] ", aa = xe + "Number primitive has more than 15 significant digits: ", qe = 1e14, mt = 14, tr = 9007199254740991, Vr = [
+          var ra = U, Lo = et(ci()), sa = /^-?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i, Vt = Math.ceil, ve = Math.floor, xe = "[BigNumber Error] ", aa = xe + "Number primitive has more than 15 significant digits: ", qe = 1e14, mt = 14, tr = 9007199254740991, Vr = [
             1,
             10,
             100,
@@ -10450,12 +10450,12 @@ var require_stdin = __commonJS({
             1e12,
             1e13
           ], nn = 1e7, de = 1e9;
-          function Qo(e) {
+          function $o(e) {
             var i, r, s, u = k.prototype = {
               constructor: k,
               toString: null,
               valueOf: null
-            }, h = new k(1), p = 20, f = 4, m = -7, y = 21, A = -1e7, C = 1e7, O = false, R = 1, H = 0, K = {
+            }, c = new k(1), p = 20, f = 4, m = -7, y = 21, A = -1e7, C = 1e7, O = false, R = 1, H = 0, K = {
               prefix: "",
               groupSize: 3,
               secondaryGroupSize: 0,
@@ -10529,7 +10529,7 @@ var require_stdin = __commonJS({
                 Z.e = 0
               ];
             }
-            k.clone = Qo, k.ROUND_UP = 0, k.ROUND_DOWN = 1, k.ROUND_CEIL = 2, k.ROUND_FLOOR = 3, k.ROUND_HALF_UP = 4, k.ROUND_HALF_DOWN = 5, k.ROUND_HALF_EVEN = 6, k.ROUND_HALF_CEIL = 7, k.ROUND_HALF_FLOOR = 8, k.EUCLID = 9, k.config = k.set = function(b) {
+            k.clone = $o, k.ROUND_UP = 0, k.ROUND_DOWN = 1, k.ROUND_CEIL = 2, k.ROUND_FLOOR = 3, k.ROUND_HALF_UP = 4, k.ROUND_HALF_DOWN = 5, k.ROUND_HALF_EVEN = 6, k.ROUND_HALF_CEIL = 7, k.ROUND_HALF_FLOOR = 8, k.EUCLID = 9, k.config = k.set = function(b) {
               var w, E;
               if (b != null) if (typeof b == "object") {
                 if (b.hasOwnProperty(w = "DECIMAL_PLACES") && (E = b[w], Xt(E, 0, de, w), p = E), b.hasOwnProperty(w = "ROUNDING_MODE") && (E = b[w], Xt(E, 0, 8, w), f = E), b.hasOwnProperty(w = "EXPONENTIAL_AT") && (E = b[w], E && E.pop ? (Xt(E[0], -de, 0, w), Xt(E[1], 0, de, w), m = E[0], y = E[1]) : (Xt(E, -de, de, w), m = -(y = E < 0 ? -E : E))), b.hasOwnProperty(w = "RANGE")) if (E = b[w], E && E.pop) Xt(E[0], -de, -1, w), Xt(E[1], 1, de, w), A = E[0], C = E[1];
@@ -10589,7 +10589,7 @@ var require_stdin = __commonJS({
                 return (Math.random() * 1073741824 | 0) * 8388608 + (Math.random() * 8388608 | 0);
               };
               return function(E) {
-                var D, T, B, N, I, F = 0, j = [], Z = new k(h);
+                var D, T, B, N, I, F = 0, j = [], Z = new k(c);
                 if (E == null ? E = p : Xt(E, 0, de), N = Vt(E / mt), O) if (crypto.getRandomValues) {
                   for (D = crypto.getRandomValues(new Uint32Array(N *= 2)); F < N; ) I = D[F] * 131072 + (D[F + 1] >>> 11), I >= 9e15 ? (T = crypto.getRandomValues(new Uint32Array(2)), D[F] = T[0], D[F + 1] = T[1]) : (j.push(I % 1e14), F += 2);
                   F = N / 2;
@@ -10660,18 +10660,18 @@ var require_stdin = __commonJS({
                 for (; !D[0] && D.length > 1; D.splice(0, 1)) ;
               }
               return function(D, T, B, N, I) {
-                var F, j, Z, Y, ut, lt, Lt, $t, oe, Dt, Ft, Ee, ga, xo, Eo, Li, Yr, ii = D.s == T.s ? 1 : -1, Be = D.c, te = T.c;
+                var F, j, Z, Y, ut, lt, Lt, $t, oe, Dt, Ft, Ee, ga, Eo, Mo, Li, Yr, ii = D.s == T.s ? 1 : -1, Be = D.c, te = T.c;
                 if (!Be || !Be[0] || !te || !te[0]) return new k(!D.s || !T.s || (Be ? te && Be[0] == te[0] : !te) ? NaN : Be && Be[0] == 0 || !te ? ii * 0 : ii / 0);
                 for ($t = new k(ii), oe = $t.c = [], j = D.e - T.e, ii = B + j + 1, I || (I = qe, j = ti(D.e / mt) - ti(T.e / mt), ii = ii / mt | 0), Z = 0; te[Z] == (Be[Z] || 0); Z++) ;
                 if (te[Z] > (Be[Z] || 0) && j--, ii < 0) oe.push(1), Y = true;
                 else {
-                  for (xo = Be.length, Li = te.length, Z = 0, ii += 2, ut = ve(I / (te[0] + 1)), ut > 1 && (te = b(te, ut, I), Be = b(Be, ut, I), Li = te.length, xo = Be.length), ga = Li, Dt = Be.slice(0, Li), Ft = Dt.length; Ft < Li; Dt[Ft++] = 0) ;
+                  for (Eo = Be.length, Li = te.length, Z = 0, ii += 2, ut = ve(I / (te[0] + 1)), ut > 1 && (te = b(te, ut, I), Be = b(Be, ut, I), Li = te.length, Eo = Be.length), ga = Li, Dt = Be.slice(0, Li), Ft = Dt.length; Ft < Li; Dt[Ft++] = 0) ;
                   Yr = te.slice(), Yr = [
                     0
-                  ].concat(Yr), Eo = te[0], te[1] >= I / 2 && Eo++;
+                  ].concat(Yr), Mo = te[0], te[1] >= I / 2 && Mo++;
                   do {
                     if (ut = 0, F = w(te, Dt, Li, Ft), F < 0) {
-                      if (Ee = Dt[0], Li != Ft && (Ee = Ee * I + (Dt[1] || 0)), ut = ve(Ee / Eo), ut > 1) for (ut >= I && (ut = I - 1), lt = b(te, ut, I), Lt = lt.length, Ft = Dt.length; w(lt, Dt, Lt, Ft) == 1; ) ut--, E(lt, Li < Lt ? Yr : te, Lt, I), Lt = lt.length, F = 1;
+                      if (Ee = Dt[0], Li != Ft && (Ee = Ee * I + (Dt[1] || 0)), ut = ve(Ee / Mo), ut > 1) for (ut >= I && (ut = I - 1), lt = b(te, ut, I), Lt = lt.length, Ft = Dt.length; w(lt, Dt, Lt, Ft) == 1; ) ut--, E(lt, Li < Lt ? Yr : te, Lt, I), Lt = lt.length, F = 1;
                       else ut == 0 && (F = ut = 1), lt = te.slice(), Lt = lt.length;
                       if (Lt < Ft && (lt = [
                         0
@@ -10682,7 +10682,7 @@ var require_stdin = __commonJS({
                     oe[Z++] = ut, Dt[0] ? Dt[Ft++] = Be[ga] || 0 : (Dt = [
                       Be[ga]
                     ], Ft = 1);
-                  } while ((ga++ < xo || Dt[0] != null) && ii--);
+                  } while ((ga++ < Eo || Dt[0] != null) && ii--);
                   Y = Dt[0] != null, oe[0] || oe.splice(0, 1);
                 }
                 if (I == qe) {
@@ -10792,7 +10792,7 @@ var require_stdin = __commonJS({
                 if (b.e > 9 && (Y.e > 0 || Y.e < -1 || (Y.e == 0 ? Y.c[0] > 1 || I && Y.c[1] >= 24e7 : Y.c[0] < 8e13 || I && Y.c[0] <= 9999975e7))) return B = Y.s < 0 && oa(b) ? -0 : 0, Y.e > -1 && (B = 1 / B), new k(F ? 1 / B : B);
                 H && (B = Vt(H / mt + 2));
               }
-              for (I ? (E = new k(0.5), F && (b.s = 1), j = oa(b)) : (T = Math.abs(+$(b)), j = T % 2), Z = new k(h); ; ) {
+              for (I ? (E = new k(0.5), F && (b.s = 1), j = oa(b)) : (T = Math.abs(+$(b)), j = T % 2), Z = new k(c); ; ) {
                 if (j) {
                   if (Z = Z.times(Y), !Z.c) break;
                   B ? Z.c.length > B && (Z.c.length = B) : D && (Z = Z.mod(w));
@@ -10807,7 +10807,7 @@ var require_stdin = __commonJS({
                 }
                 Y = Y.times(Y), B ? Y.c && Y.c.length > B && (Y.c.length = B) : D && (Y = Y.mod(w));
               }
-              return D ? Z : (F && (Z = h.div(Z)), w ? Z.mod(w) : B ? Q(Z, H, f, N) : Z);
+              return D ? Z : (F && (Z = c.div(Z)), w ? Z.mod(w) : B ? Q(Z, H, f, N) : Z);
             }, u.integerValue = function(b) {
               var w = new k(this);
               return b == null ? b = f : Xt(b, 0, 8), Q(w, w.e + 1, b);
@@ -10941,9 +10941,9 @@ var require_stdin = __commonJS({
               return (E.prefix || "") + D + (E.suffix || "");
             }, u.toFraction = function(b) {
               var w, E, D, T, B, N, I, F, j, Z, Y, ut, lt = this, Lt = lt.c;
-              if (b != null && (I = new k(b), !I.isInteger() && (I.c || I.s !== 1) || I.lt(h))) throw Error(xe + "Argument " + (I.isInteger() ? "out of range: " : "not an integer: ") + $(I));
+              if (b != null && (I = new k(b), !I.isInteger() && (I.c || I.s !== 1) || I.lt(c))) throw Error(xe + "Argument " + (I.isInteger() ? "out of range: " : "not an integer: ") + $(I));
               if (!Lt) return new k(lt);
-              for (w = new k(h), j = E = new k(h), D = F = new k(h), ut = ei(Lt), B = w.e = ut.length - lt.e - 1, w.c[0] = Vr[(N = B % mt) < 0 ? mt + N : N], b = !b || I.comparedTo(w) > 0 ? B > 0 ? w : j : I, N = C, C = 1 / 0, I = new k(ut), F.c[0] = 0; Z = i(I, w, 0, 1), T = E.plus(Z.times(D)), T.comparedTo(b) != 1; ) E = D, D = T, j = F.plus(Z.times(T = j)), F = T, w = I.minus(Z.times(T = w)), I = T;
+              for (w = new k(c), j = E = new k(c), D = F = new k(c), ut = ei(Lt), B = w.e = ut.length - lt.e - 1, w.c[0] = Vr[(N = B % mt) < 0 ? mt + N : N], b = !b || I.comparedTo(w) > 0 ? B > 0 ? w : j : I, N = C, C = 1 / 0, I = new k(ut), F.c[0] = 0; Z = i(I, w, 0, 1), T = E.plus(Z.times(D)), T.comparedTo(b) != 1; ) E = D, D = T, j = F.plus(Z.times(T = j)), F = T, w = I.minus(Z.times(T = w)), I = T;
               return T = i(b.minus(E), D, 0, 1), F = F.plus(T.times(j)), E = E.plus(T.times(D)), F.s = j.s = lt.s, B = B * 2, Y = i(j, D, B, f).minus(lt).abs().comparedTo(i(F, E, B, f).minus(lt).abs()) < 1 ? [
                 j,
                 D
@@ -10967,21 +10967,21 @@ var require_stdin = __commonJS({
             return e > 0 || e === i ? i : i - 1;
           }
           function ei(e) {
-            for (var i, r, s = 1, u = e.length, h = e[0] + ""; s < u; ) {
+            for (var i, r, s = 1, u = e.length, c = e[0] + ""; s < u; ) {
               for (i = e[s++] + "", r = mt - i.length; r--; i = "0" + i) ;
-              h += i;
+              c += i;
             }
-            for (u = h.length; h.charCodeAt(--u) === 48; ) ;
-            return h.slice(0, u + 1 || 1);
+            for (u = c.length; c.charCodeAt(--u) === 48; ) ;
+            return c.slice(0, u + 1 || 1);
           }
           function An(e, i) {
-            var r, s, u = e.c, h = i.c, p = e.s, f = i.s, m = e.e, y = i.e;
+            var r, s, u = e.c, c = i.c, p = e.s, f = i.s, m = e.e, y = i.e;
             if (!p || !f) return null;
-            if (r = u && !u[0], s = h && !h[0], r || s) return r ? s ? 0 : -f : p;
+            if (r = u && !u[0], s = c && !c[0], r || s) return r ? s ? 0 : -f : p;
             if (p != f) return p;
-            if (r = p < 0, s = m == y, !u || !h) return s ? 0 : !u ^ r ? 1 : -1;
+            if (r = p < 0, s = m == y, !u || !c) return s ? 0 : !u ^ r ? 1 : -1;
             if (!s) return m > y ^ r ? 1 : -1;
-            for (f = (m = u.length) < (y = h.length) ? m : y, p = 0; p < f; p++) if (u[p] != h[p]) return u[p] > h[p] ^ r ? 1 : -1;
+            for (f = (m = u.length) < (y = c.length) ? m : y, p = 0; p < f; p++) if (u[p] != c[p]) return u[p] > c[p] ^ r ? 1 : -1;
             return m == y ? 0 : m > y ^ r ? 1 : -1;
           }
           function Xt(e, i, r, s) {
@@ -11005,18 +11005,18 @@ var require_stdin = __commonJS({
             } else i < s && (e = e.slice(0, i) + "." + e.slice(i));
             return e;
           }
-          var Zu = Qo(), yi = Zu, ju = class {
+          var qu = $o(), yi = qu, Vu = class {
             constructor(e) {
               __publicField(this, "key");
               __publicField(this, "left", null);
               __publicField(this, "right", null);
               this.key = e;
             }
-          }, Hr = class extends ju {
+          }, Hr = class extends Vu {
             constructor(e) {
               super(e);
             }
-          }, qu = class {
+          }, Hu = class {
             constructor() {
               __publicField(this, "size", 0);
               __publicField(this, "modificationCount", 0);
@@ -11025,7 +11025,7 @@ var require_stdin = __commonJS({
             splay(e) {
               let i = this.root;
               if (i == null) return this.compare(e, e), -1;
-              let r = null, s = null, u = null, h = null, p = i, f = this.compare, m;
+              let r = null, s = null, u = null, c = null, p = i, f = this.compare, m;
               for (; ; ) if (m = f(p.key, e), m > 0) {
                 let y = p.left;
                 if (y == null || (m = f(y.key, e), m > 0 && (p.left = y.right, y.right = p, p = y, y = p.left, y == null))) break;
@@ -11033,9 +11033,9 @@ var require_stdin = __commonJS({
               } else if (m < 0) {
                 let y = p.right;
                 if (y == null || (m = f(y.key, e), m < 0 && (p.right = y.left, y.left = p, p = y, y = p.right, y == null))) break;
-                u == null ? h = p : u.right = p, u = p, p = y;
+                u == null ? c = p : u.right = p, u = p, p = y;
               } else break;
-              return u != null && (u.right = p.left, p.left = h), r != null && (r.left = p.right, p.right = s), this.root !== p && (this.root = p, this.splayCount++), m;
+              return u != null && (u.right = p.left, p.left = c), r != null && (r.left = p.right, p.right = s), this.root !== p && (this.root = p, this.splayCount++), m;
             }
             splayMin(e) {
               let i = e, r = i.left;
@@ -11105,7 +11105,7 @@ var require_stdin = __commonJS({
                 has: (e) => this.has(e)
               };
             }
-          }, la = class $r extends qu {
+          }, la = class $r extends Hu {
             constructor(i, r) {
               super();
               __publicField(this, "root", null);
@@ -11205,16 +11205,16 @@ var require_stdin = __commonJS({
             }
             copyNode(i) {
               if (i == null) return null;
-              function r(u, h) {
+              function r(u, c) {
                 let p, f;
                 do {
                   if (p = u.left, f = u.right, p != null) {
                     let m = new Hr(p.key);
-                    h.left = m, r(p, m);
+                    c.left = m, r(p, m);
                   }
                   if (f != null) {
                     let m = new Hr(f.key);
-                    h.right = m, u = f, h = m;
+                    c.right = m, u = f, c = m;
                   }
                 } while (f != null);
               }
@@ -11225,7 +11225,7 @@ var require_stdin = __commonJS({
               return this.clone();
             }
             entries() {
-              return new Hu(this.wrap());
+              return new Ku(this.wrap());
             }
             keys() {
               return this[Symbol.iterator]();
@@ -11234,9 +11234,9 @@ var require_stdin = __commonJS({
               return this[Symbol.iterator]();
             }
             [(_b = Symbol.iterator, _a2 = Symbol.toStringTag, _b)]() {
-              return new Vu(this.wrap());
+              return new Wu(this.wrap());
             }
-          }, $o = class {
+          }, tu = class {
             constructor(e) {
               __publicField(this, "tree");
               __publicField(this, "path", new Array());
@@ -11287,51 +11287,51 @@ var require_stdin = __commonJS({
               for (this.path.pop(); this.path.length && this.path[this.path.length - 1].right === e; ) e = this.path.pop();
               return this.path.length > 0;
             }
-          }, Vu = class extends $o {
+          }, Wu = class extends tu {
             getValue(e) {
               return e.key;
             }
-          }, Hu = class extends $o {
+          }, Ku = class extends tu {
             getValue(e) {
               return [
                 e.key,
                 e.key
               ];
             }
-          }, tu = (e) => () => e, Lo = (e) => {
-            let i = e ? (r, s) => s.minus(r).abs().isLessThanOrEqualTo(e) : tu(false);
+          }, eu = (e) => () => e, bo = (e) => {
+            let i = e ? (r, s) => s.minus(r).abs().isLessThanOrEqualTo(e) : eu(false);
             return (r, s) => i(r, s) ? 0 : r.comparedTo(s);
           };
-          function Wu(e) {
-            let i = e ? (r, s, u, h, p) => r.exponentiatedBy(2).isLessThanOrEqualTo(h.minus(s).exponentiatedBy(2).plus(p.minus(u).exponentiatedBy(2)).times(e)) : tu(false);
+          function Yu(e) {
+            let i = e ? (r, s, u, c, p) => r.exponentiatedBy(2).isLessThanOrEqualTo(c.minus(s).exponentiatedBy(2).plus(p.minus(u).exponentiatedBy(2)).times(e)) : eu(false);
             return (r, s, u) => {
-              let h = r.x, p = r.y, f = u.x, m = u.y, y = p.minus(m).times(s.x.minus(f)).minus(h.minus(f).times(s.y.minus(m)));
-              return i(y, h, p, f, m) ? 0 : y.comparedTo(0);
+              let c = r.x, p = r.y, f = u.x, m = u.y, y = p.minus(m).times(s.x.minus(f)).minus(c.minus(f).times(s.y.minus(m)));
+              return i(y, c, p, f, m) ? 0 : y.comparedTo(0);
             };
           }
-          var Ku = (e) => e, Yu = (e) => {
+          var Xu = (e) => e, Ju = (e) => {
             if (e) {
-              let i = new la(Lo(e)), r = new la(Lo(e)), s = (h, p) => p.addAndReturn(h), u = (h) => ({
-                x: s(h.x, i),
-                y: s(h.y, r)
+              let i = new la(bo(e)), r = new la(bo(e)), s = (c, p) => p.addAndReturn(c), u = (c) => ({
+                x: s(c.x, i),
+                y: s(c.y, r)
               });
               return u({
                 x: new yi(0),
                 y: new yi(0)
               }), u;
             }
-            return Ku;
-          }, bo = (e) => ({
+            return Xu;
+          }, wo = (e) => ({
             set: (i) => {
-              Oi = bo(i);
+              Oi = wo(i);
             },
-            reset: () => bo(e),
-            compare: Lo(e),
-            snap: Yu(e),
-            orient: Wu(e)
-          }), Oi = bo(), Wr = (e, i) => e.ll.x.isLessThanOrEqualTo(i.x) && i.x.isLessThanOrEqualTo(e.ur.x) && e.ll.y.isLessThanOrEqualTo(i.y) && i.y.isLessThanOrEqualTo(e.ur.y), wo = (e, i) => {
+            reset: () => wo(e),
+            compare: bo(e),
+            snap: Ju(e),
+            orient: Yu(e)
+          }), Oi = wo(), Wr = (e, i) => e.ll.x.isLessThanOrEqualTo(i.x) && i.x.isLessThanOrEqualTo(e.ur.x) && e.ll.y.isLessThanOrEqualTo(i.y) && i.y.isLessThanOrEqualTo(e.ur.y), Co = (e, i) => {
             if (i.ur.x.isLessThan(e.ll.x) || e.ur.x.isLessThan(i.ll.x) || i.ur.y.isLessThan(e.ll.y) || e.ur.y.isLessThan(i.ll.y)) return null;
-            let r = e.ll.x.isLessThan(i.ll.x) ? i.ll.x : e.ll.x, s = e.ur.x.isLessThan(i.ur.x) ? e.ur.x : i.ur.x, u = e.ll.y.isLessThan(i.ll.y) ? i.ll.y : e.ll.y, h = e.ur.y.isLessThan(i.ur.y) ? e.ur.y : i.ur.y;
+            let r = e.ll.x.isLessThan(i.ll.x) ? i.ll.x : e.ll.x, s = e.ur.x.isLessThan(i.ur.x) ? e.ur.x : i.ur.x, u = e.ll.y.isLessThan(i.ll.y) ? i.ll.y : e.ll.y, c = e.ur.y.isLessThan(i.ur.y) ? e.ur.y : i.ur.y;
             return {
               ll: {
                 x: r,
@@ -11339,10 +11339,10 @@ var require_stdin = __commonJS({
               },
               ur: {
                 x: s,
-                y: h
+                y: c
               }
             };
-          }, ha = (e, i) => e.x.times(i.y).minus(e.y.times(i.x)), eu = (e, i) => e.x.times(i.x).plus(e.y.times(i.y)), ca = (e) => eu(e, e).sqrt(), Xu = (e, i, r) => {
+          }, ha = (e, i) => e.x.times(i.y).minus(e.y.times(i.x)), iu = (e, i) => e.x.times(i.x).plus(e.y.times(i.y)), ca = (e) => iu(e, e).sqrt(), Qu = (e, i, r) => {
             let s = {
               x: i.x.minus(e.x),
               y: i.y.minus(e.y)
@@ -11351,7 +11351,7 @@ var require_stdin = __commonJS({
               y: r.y.minus(e.y)
             };
             return ha(u, s).div(ca(u)).div(ca(s));
-          }, Ju = (e, i, r) => {
+          }, $u = (e, i, r) => {
             let s = {
               x: i.x.minus(e.x),
               y: i.y.minus(e.y)
@@ -11359,29 +11359,29 @@ var require_stdin = __commonJS({
               x: r.x.minus(e.x),
               y: r.y.minus(e.y)
             };
-            return eu(u, s).div(ca(u)).div(ca(s));
-          }, iu = (e, i, r) => i.y.isZero() ? null : {
+            return iu(u, s).div(ca(u)).div(ca(s));
+          }, nu = (e, i, r) => i.y.isZero() ? null : {
             x: e.x.plus(i.x.div(i.y).times(r.minus(e.y))),
             y: r
-          }, nu = (e, i, r) => i.x.isZero() ? null : {
+          }, ru = (e, i, r) => i.x.isZero() ? null : {
             x: r,
             y: e.y.plus(i.y.div(i.x).times(r.minus(e.x)))
-          }, Qu = (e, i, r, s) => {
-            if (i.x.isZero()) return nu(r, s, e.x);
-            if (s.x.isZero()) return nu(e, i, r.x);
-            if (i.y.isZero()) return iu(r, s, e.y);
-            if (s.y.isZero()) return iu(e, i, r.y);
+          }, tl = (e, i, r, s) => {
+            if (i.x.isZero()) return ru(r, s, e.x);
+            if (s.x.isZero()) return ru(e, i, r.x);
+            if (i.y.isZero()) return nu(r, s, e.y);
+            if (s.y.isZero()) return nu(e, i, r.y);
             let u = ha(i, s);
             if (u.isZero()) return null;
-            let h = {
+            let c = {
               x: r.x.minus(e.x),
               y: r.y.minus(e.y)
-            }, p = ha(h, i).div(u), f = ha(h, s).div(u), m = e.x.plus(f.times(i.x)), y = r.x.plus(p.times(s.x)), A = e.y.plus(f.times(i.y)), C = r.y.plus(p.times(s.y)), O = m.plus(y).div(2), R = A.plus(C).div(2);
+            }, p = ha(c, i).div(u), f = ha(c, s).div(u), m = e.x.plus(f.times(i.x)), y = r.x.plus(p.times(s.x)), A = e.y.plus(f.times(i.y)), C = r.y.plus(p.times(s.y)), O = m.plus(y).div(2), R = A.plus(C).div(2);
             return {
               x: O,
               y: R
             };
-          }, vi = class ku {
+          }, vi = class Bu {
             constructor(i, r) {
               __publicField(this, "point");
               __publicField(this, "isLeft");
@@ -11393,7 +11393,7 @@ var require_stdin = __commonJS({
               ] : i.events.push(this), this.point = i, this.isLeft = r;
             }
             static compare(i, r) {
-              let s = ku.comparePoints(i.point, r.point);
+              let s = Bu.comparePoints(i.point, r.point);
               return s !== 0 ? s : (i.point !== r.point && i.link(r), i.isLeft !== r.isLeft ? i.isLeft ? 1 : -1 : pa.compare(i.segment, r.segment));
             }
             static comparePoints(i, r) {
@@ -11403,8 +11403,8 @@ var require_stdin = __commonJS({
               if (i.point === this.point) throw new Error("Tried to link already linked events");
               let r = i.point.events;
               for (let s = 0, u = r.length; s < u; s++) {
-                let h = r[s];
-                this.point.events.push(h), h.point = this.point;
+                let c = r[s];
+                this.point.events.push(c), c.point = this.point;
               }
               this.checkForConsuming();
             }
@@ -11413,8 +11413,8 @@ var require_stdin = __commonJS({
               for (let r = 0; r < i; r++) {
                 let s = this.point.events[r];
                 if (s.segment.consumedBy === void 0) for (let u = r + 1; u < i; u++) {
-                  let h = this.point.events[u];
-                  h.consumedBy === void 0 && s.otherSE.point.events === h.otherSE.point.events && s.segment.consume(h.segment);
+                  let c = this.point.events[u];
+                  c.consumedBy === void 0 && s.otherSE.point.events === c.otherSE.point.events && s.segment.consume(c.segment);
                 }
               }
             }
@@ -11428,19 +11428,19 @@ var require_stdin = __commonJS({
             }
             getLeftmostComparator(i) {
               let r = /* @__PURE__ */ new Map(), s = (u) => {
-                let h = u.otherSE;
+                let c = u.otherSE;
                 r.set(u, {
-                  sine: Xu(this.point, i.point, h.point),
-                  cosine: Ju(this.point, i.point, h.point)
+                  sine: Qu(this.point, i.point, c.point),
+                  cosine: $u(this.point, i.point, c.point)
                 });
               };
-              return (u, h) => {
-                r.has(u) || s(u), r.has(h) || s(h);
-                let { sine: p, cosine: f } = r.get(u), { sine: m, cosine: y } = r.get(h);
+              return (u, c) => {
+                r.has(u) || s(u), r.has(c) || s(c);
+                let { sine: p, cosine: f } = r.get(u), { sine: m, cosine: y } = r.get(c);
                 return p.isGreaterThanOrEqualTo(0) && m.isGreaterThanOrEqualTo(0) ? f.isLessThan(y) ? 1 : f.isGreaterThan(y) ? -1 : 0 : p.isLessThan(0) && m.isLessThan(0) ? f.isLessThan(y) ? -1 : f.isGreaterThan(y) ? 1 : 0 : m.isLessThan(p) ? -1 : m.isGreaterThan(p) ? 1 : 0;
               };
             }
-          }, $u = class Do {
+          }, el = class Io {
             constructor(i) {
               __publicField(this, "events");
               __publicField(this, "poly");
@@ -11453,9 +11453,9 @@ var require_stdin = __commonJS({
             static factory(i) {
               let r = [];
               for (let s = 0, u = i.length; s < u; s++) {
-                let h = i[s];
-                if (!h.isInResult() || h.ringOut) continue;
-                let p = null, f = h.leftSE, m = h.rightSE, y = [
+                let c = i[s];
+                if (!c.isInResult() || c.ringOut) continue;
+                let p = null, f = c.leftSE, m = c.rightSE, y = [
                   f
                 ], A = f.point, C = [];
                 for (; p = f, f = m, y.push(f), f.point !== A; ) for (; ; ) {
@@ -11475,7 +11475,7 @@ var require_stdin = __commonJS({
                   }
                   if (R !== null) {
                     let K = C.splice(R)[0], it = y.splice(K.index);
-                    it.unshift(it[0].otherSE), r.push(new Do(it.reverse()));
+                    it.unshift(it[0].otherSE), r.push(new Io(it.reverse()));
                     continue;
                   }
                   C.push({
@@ -11486,7 +11486,7 @@ var require_stdin = __commonJS({
                   m = O.sort(H)[0].otherSE;
                   break;
                 }
-                r.push(new Do(y));
+                r.push(new Io(y));
               }
               return r;
             }
@@ -11501,8 +11501,8 @@ var require_stdin = __commonJS({
               if (r.length === 1) return null;
               let s = r[0], u = r[1];
               Oi.orient(s, i, u) === 0 && r.shift(), r.push(r[0]);
-              let h = this.isExteriorRing() ? 1 : -1, p = this.isExteriorRing() ? 0 : r.length - 1, f = this.isExteriorRing() ? r.length : -1, m = [];
-              for (let y = p; y != f; y += h) m.push([
+              let c = this.isExteriorRing() ? 1 : -1, p = this.isExteriorRing() ? 0 : r.length - 1, f = this.isExteriorRing() ? r.length : -1, m = [];
+              for (let y = p; y != f; y += c) m.push([
                 r[y].x.toNumber(),
                 r[y].y.toNumber()
               ]);
@@ -11521,7 +11521,7 @@ var require_stdin = __commonJS({
             _calcEnclosingRing() {
               var _a3, _b2;
               let i = this.events[0];
-              for (let u = 1, h = this.events.length; u < h; u++) {
+              for (let u = 1, c = this.events.length; u < c; u++) {
                 let p = this.events[u];
                 vi.compare(i, p) > 0 && (i = p);
               }
@@ -11533,7 +11533,7 @@ var require_stdin = __commonJS({
                 r = s.prevInResult(), s = r ? r.prevInResult() : null;
               }
             }
-          }, ru = class {
+          }, su = class {
             constructor(e) {
               __publicField(this, "exteriorRing");
               __publicField(this, "interiorRings");
@@ -11554,7 +11554,7 @@ var require_stdin = __commonJS({
               }
               return i;
             }
-          }, tl = class {
+          }, il = class {
             constructor(e) {
               __publicField(this, "rings");
               __publicField(this, "polys");
@@ -11573,15 +11573,15 @@ var require_stdin = __commonJS({
               let i = [];
               for (let r = 0, s = e.length; r < s; r++) {
                 let u = e[r];
-                if (!u.poly) if (u.isExteriorRing()) i.push(new ru(u));
+                if (!u.poly) if (u.isExteriorRing()) i.push(new su(u));
                 else {
-                  let h = u.enclosingRing();
-                  (h == null ? void 0 : h.poly) || i.push(new ru(h)), (_a3 = h == null ? void 0 : h.poly) == null ? void 0 : _a3.addInterior(u);
+                  let c = u.enclosingRing();
+                  (c == null ? void 0 : c.poly) || i.push(new su(c)), (_a3 = c == null ? void 0 : c.poly) == null ? void 0 : _a3.addInterior(u);
                 }
               }
               return i;
             }
-          }, el = class {
+          }, nl = class {
             constructor(e, i = pa.compare) {
               __publicField(this, "queue");
               __publicField(this, "tree");
@@ -11600,10 +11600,10 @@ var require_stdin = __commonJS({
                 u = this.tree.firstAfter(u);
               while (u != null && u.consumedBy != null);
               if (e.isLeft) {
-                let h = null;
+                let c = null;
                 if (s) {
                   let f = s.getIntersection(i);
-                  if (f !== null && (i.isAnEndpoint(f) || (h = f), !s.isAnEndpoint(f))) {
+                  if (f !== null && (i.isAnEndpoint(f) || (c = f), !s.isAnEndpoint(f))) {
                     let m = this._splitSafely(s, f);
                     for (let y = 0, A = m.length; y < A; y++) r.push(m[y]);
                   }
@@ -11616,23 +11616,23 @@ var require_stdin = __commonJS({
                     for (let y = 0, A = m.length; y < A; y++) r.push(m[y]);
                   }
                 }
-                if (h !== null || p !== null) {
+                if (c !== null || p !== null) {
                   let f = null;
-                  h === null ? f = p : p === null ? f = h : f = vi.comparePoints(h, p) <= 0 ? h : p, this.queue.delete(i.rightSE), r.push(i.rightSE);
+                  c === null ? f = p : p === null ? f = c : f = vi.comparePoints(c, p) <= 0 ? c : p, this.queue.delete(i.rightSE), r.push(i.rightSE);
                   let m = i.split(f);
                   for (let y = 0, A = m.length; y < A; y++) r.push(m[y]);
                 }
                 r.length > 0 ? (this.tree.delete(i), r.push(e)) : (this.segments.push(i), i.prev = s);
               } else {
                 if (s && u) {
-                  let h = s.getIntersection(u);
-                  if (h !== null) {
-                    if (!s.isAnEndpoint(h)) {
-                      let p = this._splitSafely(s, h);
+                  let c = s.getIntersection(u);
+                  if (c !== null) {
+                    if (!s.isAnEndpoint(c)) {
+                      let p = this._splitSafely(s, c);
                       for (let f = 0, m = p.length; f < m; f++) r.push(p[f]);
                     }
-                    if (!u.isAnEndpoint(h)) {
-                      let p = this._splitSafely(u, h);
+                    if (!u.isAnEndpoint(c)) {
+                      let p = this._splitSafely(u, c);
                       for (let f = 0, m = p.length; f < m; f++) r.push(p[f]);
                     }
                   }
@@ -11648,7 +11648,7 @@ var require_stdin = __commonJS({
               let s = e.split(i);
               return s.push(r), e.consumedBy === void 0 && this.tree.add(e), s;
             }
-          }, il = class {
+          }, rl = class {
             constructor() {
               __publicField(this, "type");
               __publicField(this, "numMultiPolys");
@@ -11656,25 +11656,25 @@ var require_stdin = __commonJS({
             run(e, i, r) {
               Kr.type = e;
               let s = [
-                new au(i, true)
+                new ou(i, true)
               ];
-              for (let m = 0, y = r.length; m < y; m++) s.push(new au(r[m], false));
+              for (let m = 0, y = r.length; m < y; m++) s.push(new ou(r[m], false));
               if (Kr.numMultiPolys = s.length, Kr.type === "difference") {
                 let m = s[0], y = 1;
-                for (; y < s.length; ) wo(s[y].bbox, m.bbox) !== null ? y++ : s.splice(y, 1);
+                for (; y < s.length; ) Co(s[y].bbox, m.bbox) !== null ? y++ : s.splice(y, 1);
               }
               if (Kr.type === "intersection") for (let m = 0, y = s.length; m < y; m++) {
                 let A = s[m];
-                for (let C = m + 1, O = s.length; C < O; C++) if (wo(A.bbox, s[C].bbox) === null) return [];
+                for (let C = m + 1, O = s.length; C < O; C++) if (Co(A.bbox, s[C].bbox) === null) return [];
               }
               let u = new la(vi.compare);
               for (let m = 0, y = s.length; m < y; m++) {
                 let A = s[m].getSweepEvents();
                 for (let C = 0, O = A.length; C < O; C++) u.add(A[C]);
               }
-              let h = new el(u), p = null;
+              let c = new nl(u), p = null;
               for (u.size != 0 && (p = u.first(), u.delete(p)); p; ) {
-                let m = h.process(p);
+                let m = c.process(p);
                 for (let y = 0, A = m.length; y < A; y++) {
                   let C = m[y];
                   C.consumedBy === void 0 && u.add(C);
@@ -11682,10 +11682,10 @@ var require_stdin = __commonJS({
                 u.size != 0 ? (p = u.first(), u.delete(p)) : p = null;
               }
               Oi.reset();
-              let f = $u.factory(h.segments);
-              return new tl(f).getGeom();
+              let f = el.factory(c.segments);
+              return new il(f).getGeom();
             }
-          }, Kr = new il(), da = Kr, nl = 0, pa = class La {
+          }, Kr = new rl(), da = Kr, sl = 0, pa = class ba {
             constructor(i, r, s, u) {
               __publicField(this, "id");
               __publicField(this, "leftSE");
@@ -11699,12 +11699,12 @@ var require_stdin = __commonJS({
               __publicField(this, "_beforeState");
               __publicField(this, "_afterState");
               __publicField(this, "_isInResult");
-              this.id = ++nl, this.leftSE = i, i.segment = this, i.otherSE = r, this.rightSE = r, r.segment = this, r.otherSE = i, this.rings = s, this.windings = u;
+              this.id = ++sl, this.leftSE = i, i.segment = this, i.otherSE = r, this.rightSE = r, r.segment = this, r.otherSE = i, this.rings = s, this.windings = u;
             }
             static compare(i, r) {
-              let s = i.leftSE.point.x, u = r.leftSE.point.x, h = i.rightSE.point.x, p = r.rightSE.point.x;
+              let s = i.leftSE.point.x, u = r.leftSE.point.x, c = i.rightSE.point.x, p = r.rightSE.point.x;
               if (p.isLessThan(s)) return 1;
-              if (h.isLessThan(u)) return -1;
+              if (c.isLessThan(u)) return -1;
               let f = i.leftSE.point.y, m = r.leftSE.point.y, y = i.rightSE.point.y, A = r.rightSE.point.y;
               if (s.isLessThan(u)) {
                 if (m.isLessThan(f) && m.isLessThan(y)) return 1;
@@ -11725,29 +11725,29 @@ var require_stdin = __commonJS({
               }
               if (f.isLessThan(m)) return -1;
               if (f.isGreaterThan(m)) return 1;
-              if (h.isLessThan(p)) {
+              if (c.isLessThan(p)) {
                 let C = r.comparePoint(i.rightSE.point);
                 if (C !== 0) return C;
               }
-              if (h.isGreaterThan(p)) {
+              if (c.isGreaterThan(p)) {
                 let C = i.comparePoint(r.rightSE.point);
                 if (C < 0) return 1;
                 if (C > 0) return -1;
               }
-              if (!h.eq(p)) {
-                let C = y.minus(f), O = h.minus(s), R = A.minus(m), H = p.minus(u);
+              if (!c.eq(p)) {
+                let C = y.minus(f), O = c.minus(s), R = A.minus(m), H = p.minus(u);
                 if (C.isGreaterThan(O) && R.isLessThan(H)) return 1;
                 if (C.isLessThan(O) && R.isGreaterThan(H)) return -1;
               }
-              return h.isGreaterThan(p) ? 1 : h.isLessThan(p) || y.isLessThan(A) ? -1 : y.isGreaterThan(A) ? 1 : i.id < r.id ? -1 : i.id > r.id ? 1 : 0;
+              return c.isGreaterThan(p) ? 1 : c.isLessThan(p) || y.isLessThan(A) ? -1 : y.isGreaterThan(A) ? 1 : i.id < r.id ? -1 : i.id > r.id ? 1 : 0;
             }
             static fromRing(i, r, s) {
-              let u, h, p, f = vi.comparePoints(i, r);
-              if (f < 0) u = i, h = r, p = 1;
-              else if (f > 0) u = r, h = i, p = -1;
+              let u, c, p, f = vi.comparePoints(i, r);
+              if (f < 0) u = i, c = r, p = 1;
+              else if (f > 0) u = r, c = i, p = -1;
               else throw new Error(`Tried to create degenerate segment at [${i.x}, ${i.y}]`);
-              let m = new vi(u, true), y = new vi(h, false);
-              return new La(m, y, [
+              let m = new vi(u, true), y = new vi(c, false);
+              return new ba(m, y, [
                 s
               ], [
                 p
@@ -11782,23 +11782,23 @@ var require_stdin = __commonJS({
               return Oi.orient(this.leftSE.point, i, this.rightSE.point);
             }
             getIntersection(i) {
-              let r = this.bbox(), s = i.bbox(), u = wo(r, s);
+              let r = this.bbox(), s = i.bbox(), u = Co(r, s);
               if (u === null) return null;
-              let h = this.leftSE.point, p = this.rightSE.point, f = i.leftSE.point, m = i.rightSE.point, y = Wr(r, f) && this.comparePoint(f) === 0, A = Wr(s, h) && i.comparePoint(h) === 0, C = Wr(r, m) && this.comparePoint(m) === 0, O = Wr(s, p) && i.comparePoint(p) === 0;
+              let c = this.leftSE.point, p = this.rightSE.point, f = i.leftSE.point, m = i.rightSE.point, y = Wr(r, f) && this.comparePoint(f) === 0, A = Wr(s, c) && i.comparePoint(c) === 0, C = Wr(r, m) && this.comparePoint(m) === 0, O = Wr(s, p) && i.comparePoint(p) === 0;
               if (A && y) return O && !C ? p : !O && C ? m : null;
-              if (A) return C && h.x.eq(m.x) && h.y.eq(m.y) ? null : h;
+              if (A) return C && c.x.eq(m.x) && c.y.eq(m.y) ? null : c;
               if (y) return O && p.x.eq(f.x) && p.y.eq(f.y) ? null : f;
               if (O && C) return null;
               if (O) return p;
               if (C) return m;
-              let R = Qu(h, this.vector(), f, i.vector());
+              let R = tl(c, this.vector(), f, i.vector());
               return R === null || !Wr(u, R) ? null : Oi.snap(R);
             }
             split(i) {
-              let r = [], s = i.events !== void 0, u = new vi(i, true), h = new vi(i, false), p = this.rightSE;
-              this.replaceRightSE(h), r.push(h), r.push(u);
-              let f = new La(u, p, this.rings.slice(), this.windings.slice());
-              return vi.comparePoints(f.leftSE.point, f.rightSE.point) > 0 && f.swapEvents(), vi.comparePoints(this.leftSE.point, this.rightSE.point) > 0 && this.swapEvents(), s && (u.checkForConsuming(), h.checkForConsuming()), r;
+              let r = [], s = i.events !== void 0, u = new vi(i, true), c = new vi(i, false), p = this.rightSE;
+              this.replaceRightSE(c), r.push(c), r.push(u);
+              let f = new ba(u, p, this.rings.slice(), this.windings.slice());
+              return vi.comparePoints(f.leftSE.point, f.rightSE.point) > 0 && f.swapEvents(), vi.comparePoints(this.leftSE.point, this.rightSE.point) > 0 && this.swapEvents(), s && (u.checkForConsuming(), c.checkForConsuming()), r;
             }
             swapEvents() {
               let i = this.rightSE;
@@ -11809,18 +11809,18 @@ var require_stdin = __commonJS({
               let r = this, s = i;
               for (; r.consumedBy; ) r = r.consumedBy;
               for (; s.consumedBy; ) s = s.consumedBy;
-              let u = La.compare(r, s);
+              let u = ba.compare(r, s);
               if (u !== 0) {
                 if (u > 0) {
-                  let h = r;
-                  r = s, s = h;
+                  let c = r;
+                  r = s, s = c;
                 }
                 if (r.prev === s) {
-                  let h = r;
-                  r = s, s = h;
+                  let c = r;
+                  r = s, s = c;
                 }
-                for (let h = 0, p = s.rings.length; h < p; h++) {
-                  let f = s.rings[h], m = s.windings[h], y = r.rings.indexOf(f);
+                for (let c = 0, p = s.rings.length; c < p; c++) {
+                  let f = s.rings[c], m = s.windings[c], y = r.rings.indexOf(f);
                   y === -1 ? (r.rings.push(f), r.windings.push(m)) : r.windings[y] += m;
                 }
                 s.rings = null, s.windings = null, s.consumedBy = r, s.leftSE.consumedBy = r.leftSE, s.rightSE.consumedBy = r.rightSE;
@@ -11855,19 +11855,19 @@ var require_stdin = __commonJS({
                 let y = this.rings[f], A = this.windings[f], C = r.indexOf(y);
                 C === -1 ? (r.push(y), s.push(A)) : s[C] += A;
               }
-              let h = [], p = [];
+              let c = [], p = [];
               for (let f = 0, m = r.length; f < m; f++) {
                 if (s[f] === 0) continue;
                 let y = r[f], A = y.poly;
-                if (p.indexOf(A) === -1) if (y.isExterior) h.push(A);
+                if (p.indexOf(A) === -1) if (y.isExterior) c.push(A);
                 else {
                   p.indexOf(A) === -1 && p.push(A);
-                  let C = h.indexOf(y.poly);
-                  C !== -1 && h.splice(C, 1);
+                  let C = c.indexOf(y.poly);
+                  C !== -1 && c.splice(C, 1);
                 }
               }
-              for (let f = 0, m = h.length; f < m; f++) {
-                let y = h[f].multiPoly;
+              for (let f = 0, m = c.length; f < m; f++) {
+                let y = c[f].multiPoly;
                 u.indexOf(y) === -1 && u.push(y);
               }
               return this._afterState;
@@ -11900,7 +11900,7 @@ var require_stdin = __commonJS({
               }
               return this._isInResult;
             }
-          }, su = class {
+          }, au = class {
             constructor(e, i, r) {
               __publicField(this, "poly");
               __publicField(this, "isExterior");
@@ -11923,11 +11923,11 @@ var require_stdin = __commonJS({
                 }
               };
               let u = s;
-              for (let h = 1, p = e.length; h < p; h++) {
-                if (typeof e[h][0] != "number" || typeof e[h][1] != "number") throw new Error("Input geometry is not a valid Polygon or MultiPolygon");
+              for (let c = 1, p = e.length; c < p; c++) {
+                if (typeof e[c][0] != "number" || typeof e[c][1] != "number") throw new Error("Input geometry is not a valid Polygon or MultiPolygon");
                 let f = Oi.snap({
-                  x: new yi(e[h][0]),
-                  y: new yi(e[h][1])
+                  x: new yi(e[c][0]),
+                  y: new yi(e[c][1])
                 });
                 f.x.eq(u.x) && f.y.eq(u.y) || (this.segments.push(pa.fromRing(u, f, this)), f.x.isLessThan(this.bbox.ll.x) && (this.bbox.ll.x = f.x), f.y.isLessThan(this.bbox.ll.y) && (this.bbox.ll.y = f.y), f.x.isGreaterThan(this.bbox.ur.x) && (this.bbox.ur.x = f.x), f.y.isGreaterThan(this.bbox.ur.y) && (this.bbox.ur.y = f.y), u = f);
               }
@@ -11941,14 +11941,14 @@ var require_stdin = __commonJS({
               }
               return e;
             }
-          }, rl = class {
+          }, al = class {
             constructor(e, i) {
               __publicField(this, "multiPoly");
               __publicField(this, "exteriorRing");
               __publicField(this, "interiorRings");
               __publicField(this, "bbox");
               if (!Array.isArray(e)) throw new Error("Input geometry is not a valid Polygon or MultiPolygon");
-              this.exteriorRing = new su(e[0], this, true), this.bbox = {
+              this.exteriorRing = new au(e[0], this, true), this.bbox = {
                 ll: {
                   x: this.exteriorRing.bbox.ll.x,
                   y: this.exteriorRing.bbox.ll.y
@@ -11959,7 +11959,7 @@ var require_stdin = __commonJS({
                 }
               }, this.interiorRings = [];
               for (let r = 1, s = e.length; r < s; r++) {
-                let u = new su(e[r], this, false);
+                let u = new au(e[r], this, false);
                 u.bbox.ll.x.isLessThan(this.bbox.ll.x) && (this.bbox.ll.x = u.bbox.ll.x), u.bbox.ll.y.isLessThan(this.bbox.ll.y) && (this.bbox.ll.y = u.bbox.ll.y), u.bbox.ur.x.isGreaterThan(this.bbox.ur.x) && (this.bbox.ur.x = u.bbox.ur.x), u.bbox.ur.y.isGreaterThan(this.bbox.ur.y) && (this.bbox.ur.y = u.bbox.ur.y), this.interiorRings.push(u);
               }
               this.multiPoly = i;
@@ -11968,11 +11968,11 @@ var require_stdin = __commonJS({
               let e = this.exteriorRing.getSweepEvents();
               for (let i = 0, r = this.interiorRings.length; i < r; i++) {
                 let s = this.interiorRings[i].getSweepEvents();
-                for (let u = 0, h = s.length; u < h; u++) e.push(s[u]);
+                for (let u = 0, c = s.length; u < c; u++) e.push(s[u]);
               }
               return e;
             }
-          }, au = class {
+          }, ou = class {
             constructor(e, i) {
               __publicField(this, "isSubject");
               __publicField(this, "polys");
@@ -11995,7 +11995,7 @@ var require_stdin = __commonJS({
                 }
               };
               for (let r = 0, s = e.length; r < s; r++) {
-                let u = new rl(e[r], this);
+                let u = new al(e[r], this);
                 u.bbox.ll.x.isLessThan(this.bbox.ll.x) && (this.bbox.ll.x = u.bbox.ll.x), u.bbox.ll.y.isLessThan(this.bbox.ll.y) && (this.bbox.ll.y = u.bbox.ll.y), u.bbox.ur.x.isGreaterThan(this.bbox.ur.x) && (this.bbox.ur.x = u.bbox.ur.x), u.bbox.ur.y.isGreaterThan(this.bbox.ur.y) && (this.bbox.ur.y = u.bbox.ur.y), this.polys.push(u);
               }
               this.isSubject = i;
@@ -12004,11 +12004,11 @@ var require_stdin = __commonJS({
               let e = [];
               for (let i = 0, r = this.polys.length; i < r; i++) {
                 let s = this.polys[i].getSweepEvents();
-                for (let u = 0, h = s.length; u < h; u++) e.push(s[u]);
+                for (let u = 0, c = s.length; u < c; u++) e.push(s[u]);
               }
               return e;
             }
-          }, sl = (e, ...i) => da.run("intersection", e, i), al = (e, ...i) => da.run("difference", e, i);
+          }, ol = (e, ...i) => da.run("intersection", e, i), ul = (e, ...i) => da.run("difference", e, i);
           Oi.set;
           function fa(e) {
             let i = {
@@ -12019,56 +12019,56 @@ var require_stdin = __commonJS({
           function _a(e) {
             return e.type === "Feature" ? e.geometry : e;
           }
-          function ou(e) {
+          function uu(e) {
             return e && e.geometry && e.geometry.coordinates ? e.geometry.coordinates : e;
           }
-          function ol(e) {
+          function ll(e) {
             return fa({
               type: "LineString",
               coordinates: e
             });
           }
-          function ul(e) {
+          function hl(e) {
             return fa({
               type: "MultiLineString",
               coordinates: e
             });
           }
-          function uu(e) {
+          function lu(e) {
             return fa({
               type: "Polygon",
               coordinates: e
             });
           }
-          function lu(e) {
+          function hu(e) {
             return fa({
               type: "MultiPolygon",
               coordinates: e
             });
           }
-          function ll(e, i) {
-            let r = _a(e), s = _a(i), u = sl(r.coordinates, s.coordinates);
-            return u.length === 0 ? null : u.length === 1 ? uu(u[0]) : lu(u);
+          function cl(e, i) {
+            let r = _a(e), s = _a(i), u = ol(r.coordinates, s.coordinates);
+            return u.length === 0 ? null : u.length === 1 ? lu(u[0]) : hu(u);
           }
-          function hl(e, i) {
-            let r = _a(e), s = _a(i), u = al(r.coordinates, s.coordinates);
-            return u.length === 0 ? null : u.length === 1 ? uu(u[0]) : lu(u);
+          function dl(e, i) {
+            let r = _a(e), s = _a(i), u = ul(r.coordinates, s.coordinates);
+            return u.length === 0 ? null : u.length === 1 ? lu(u[0]) : hu(u);
           }
-          function hu(e) {
-            return Array.isArray(e) ? 1 + hu(e[0]) : -1;
+          function cu(e) {
+            return Array.isArray(e) ? 1 + cu(e[0]) : -1;
           }
-          function cl(e) {
+          function pl(e) {
             e instanceof L.Polyline && (e = e.toGeoJSON(15));
-            let i = ou(e), r = hu(i), s = [];
+            let i = uu(e), r = cu(i), s = [];
             return r > 1 ? i.forEach((u) => {
-              s.push(ol(u));
+              s.push(ll(u));
             }) : s.push(e), s;
           }
-          function dl(e) {
+          function fl(e) {
             let i = [];
             return e.eachLayer((r) => {
-              i.push(ou(r.toGeoJSON(15)));
-            }), ul(i);
+              i.push(uu(r.toGeoJSON(15)));
+            }), hl(i);
           }
           re.Cut = re.Polygon.extend({
             initialize(e) {
@@ -12090,7 +12090,7 @@ var require_stdin = __commonJS({
               Object.keys(i).map((s) => i[s]).filter((s) => s.pm).filter((s) => !s._pmTempLayer).filter((s) => !L.PM.optIn && !s.options.pmIgnore || L.PM.optIn && s.options.pmIgnore === false).filter((s) => s instanceof L.Polyline).filter((s) => s !== e).filter((s) => s.pm.options.allowCutting).filter((s) => this.options.layersToCut && L.Util.isArray(this.options.layersToCut) && this.options.layersToCut.length > 0 ? this.options.layersToCut.indexOf(s) > -1 : true).filter((s) => !this._layerGroup.hasLayer(s)).filter((s) => {
                 try {
                   let u = !!Ie(e.toGeoJSON(15), s.toGeoJSON(15)).features.length > 0;
-                  return u || s instanceof L.Polyline && !(s instanceof L.Polygon) ? u : !!ll(e.toGeoJSON(15), s.toGeoJSON(15));
+                  return u || s instanceof L.Polyline && !(s instanceof L.Polygon) ? u : !!cl(e.toGeoJSON(15), s.toGeoJSON(15));
                 } catch {
                   return s instanceof L.Polygon && console.error("You can't cut polygons with self-intersections"), false;
                 }
@@ -12108,13 +12108,13 @@ var require_stdin = __commonJS({
                         let { segment: O } = C;
                         if (O && O.length === 2) {
                           let { indexPath: R, parentPath: H, newIndex: K } = L.PM.Utils._getIndexFromSegment(m, O);
-                          (R.length > 1 ? (0, vo.default)(m, H) : m).splice(K, 0, A);
+                          (R.length > 1 ? (0, Lo.default)(m, H) : m).splice(K, 0, A);
                         }
                       }
                     }
                   });
                 } else u = s;
-                let h = this._cutLayer(e, u), p = L.geoJSON(h, s.options);
+                let c = this._cutLayer(e, u), p = L.geoJSON(c, s.options);
                 p.getLayers().length === 1 && ([p] = p.getLayers()), this._setPane(p, "layerPane");
                 let f = p.addTo(this._map.pm._getContainingLayer());
                 if (f.pm.enable(s.pm.options), f.pm.disable(), s._pmTempLayer = true, e._pmTempLayer = true, s.remove(), s.removeFrom(this._map.pm._getContainingLayer()), e.remove(), e.removeFrom(this._map.pm._getContainingLayer()), f.getLayers && f.getLayers().length === 0 && this._map.pm.removeLayer({
@@ -12133,15 +12133,15 @@ var require_stdin = __commonJS({
             },
             _cutLayer(e, i) {
               let r = L.geoJSON(), s;
-              if (i instanceof L.Polygon) s = hl(i.toGeoJSON(15), e.toGeoJSON(15));
+              if (i instanceof L.Polygon) s = dl(i.toGeoJSON(15), e.toGeoJSON(15));
               else {
-                let u = cl(i);
-                u.forEach((h) => {
-                  let p = mo(h, e.toGeoJSON(15)), f;
-                  p && p.features.length > 0 ? f = L.geoJSON(p) : f = L.geoJSON(h), f.getLayers().forEach((m) => {
+                let u = pl(i);
+                u.forEach((c) => {
+                  let p = go(c, e.toGeoJSON(15)), f;
+                  p && p.features.length > 0 ? f = L.geoJSON(p) : f = L.geoJSON(c), f.getLayers().forEach((m) => {
                     ra(e.toGeoJSON(15), m.toGeoJSON(15)) || m.addTo(r);
                   });
-                }), u.length > 1 ? s = dl(r) : s = r.toGeoJSON(15);
+                }), u.length > 1 ? s = fl(r) : s = r.toGeoJSON(15);
               }
               return s;
             },
@@ -12217,7 +12217,7 @@ var require_stdin = __commonJS({
               });
             }
           });
-          var pl = {
+          var _l = {
             enableLayerDrag() {
               if (!this.options.draggable || !this._layer._map) return;
               this.disable(), this._layerDragEnabled = true, this._map || (this._map = this._layer._map), (this._layer instanceof L.Marker || this._layer instanceof L.ImageOverlay) && L.DomEvent.on(this._getDOMElem(), "dragstart", this._stopDOMImageDrag), this._layer.dragging && this._layer.dragging.disable(), this._tempDragCoord = null, Ki(this._layer) instanceof L.Canvas ? (this._layer.on("mouseout", this.removeDraggingClass, this), this._layer.on("mouseover", this.addDraggingClass, this)) : this.addDraggingClass(), this._originalMapDragState = this._layer._map.dragging._enabled, this._safeToCacheDragState = true;
@@ -12281,13 +12281,13 @@ var require_stdin = __commonJS({
               let { latlng: i } = e, r = {
                 lat: i.lat - this._tempDragCoord.lat,
                 lng: i.lng - this._tempDragCoord.lng
-              }, s = (u) => u.map((h) => {
-                if (Array.isArray(h)) return s(h);
+              }, s = (u) => u.map((c) => {
+                if (Array.isArray(c)) return s(c);
                 let p = {
-                  lat: h.lat + r.lat,
-                  lng: h.lng + r.lng
+                  lat: c.lat + r.lat,
+                  lng: c.lng + r.lng
                 };
-                return (h.alt || h.alt === 0) && (p.alt = h.alt), p;
+                return (c.alt || c.alt === 0) && (p.alt = c.alt), p;
               });
               if (this._layer instanceof L.Circle && this._layer.options.resizeableCircle || this._layer instanceof L.CircleMarker && this._layer.options.resizeableCircleMarker) {
                 let u = s([
@@ -12297,10 +12297,10 @@ var require_stdin = __commonJS({
               } else if (this._layer instanceof L.CircleMarker || this._layer instanceof L.Marker) {
                 let u = this._layer.getLatLng();
                 this._layer._snapped && (u = this._layer._orgLatLng);
-                let h = s([
+                let c = s([
                   u
                 ]);
-                this._layer.setLatLng(h[0]), this._fireChange(this._layer.getLatLng(), "Edit");
+                this._layer.setLatLng(c[0]), this._fireChange(this._layer.getLatLng(), "Edit");
               } else if (this._layer instanceof L.ImageOverlay) {
                 let u = s([
                   this._layer.getBounds().getNorthWest(),
@@ -12349,19 +12349,19 @@ var require_stdin = __commonJS({
             _stopDOMImageDrag(e) {
               return e.preventDefault(), false;
             }
-          }, fl = pl, _l = et(ci());
-          function ml(e, i, r, s) {
+          }, ml = _l, gl = et(ci());
+          function yl(e, i, r, s) {
             return r.unproject(i.transform(r.project(e, s)), s);
           }
-          function cu(e, i, r) {
+          function du(e, i, r) {
             let s = r.getMaxZoom();
             if (s === 1 / 0 && (s = r.getZoom()), L.Util.isArray(e)) {
               let u = [];
-              return e.forEach((h) => {
-                u.push(cu(h, i, r));
+              return e.forEach((c) => {
+                u.push(du(c, i, r));
               }), u;
             }
-            return e instanceof L.LatLng ? ml(e, i, r, s) : null;
+            return e instanceof L.LatLng ? yl(e, i, r, s) : null;
           }
           function er(e, i) {
             i instanceof L.Layer && (i = i.getLatLng());
@@ -12372,7 +12372,7 @@ var require_stdin = __commonJS({
             let r = e.getMaxZoom();
             return r === 1 / 0 && (r = e.getZoom()), e.unproject(i, r);
           }
-          var gl = {
+          var vl = {
             _onRotateStart(e) {
               this._preventRenderingMarkers(true), this._rotationOriginLatLng = this._getRotationCenter().clone(), this._rotationOriginPoint = er(this._map, this._rotationOriginLatLng), this._rotationStartPoint = er(this._map, e.target.getLatLng()), this._initialRotateLatLng = ri(this._layer), this._startAngle = this.getAngle();
               let i = ri(this._rotationLayer, this._rotationLayer.pm._rotateOrgLatLng);
@@ -12381,11 +12381,11 @@ var require_stdin = __commonJS({
             _onRotate(e) {
               let i = er(this._map, e.target.getLatLng()), r = this._rotationStartPoint, s = this._rotationOriginPoint, u = Math.atan2(i.y - s.y, i.x - s.x) - Math.atan2(r.y - s.y, r.x - s.x);
               this._layer.setLatLngs(this._rotateLayer(u, this._initialRotateLatLng, this._rotationOriginLatLng, L.PM.Matrix.init(), this._map));
-              let h = this;
+              let c = this;
               function p(A, C = [], O = -1) {
                 if (O > -1 && C.push(O), L.Util.isArray(A[0])) A.forEach((R, H) => p(R, C.slice(), H));
                 else {
-                  let R = C.length > 0 ? (0, _l.default)(h._markers, C) : h._markers[0];
+                  let R = C.length > 0 ? (0, gl.default)(c._markers, C) : c._markers[0];
                   A.forEach((H, K) => {
                     R[K].setLatLng(H);
                   });
@@ -12406,8 +12406,8 @@ var require_stdin = __commonJS({
               this._rotationLayer.pm._rotateOrgLatLng = ri(this._rotationLayer), this._fireRotationEnd(this._rotationLayer, e, i), this._fireRotationEnd(this._map, e, i), this._rotationLayer.pm._fireEdit(this._rotationLayer, "Rotation"), this._preventRenderingMarkers(false), this._layerRotated = true;
             },
             _rotateLayer(e, i, r, s, u) {
-              let h = er(u, r);
-              return this._matrix = s.clone().rotate(e, h).flip(), cu(i, this._matrix, u);
+              let c = er(u, r);
+              return this._matrix = s.clone().rotate(e, c).flip(), du(i, this._matrix, u);
             },
             _setAngle(e) {
               e = e < 0 ? e + 360 : e, this._angle = e % 360;
@@ -12469,11 +12469,11 @@ var require_stdin = __commonJS({
             setRotationCenter(e) {
               this._rotationCenter = e, this._rotatePoly && this._rotatePoly.pm.setRotationCenter(e);
             }
-          }, yl = gl, vl = L.Class.extend({
+          }, Ll = vl, bl = L.Class.extend({
             includes: [
-              fl,
+              ml,
               zs,
-              yl,
+              Ll,
               bn
             ],
             options: {
@@ -12538,16 +12538,16 @@ var require_stdin = __commonJS({
             _vertexValidationDragEnd(e) {
               return e._cancelDragEventChain ? (e._cancelDragEventChain = null, false) : true;
             }
-          }), pe = vl;
+          }), pe = bl;
           pe.LayerGroup = L.Class.extend({
             initialize(e) {
               this._layerGroup = e, this._layers = this.getLayers(), this._getMap(), this._layers.forEach((s) => this._initLayer(s));
               let i = (s) => {
                 if (s.layer._pmTempLayer) return;
                 this._layers = this.getLayers();
-                let u = this._layers.filter((h) => !h.pm._parentLayerGroup || !(this._layerGroup._leaflet_id in h.pm._parentLayerGroup));
-                u.forEach((h) => {
-                  this._initLayer(h);
+                let u = this._layers.filter((c) => !c.pm._parentLayerGroup || !(this._layerGroup._leaflet_id in c.pm._parentLayerGroup));
+                u.forEach((c) => {
+                  this._initLayer(c);
                 }), u.length > 0 && this._getMap() && this._getMap().pm.globalEditModeEnabled() && this.enabled() && this.enable(this.getOptions());
               };
               this._layerGroup.on("layeradd", L.Util.throttle(i, 100, this), this), this._layerGroup.on("layerremove", (s) => {
@@ -12598,9 +12598,9 @@ var require_stdin = __commonJS({
             },
             getLayers(e = false, i = true, r = true, s = []) {
               let u = [];
-              return e ? this._layerGroup.getLayers().forEach((h) => {
-                u.push(h), h instanceof L.LayerGroup && s.indexOf(h._leaflet_id) === -1 && (s.push(h._leaflet_id), u = u.concat(h.pm.getLayers(true, true, true, s)));
-              }) : u = this._layerGroup.getLayers(), r && (u = u.filter((h) => !(h instanceof L.LayerGroup))), i && (u = u.filter((h) => !!h.pm), u = u.filter((h) => !h._pmTempLayer), u = u.filter((h) => !L.PM.optIn && !h.options.pmIgnore || L.PM.optIn && h.options.pmIgnore === false)), u;
+              return e ? this._layerGroup.getLayers().forEach((c) => {
+                u.push(c), c instanceof L.LayerGroup && s.indexOf(c._leaflet_id) === -1 && (s.push(c._leaflet_id), u = u.concat(c.pm.getLayers(true, true, true, s)));
+              }) : u = this._layerGroup.getLayers(), r && (u = u.filter((c) => !(c instanceof L.LayerGroup))), i && (u = u.filter((c) => !!c.pm), u = u.filter((c) => !c._pmTempLayer), u = u.filter((c) => !L.PM.optIn && !c.options.pmIgnore || L.PM.optIn && c.options.pmIgnore === false)), u;
             },
             setOptions(e, i = []) {
               i.length === 0 && (this._layers = this.getLayers()), this.options = e, this._layers.forEach((r) => {
@@ -12655,7 +12655,7 @@ var require_stdin = __commonJS({
               e.off("pm:drag", this._handleSnapping, this), e.off("pm:dragend", this._cleanupSnapping, this), e.off("pm:dragstart", this._unsnap, this);
             }
           });
-          var rn = et(ci()), Ll = {
+          var rn = et(ci()), wl = {
             filterMarkerGroup() {
               this.markerCache = [], this.createCache(), this._layer.on("pm:edit", this.createCache, this), this.applyLimitFilters({}), this.throttledApplyLimitFilters || (this.throttledApplyLimitFilters = L.Util.throttle(this.applyLimitFilters, 100, this)), this._layer.on("pm:disable", this._removeMarkerLimitEvents, this), this._layer.on("remove", this._removeMarkerLimitEvents, this), this.options.limitMarkersToCount > -1 && (this._layer.on("pm:vertexremoved", this._initMarkers, this), this._map.on("mousemove", this.throttledApplyLimitFilters, this));
             },
@@ -12693,18 +12693,18 @@ var require_stdin = __commonJS({
                 ...this.markerCache
               ], r = this.options.limitMarkersToCount;
               return r === -1 ? i : (i.sort((s, u) => {
-                let h = s._latlng.distanceTo(e), p = u._latlng.distanceTo(e);
-                return h - p;
+                let c = s._latlng.distanceTo(e), p = u._latlng.distanceTo(e);
+                return c - p;
               }), i.filter((s, u) => r > -1 ? u < r : true));
             },
             _preventRenderMarkers: false,
             _preventRenderingMarkers(e) {
               this._preventRenderMarkers = !!e;
             }
-          }, bl = Ll;
+          }, Cl = wl;
           pe.Line = pe.extend({
             includes: [
-              bl
+              Cl
             ],
             _shape: "Line",
             initialize(e) {
@@ -12740,7 +12740,7 @@ var require_stdin = __commonJS({
               let r = (s) => {
                 if (Array.isArray(s[0])) return s.map(r, this);
                 let u = s.map(this._createMarker, this);
-                return this.options.hideMiddleMarkers !== true && s.map((h, p) => {
+                return this.options.hideMiddleMarkers !== true && s.map((c, p) => {
                   let f = this.isPolygon() ? (p + 1) % s.length : p + 1;
                   return this._createMiddleMarker(u[p], u[f]);
                 }), u;
@@ -12797,7 +12797,7 @@ var require_stdin = __commonJS({
               e.off("movestart", this._onMiddleMarkerMoveStart, this), e.off(this.options.addVertexOn, this._onMiddleMarkerClick, this);
               let s = e.getLatLng(), u = this._layer._latlngs;
               delete e.leftM, delete e.rightM;
-              let { indexPath: h, index: p, parentPath: f } = L.PM.Utils.findDeepMarkerIndex(this._markers, i), m = h.length > 1 ? (0, rn.default)(u, f) : u, y = h.length > 1 ? (0, rn.default)(this._markers, f) : this._markers;
+              let { indexPath: c, index: p, parentPath: f } = L.PM.Utils.findDeepMarkerIndex(this._markers, i), m = c.length > 1 ? (0, rn.default)(u, f) : u, y = c.length > 1 ? (0, rn.default)(this._markers, f) : this._markers;
               m.splice(p + 1, 0, s), y.splice(p + 1, 0, e), this._layer.setLatLngs(u), this.options.hideMiddleMarkers !== true && (this._createMiddleMarker(i, e), this._createMiddleMarker(e, r)), this._fireEdit(), this._layerEdited = true, this._fireChange(this._layer.getLatLngs(), "Edit"), this._fireVertexAdded(e, L.PM.Utils.findDeepMarkerIndex(this._markers, e).indexPath, s), this.options.snappable && this._initSnappableMarkers();
             },
             hasSelfIntersection() {
@@ -12836,16 +12836,16 @@ var require_stdin = __commonJS({
               let i = e.target;
               if (!this._vertexValidation("remove", e)) return;
               this.options.allowSelfIntersection || (this._coordsBeforeEdit = ri(this._layer, this._layer.getLatLngs()));
-              let r = this._layer.getLatLngs(), { indexPath: s, index: u, parentPath: h } = L.PM.Utils.findDeepMarkerIndex(this._markers, i);
+              let r = this._layer.getLatLngs(), { indexPath: s, index: u, parentPath: c } = L.PM.Utils.findDeepMarkerIndex(this._markers, i);
               if (!s) return;
-              let p = s.length > 1 ? (0, rn.default)(r, h) : r, f = s.length > 1 ? (0, rn.default)(this._markers, h) : this._markers, m = h[h.length - 1] > 0 && this._layer instanceof L.Polygon;
+              let p = s.length > 1 ? (0, rn.default)(r, c) : r, f = s.length > 1 ? (0, rn.default)(this._markers, c) : this._markers, m = c[c.length - 1] > 0 && this._layer instanceof L.Polygon;
               if (!this.options.removeLayerBelowMinVertexCount && !m && (p.length <= 2 || this.isPolygon() && p.length <= 3)) {
                 this._flashLayer();
                 return;
               }
               p.splice(u, 1), this._layer.setLatLngs(r), this.isPolygon() && p.length <= 2 && p.splice(0, p.length);
               let y = false;
-              if (p.length <= 1 && (p.splice(0, p.length), h.length > 1 && s.length > 1 && (r = jn(r)), this._layer.setLatLngs(r), this._initMarkers(), y = true), kt(r) || this._layer.remove(), r = jn(r), this._layer.setLatLngs(r), this._markers = jn(this._markers), !y && (f = s.length > 1 ? (0, rn.default)(this._markers, h) : this._markers, i._middleMarkerPrev && (this._markerGroup.removeLayer(i._middleMarkerPrev), this._removeFromCache(i._middleMarkerPrev)), i._middleMarkerNext && (this._markerGroup.removeLayer(i._middleMarkerNext), this._removeFromCache(i._middleMarkerNext)), this._markerGroup.removeLayer(i), this._removeFromCache(i), f)) {
+              if (p.length <= 1 && (p.splice(0, p.length), c.length > 1 && s.length > 1 && (r = jn(r)), this._layer.setLatLngs(r), this._initMarkers(), y = true), kt(r) || this._layer.remove(), r = jn(r), this._layer.setLatLngs(r), this._markers = jn(this._markers), !y && (f = s.length > 1 ? (0, rn.default)(this._markers, c) : this._markers, i._middleMarkerPrev && (this._markerGroup.removeLayer(i._middleMarkerPrev), this._removeFromCache(i._middleMarkerPrev)), i._middleMarkerNext && (this._markerGroup.removeLayer(i._middleMarkerNext), this._removeFromCache(i._middleMarkerNext)), this._markerGroup.removeLayer(i), this._removeFromCache(i), f)) {
                 let A, C;
                 if (this.isPolygon() ? (A = (u + 1) % f.length, C = (u + (f.length - 1)) % f.length) : (C = u - 1 < 0 ? void 0 : u - 1, A = u + 1 >= f.length ? void 0 : u + 1), A !== C) {
                   let O = f[C], R = f[A];
@@ -12856,11 +12856,11 @@ var require_stdin = __commonJS({
               this._fireEdit(), this._layerEdited = true, this._fireVertexRemoved(i, s), this._fireChange(this._layer.getLatLngs(), "Edit");
             },
             updatePolygonCoordsFromMarkerDrag(e) {
-              let i = this._layer.getLatLngs(), r = e.getLatLng(), { indexPath: s, index: u, parentPath: h } = L.PM.Utils.findDeepMarkerIndex(this._markers, e), p = s.length > 1 ? (0, rn.default)(i, h) : i;
+              let i = this._layer.getLatLngs(), r = e.getLatLng(), { indexPath: s, index: u, parentPath: c } = L.PM.Utils.findDeepMarkerIndex(this._markers, e), p = s.length > 1 ? (0, rn.default)(i, c) : i;
               r.alt = p[u].alt, p.splice(u, 1, r), this._layer.setLatLngs(i);
             },
             _getNeighborMarkers(e) {
-              let { indexPath: i, index: r, parentPath: s } = L.PM.Utils.findDeepMarkerIndex(this._markers, e), u = i.length > 1 ? (0, rn.default)(this._markers, s) : this._markers, h = (r + 1) % u.length, p = (r + (u.length - 1)) % u.length, f = u[p], m = u[h];
+              let { indexPath: i, index: r, parentPath: s } = L.PM.Utils.findDeepMarkerIndex(this._markers, e), u = i.length > 1 ? (0, rn.default)(this._markers, s) : this._markers, c = (r + 1) % u.length, p = (r + (u.length - 1)) % u.length, f = u[p], m = u[c];
               return {
                 prevMarker: f,
                 nextMarker: m
@@ -12873,14 +12873,14 @@ var require_stdin = __commonJS({
               ]), u = L.polyline([
                 e.getLatLng(),
                 r.getLatLng()
-              ]), h = Ie(this._layer.toGeoJSON(15), s.toGeoJSON(15)).features.filter((f) => {
+              ]), c = Ie(this._layer.toGeoJSON(15), s.toGeoJSON(15)).features.filter((f) => {
                 let m = f.geometry.coordinates, y = L.latLng(m[1], m[0]);
                 return !y.equals(i.getLatLng()) && !y.equals(e.getLatLng());
               }).length, p = Ie(this._layer.toGeoJSON(15), u.toGeoJSON(15)).features.filter((f) => {
                 let m = f.geometry.coordinates, y = L.latLng(m[1], m[0]);
                 return !y.equals(r.getLatLng()) && !y.equals(e.getLatLng());
               }).length;
-              return !(h < 1 && p < 1);
+              return !(c < 1 && p < 1);
             },
             _onMarkerDragStart(e) {
               let i = e.target;
@@ -12898,7 +12898,7 @@ var require_stdin = __commonJS({
                 return;
               }
               this.updatePolygonCoordsFromMarkerDrag(i);
-              let h = r.length > 1 ? (0, rn.default)(this._markers, u) : this._markers, p = (s + 1) % h.length, f = (s + (h.length - 1)) % h.length, m = i.getLatLng(), y = h[f].getLatLng(), A = h[p].getLatLng();
+              let c = r.length > 1 ? (0, rn.default)(this._markers, u) : this._markers, p = (s + 1) % c.length, f = (s + (c.length - 1)) % c.length, m = i.getLatLng(), y = c[f].getLatLng(), A = c[p].getLatLng();
               if (i._middleMarkerNext) {
                 let C = L.PM.Utils.calcMiddleLatLng(this._map, m, A);
                 i._middleMarkerNext.setLatLng(C);
@@ -12936,21 +12936,21 @@ var require_stdin = __commonJS({
               ]), u = L.polyline([
                 e.getLatLng(),
                 r.getLatLng()
-              ]), h = Ie(this._layer.toGeoJSON(15), s.toGeoJSON(15)).features.filter((f) => {
+              ]), c = Ie(this._layer.toGeoJSON(15), s.toGeoJSON(15)).features.filter((f) => {
                 let m = f.geometry.coordinates, y = L.latLng(m[1], m[0]);
                 return !y.equals(i.getLatLng()) && !y.equals(e.getLatLng());
               }).length, p = Ie(this._layer.toGeoJSON(15), u.toGeoJSON(15)).features.filter((f) => {
                 let m = f.geometry.coordinates, y = L.latLng(m[1], m[0]);
                 return !y.equals(r.getLatLng()) && !y.equals(e.getLatLng());
               }).length;
-              return !(h < 1 && p < 1);
+              return !(c < 1 && p < 1);
             }
           }), pe.Rectangle = pe.Polygon.extend({
             _shape: "Rectangle",
             _initMarkers() {
               let e = this._map, i = this._findCorners();
               this._markerGroup && this._markerGroup.clearLayers(), this._markerGroup = new L.FeatureGroup(), this._markerGroup._pmTempLayer = true, e.addLayer(this._markerGroup), this._markers = [], this._markers[0] = i.map(this._createMarker, this), [this._cornerMarkers] = this._markers, this._layer.getLatLngs()[0].forEach((r, s) => {
-                let u = this._cornerMarkers.find((h) => h._index === s);
+                let u = this._cornerMarkers.find((c) => c._index === s);
                 u && u.setLatLng(r);
               });
             },
@@ -13356,17 +13356,17 @@ var require_stdin = __commonJS({
               e.preventDefault();
             }
           });
-          var Co = function(e, i, r, s, u, h) {
+          var xo = function(e, i, r, s, u, c) {
             this._matrix = [
               e,
               i,
               r,
               s,
               u,
-              h
+              c
             ];
           };
-          Co.init = () => new L.PM.Matrix(1, 0, 0, 1, 0, 0), Co.prototype = {
+          xo.init = () => new L.PM.Matrix(1, 0, 0, 1, 0, 0), xo.prototype = {
             transform(e) {
               return this._transform(e.clone());
             },
@@ -13399,7 +13399,7 @@ var require_stdin = __commonJS({
             flip() {
               return this._matrix[1] *= -1, this._matrix[2] *= -1, this;
             },
-            _add(e, i, r, s, u, h) {
+            _add(e, i, r, s, u, c) {
               let p = [
                 [],
                 [],
@@ -13429,7 +13429,7 @@ var require_stdin = __commonJS({
                 [
                   i,
                   s,
-                  h
+                  c
                 ],
                 [
                   0,
@@ -13469,7 +13469,7 @@ var require_stdin = __commonJS({
               ], this;
             }
           };
-          var wl = Co, Cl = {
+          var xl = xo, El = {
             calcMiddleLatLng(e, i, r) {
               let s = e.project(i), u = e.project(r);
               return e.unproject(s._add(u)._divideBy(2));
@@ -13481,11 +13481,11 @@ var require_stdin = __commonJS({
               }), i = i.filter((r) => !!r.pm), i = i.filter((r) => !r._pmTempLayer), i = i.filter((r) => !L.PM.optIn && !r.options.pmIgnore || L.PM.optIn && r.options.pmIgnore === false), i;
             },
             circleToPolygon(e, i = 60, r = true) {
-              let s = e.getLatLng(), u = e.getRadius(), h = Hi(s, u, i, 0, r), p = [];
-              for (let f = 0; f < h.length; f += 1) {
+              let s = e.getLatLng(), u = e.getRadius(), c = Hi(s, u, i, 0, r), p = [];
+              for (let f = 0; f < c.length; f += 1) {
                 let m = [
-                  h[f].lat,
-                  h[f].lng
+                  c[f].lat,
+                  c[f].lng
                 ];
                 p.push(m);
               }
@@ -13500,15 +13500,15 @@ var require_stdin = __commonJS({
             _fireEvent(e, i, r, s = false) {
               e.fire(i, r, s);
               let { groups: u } = this.getAllParentGroups(e);
-              u.forEach((h) => {
-                h.fire(i, r, s);
+              u.forEach((c) => {
+                c.fire(i, r, s);
               });
             },
             getAllParentGroups(e) {
               let i = [], r = [], s = (u) => {
-                for (let h in u._eventParents) if (i.indexOf(h) === -1) {
-                  i.push(h);
-                  let p = u._eventParents[h];
+                for (let c in u._eventParents) if (i.indexOf(c) === -1) {
+                  i.push(c);
+                  let p = u._eventParents[c];
                   r.push(p), s(p);
                 }
               };
@@ -13535,16 +13535,16 @@ var require_stdin = __commonJS({
                 return Array.isArray(f) && f.some(u(y));
               };
               e.some(u([]));
-              let h = {};
-              return s && (h = {
+              let c = {};
+              return s && (c = {
                 indexPath: s,
                 index: s[s.length - 1],
                 parentPath: s.slice(0, s.length - 1)
-              }), h;
+              }), c;
             },
             findDeepMarkerIndex(e, i) {
-              let r, s = (h) => (p, f) => {
-                let m = h.concat(f);
+              let r, s = (c) => (p, f) => {
+                let m = c.concat(f);
                 return p._leaflet_id === i._leaflet_id ? (r = m, true) : Array.isArray(p) && p.some(s(m));
               };
               e.some(s([]));
@@ -13569,10 +13569,10 @@ var require_stdin = __commonJS({
               return null;
             },
             _getRotatedRectangle(e, i, r, s) {
-              let u = er(s, e), h = er(s, i), p = r * Math.PI / 180, f = Math.cos(p), m = Math.sin(p), y = (h.x - u.x) * f + (h.y - u.y) * m, A = (h.y - u.y) * f - (h.x - u.x) * m, C = y * f + u.x, O = y * m + u.y, R = -A * m + u.x, H = A * f + u.y, K = ma(s, u), it = ma(s, {
+              let u = er(s, e), c = er(s, i), p = r * Math.PI / 180, f = Math.cos(p), m = Math.sin(p), y = (c.x - u.x) * f + (c.y - u.y) * m, A = (c.y - u.y) * f - (c.x - u.x) * m, C = y * f + u.x, O = y * m + u.y, R = -A * m + u.x, H = A * f + u.y, K = ma(s, u), it = ma(s, {
                 x: C,
                 y: O
-              }), st = ma(s, h), k = ma(s, {
+              }), st = ma(s, c), k = ma(s, {
                 x: R,
                 y: H
               });
@@ -13587,15 +13587,15 @@ var require_stdin = __commonJS({
               let s = i.project(r), u = L.point(s.x + e, s.y);
               return i.distance(i.unproject(u), r);
             }
-          }, xl = Cl;
+          }, Ml = El;
           L.PM = L.PM || {
             version: qt.version,
             Map: Ye,
             Toolbar: Rs,
             Draw: re,
             Edit: pe,
-            Utils: xl,
-            Matrix: wl,
+            Utils: Ml,
+            Matrix: xl,
             activeLang: "en",
             optIn: false,
             initialize(e) {
@@ -13625,10 +13625,10 @@ var require_stdin = __commonJS({
                 this.pm = void 0, L.PM.optIn ? this.options.pmIgnore === false && (this.pm = new L.PM.Edit.Line(this)) : this.options.pmIgnore || (this.pm = new L.PM.Edit.Line(this));
               }
               L.Polyline.addInitHook(u);
-              function h() {
+              function c() {
                 this.pm = void 0, L.PM.optIn ? this.options.pmIgnore === false && (this.pm = new L.PM.Edit.Polygon(this)) : this.options.pmIgnore || (this.pm = new L.PM.Edit.Polygon(this));
               }
-              L.Polygon.addInitHook(h);
+              L.Polygon.addInitHook(c);
               function p() {
                 this.pm = void 0, L.PM.optIn ? this.options.pmIgnore === false && (this.pm = new L.PM.Edit.Rectangle(this)) : this.options.pmIgnore || (this.pm = new L.PM.Edit.Rectangle(this));
               }
@@ -13656,10 +13656,10 @@ var require_stdin = __commonJS({
               ], e));
             }
           }), L.PM.initialize();
-        })()), pu;
+        })()), fu;
       }
-      Tl();
-      class Sl {
+      Dl();
+      class Il {
         constructor() {
           this.waypoints = [], this.wpMarkers = [], this.routeLayer = null, this.isZooming = false, this.lastOpacity = 0.4, this.drawModeActive = false, this.onWaypointsChanged = () => {
           }, this.getSimState = () => "stopped", this.onMapClick = (o) => {
@@ -13814,7 +13814,7 @@ var require_stdin = __commonJS({
           this.wpMarkers = [], this.routeLayer && (this.routeLayer.remove(), this.routeLayer = null);
         }
       }
-      class Dl {
+      class Ol {
         constructor(o) {
           this.callbacks = o, this.btnDraw = document.getElementById("btn-draw"), this.btnPlay = document.getElementById("btn-play"), this.btnPause = document.getElementById("btn-pause"), this.btnStop = document.getElementById("btn-stop"), this.btnClear = document.getElementById("btn-clear"), this.speedInput = document.getElementById("speed-input"), this.btnSettings = document.getElementById("btn-settings"), this.simStatusBadge = document.getElementById("sim-status-badge"), this.simStatusText = document.getElementById("sim-status-text"), this.simState = "stopped", this.drawModeActive = false, this.btnPlay.addEventListener("click", () => o.onPlay()), this.btnPause.addEventListener("click", () => o.onPause()), this.btnStop.addEventListener("click", () => o.onStop()), this.btnClear.addEventListener("click", () => o.onClear()), this.btnDraw.addEventListener("click", () => o.onDrawToggle()), this.btnSettings.addEventListener("click", () => o.onSettingsOpen()), this.speedInput.addEventListener("change", () => {
             o.onSpeedChange(parseFloat(this.speedInput.value));
@@ -13828,9 +13828,9 @@ var require_stdin = __commonJS({
           this.btnPlay.disabled = !g, this.btnPause.disabled = this.simState !== "playing", this.btnStop.disabled = this.simState === "stopped", this.btnClear.disabled = !l, this.btnDraw.disabled = !l, !l && this.drawModeActive && (this.drawModeActive = false, this.btnDraw.classList.remove("active")), this.simState === "playing" ? (this.simStatusBadge.classList.add("visible"), this.simStatusBadge.classList.remove("paused"), this.simStatusText.textContent = "Running") : this.simState === "paused" ? (this.simStatusBadge.classList.add("visible", "paused"), this.simStatusText.textContent = "Paused") : this.simStatusBadge.classList.remove("visible", "paused");
         }
       }
-      var Mo, _u;
-      function Il() {
-        return _u || (_u = 1, Mo = (function(c) {
+      var ko, mu;
+      function Rl() {
+        return mu || (mu = 1, ko = (function(h) {
           var o = {};
           function l(g) {
             if (o[g]) return o[g].exports;
@@ -13839,9 +13839,9 @@ var require_stdin = __commonJS({
               l: false,
               exports: {}
             };
-            return c[g].call(x.exports, x, x.exports, l), x.l = true, x.exports;
+            return h[g].call(x.exports, x, x.exports, l), x.l = true, x.exports;
           }
-          return l.m = c, l.c = o, l.d = function(g, x, S) {
+          return l.m = h, l.c = o, l.d = function(g, x, S) {
             l.o(g, x) || Object.defineProperty(g, x, {
               enumerable: true,
               get: S
@@ -13873,13 +13873,13 @@ var require_stdin = __commonJS({
             return Object.prototype.hasOwnProperty.call(g, x);
           }, l.p = "", l(l.s = 1);
         })([
-          function(c, o, l) {
+          function(h, o, l) {
             var g = l(2), x = l(3), S = l(4);
-            c.exports = function(M) {
+            h.exports = function(M) {
               return g(M) || x(M) || S();
             };
           },
-          function(c, o, l) {
+          function(h, o, l) {
             l.r(o), l.d(o, "sparkline", function() {
               return et;
             });
@@ -13961,28 +13961,28 @@ var require_stdin = __commonJS({
             }
             o.default = et;
           },
-          function(c, o) {
-            c.exports = function(l) {
+          function(h, o) {
+            h.exports = function(l) {
               if (Array.isArray(l)) {
                 for (var g = 0, x = new Array(l.length); g < l.length; g++) x[g] = l[g];
                 return x;
               }
             };
           },
-          function(c, o) {
-            c.exports = function(l) {
+          function(h, o) {
+            h.exports = function(l) {
               if (Symbol.iterator in Object(l) || Object.prototype.toString.call(l) === "[object Arguments]") return Array.from(l);
             };
           },
-          function(c, o) {
-            c.exports = function() {
+          function(h, o) {
+            h.exports = function() {
               throw new TypeError("Invalid attempt to spread non-iterable instance");
             };
           }
-        ])), Mo;
+        ])), ko;
       }
-      var Ol = Il();
-      const Rl = 600, an = {
+      var Fl = Rl();
+      const zl = 600, an = {
         heading: [],
         speed: [],
         roll: [],
@@ -13992,38 +13992,53 @@ var require_stdin = __commonJS({
         speed: document.getElementById("gauge-speed"),
         roll: document.getElementById("gauge-roll"),
         pitch: document.getElementById("gauge-pitch")
-      }, ko = {
+      }, Ao = {
         heading: document.getElementById("spark-heading"),
         speed: document.getElementById("spark-speed"),
         roll: document.getElementById("spark-roll"),
         pitch: document.getElementById("spark-pitch")
-      };
-      function Fl(c) {
-        if (c.state === "stopped") {
+      }, va = document.getElementById("health-level"), gu = document.getElementById("health-subsystems");
+      function Nl(h) {
+        if (!h) {
+          va.textContent = "\u2014", va.removeAttribute("data-level"), gu.innerHTML = "";
+          return;
+        }
+        va.textContent = h.level.toUpperCase(), va.setAttribute("data-level", h.level);
+        const o = h.subsystems.map((l) => {
+          const g = l.detail ? ` (${l.detail})` : "";
+          return `<div class="health-sub-row">
+      <span class="health-sub-name">${l.name}</span>
+      <span class="health-sub-level" data-level="${l.level}">${l.level.toUpperCase()}${g}</span>
+    </div>`;
+        });
+        gu.innerHTML = o.join("");
+      }
+      function Ul(h) {
+        if (Nl(h.health), h.state === "stopped") {
           for (const l of Object.keys(an)) an[l] = [];
           for (const l of Object.keys(ir)) ir[l].textContent = "\u2014";
           return;
         }
-        if (c.state === "playing") {
+        if (h.state === "playing") {
           const l = {
-            heading: c.heading,
-            speed: c.speed * 1.94384,
-            roll: c.roll,
-            pitch: c.pitch
+            heading: h.heading,
+            speed: h.speed * 1.94384,
+            roll: h.roll,
+            pitch: h.pitch
           };
-          for (const g of Object.keys(an)) an[g].push(l[g]), an[g].length > Rl && an[g].shift();
-          ir.heading.textContent = c.heading.toFixed(1), ir.speed.textContent = (c.speed * 1.94384).toFixed(2), ir.roll.textContent = c.roll.toFixed(2), ir.pitch.textContent = c.pitch.toFixed(2);
+          for (const g of Object.keys(an)) an[g].push(l[g]), an[g].length > zl && an[g].shift();
+          ir.heading.textContent = h.heading.toFixed(1), ir.speed.textContent = (h.speed * 1.94384).toFixed(2), ir.roll.textContent = h.roll.toFixed(2), ir.pitch.textContent = h.pitch.toFixed(2);
         }
         const o = Pn("--instrument-enhanced-primary-color") || "#5a84bf";
-        for (const l of Object.keys(ko)) an[l].length > 1 && (ko[l].style.stroke = o, Ol.sparkline(ko[l], an[l]));
+        for (const l of Object.keys(Ao)) an[l].length > 1 && (Ao[l].style.stroke = o, Fl.sparkline(Ao[l], an[l]));
       }
-      const Au = [
+      const Pu = [
         "location_fix",
         "heading_true_north_deg",
         "speed_over_ground_knots",
         "roll_deg",
         "pitch_deg"
-      ], zl = [
+      ], Gl = [
         [
           "sl-roll-amp",
           "lbl-roll-amp"
@@ -14045,9 +14060,9 @@ var require_stdin = __commonJS({
           "lbl-loc-noise"
         ]
       ];
-      function Nl() {
-        const c = document.getElementById("subject-rows");
-        c.innerHTML = "";
+      function Zl() {
+        const h = document.getElementById("subject-rows");
+        h.innerHTML = "";
         const o = {
           location_fix: {
             rate_hz: 1,
@@ -14070,19 +14085,19 @@ var require_stdin = __commonJS({
             source_id: "imu/0"
           }
         };
-        for (const l of Au) {
+        for (const l of Pu) {
           const g = o[l], x = document.createElement("tr");
           x.innerHTML = `
       <td>${l}</td>
       <td><input type="number" class="settings-input" data-subj="${l}" data-field="rate_hz"
           value="${g.rate_hz}" min="0.1" max="10" step="0.1" style="width:58px"></td>
       <td><input type="text" class="settings-input" data-subj="${l}" data-field="source_id"
-          value="${g.source_id}" style="width:80px"></td>`, c.appendChild(x);
+          value="${g.source_id}" style="width:80px"></td>`, h.appendChild(x);
         }
       }
-      function Bu(c) {
-        for (const l of Au) {
-          const g = c.subjects[l];
+      function Tu(h) {
+        for (const l of Pu) {
+          const g = h.subjects[l];
           if (!g) continue;
           const x = document.querySelector(`#subject-rows input[data-subj="${l}"][data-field="rate_hz"]`), S = document.querySelector(`#subject-rows input[data-subj="${l}"][data-field="source_id"]`);
           x && (x.value = String(g.rate_hz)), S && (S.value = g.source_id);
@@ -14110,12 +14125,12 @@ var require_stdin = __commonJS({
           ]
         };
         for (const [l, [g, x]] of Object.entries(o)) {
-          const S = c[l];
+          const S = h[l];
           S !== void 0 && (document.getElementById(g).value = String(S), document.getElementById(x).textContent = String(S));
         }
       }
-      function Ul(c) {
-        for (const [o, l] of zl) document.getElementById(o).addEventListener("input", function() {
+      function jl(h) {
+        for (const [o, l] of Gl) document.getElementById(o).addEventListener("input", function() {
           document.getElementById(l).textContent = this.value;
         });
         document.getElementById("btn-settings").addEventListener("click", () => {
@@ -14141,10 +14156,10 @@ var require_stdin = __commonJS({
             pitch_period_s: parseFloat(document.getElementById("sl-pitch-period").value),
             location_noise_sigma_m: parseFloat(document.getElementById("sl-loc-noise").value)
           };
-          c(l), document.getElementById("settings-overlay").style.display = "none";
+          h(l), document.getElementById("settings-overlay").style.display = "none";
         });
       }
-      const Gl = "/assets/zenoh_keyexpr_wrapper_bg-Dc8Z_9zx.wasm", Zl = async (c = {}, o) => {
+      const ql = "/assets/zenoh_keyexpr_wrapper_bg-Dc8Z_9zx.wasm", Vl = async (h = {}, o) => {
         let l;
         if (o.startsWith("data:")) {
           const g = o.replace(/^data:.*?base64,/, "");
@@ -14155,78 +14170,78 @@ var require_stdin = __commonJS({
             x = new Uint8Array(S.length);
             for (let M = 0; M < S.length; M++) x[M] = S.charCodeAt(M);
           } else throw new Error("Cannot decode base64-encoded data URL");
-          l = await WebAssembly.instantiate(x, c);
+          l = await WebAssembly.instantiate(x, h);
         } else {
           const g = await fetch(o), x = g.headers.get("Content-Type") || "";
-          if ("instantiateStreaming" in WebAssembly && x.startsWith("application/wasm")) l = await WebAssembly.instantiateStreaming(g, c);
+          if ("instantiateStreaming" in WebAssembly && x.startsWith("application/wasm")) l = await WebAssembly.instantiateStreaming(g, h);
           else {
             const S = await g.arrayBuffer();
-            l = await WebAssembly.instantiate(S, c);
+            l = await WebAssembly.instantiate(S, h);
           }
         }
         return l.instance.exports;
       };
       let Tt;
-      function jl(c) {
-        Tt = c;
+      function Hl(h) {
+        Tt = h;
       }
-      const ql = typeof TextDecoder > "u" ? (0, module.require)("util").TextDecoder : TextDecoder;
-      let Pu = new ql("utf-8", {
+      const Wl = typeof TextDecoder > "u" ? (0, module.require)("util").TextDecoder : TextDecoder;
+      let Su = new Wl("utf-8", {
         ignoreBOM: true,
         fatal: true
       });
-      Pu.decode();
-      let va = null;
-      function ba() {
-        return (va === null || va.byteLength === 0) && (va = new Uint8Array(Tt.memory.buffer)), va;
+      Su.decode();
+      let La = null;
+      function wa() {
+        return (La === null || La.byteLength === 0) && (La = new Uint8Array(Tt.memory.buffer)), La;
       }
-      function es(c, o) {
-        return c = c >>> 0, Pu.decode(ba().subarray(c, c + o));
+      function es(h, o) {
+        return h = h >>> 0, Su.decode(wa().subarray(h, h + o));
       }
       let ni = 0;
-      const Vl = typeof TextEncoder > "u" ? (0, module.require)("util").TextEncoder : TextEncoder;
-      let wa = new Vl("utf-8");
-      const Hl = typeof wa.encodeInto == "function" ? function(c, o) {
-        return wa.encodeInto(c, o);
-      } : function(c, o) {
-        const l = wa.encode(c);
+      const Kl = typeof TextEncoder > "u" ? (0, module.require)("util").TextEncoder : TextEncoder;
+      let Ca = new Kl("utf-8");
+      const Yl = typeof Ca.encodeInto == "function" ? function(h, o) {
+        return Ca.encodeInto(h, o);
+      } : function(h, o) {
+        const l = Ca.encode(h);
         return o.set(l), {
-          read: c.length,
+          read: h.length,
           written: l.length
         };
       };
-      function bi(c, o, l) {
+      function bi(h, o, l) {
         if (l === void 0) {
-          const J = wa.encode(c), et = o(J.length, 1) >>> 0;
-          return ba().subarray(et, et + J.length).set(J), ni = J.length, et;
+          const J = Ca.encode(h), et = o(J.length, 1) >>> 0;
+          return wa().subarray(et, et + J.length).set(J), ni = J.length, et;
         }
-        let g = c.length, x = o(g, 1) >>> 0;
-        const S = ba();
+        let g = h.length, x = o(g, 1) >>> 0;
+        const S = wa();
         let M = 0;
         for (; M < g; M++) {
-          const J = c.charCodeAt(M);
+          const J = h.charCodeAt(M);
           if (J > 127) break;
           S[x + M] = J;
         }
         if (M !== g) {
-          M !== 0 && (c = c.slice(M)), x = l(x, g, g = M + c.length * 3, 1) >>> 0;
-          const J = ba().subarray(x + M, x + g), et = Hl(c, J);
+          M !== 0 && (h = h.slice(M)), x = l(x, g, g = M + h.length * 3, 1) >>> 0;
+          const J = wa().subarray(x + M, x + g), et = Yl(h, J);
           M += et.written, x = l(x, g, M, 1) >>> 0;
         }
         return ni = M, x;
       }
-      function rr(c) {
-        const o = Tt.__wbindgen_export_0.get(c);
-        return Tt.__externref_table_dealloc(c), o;
+      function rr(h) {
+        const o = Tt.__wbindgen_export_0.get(h);
+        return Tt.__externref_table_dealloc(h), o;
       }
-      function Wl(c) {
-        const o = bi(c, Tt.__wbindgen_malloc, Tt.__wbindgen_realloc), l = ni, g = Tt.new_key_expr(o, l);
+      function Xl(h) {
+        const o = bi(h, Tt.__wbindgen_malloc, Tt.__wbindgen_realloc), l = ni, g = Tt.new_key_expr(o, l);
         if (g[1]) throw rr(g[0]);
       }
-      function Kl(c, o) {
+      function Jl(h, o) {
         let l, g;
         try {
-          const M = bi(c, Tt.__wbindgen_malloc, Tt.__wbindgen_realloc), J = ni, et = bi(o, Tt.__wbindgen_malloc, Tt.__wbindgen_realloc), _t = ni, wt = Tt.join(M, J, et, _t);
+          const M = bi(h, Tt.__wbindgen_malloc, Tt.__wbindgen_realloc), J = ni, et = bi(o, Tt.__wbindgen_malloc, Tt.__wbindgen_realloc), _t = ni, wt = Tt.join(M, J, et, _t);
           var x = wt[0], S = wt[1];
           if (wt[3]) throw x = 0, S = 0, rr(wt[2]);
           return l = x, g = S, es(x, S);
@@ -14234,10 +14249,10 @@ var require_stdin = __commonJS({
           Tt.__wbindgen_free(l, g, 1);
         }
       }
-      function Yl(c, o) {
+      function Ql(h, o) {
         let l, g;
         try {
-          const M = bi(c, Tt.__wbindgen_malloc, Tt.__wbindgen_realloc), J = ni, et = bi(o, Tt.__wbindgen_malloc, Tt.__wbindgen_realloc), _t = ni, wt = Tt.concat(M, J, et, _t);
+          const M = bi(h, Tt.__wbindgen_malloc, Tt.__wbindgen_realloc), J = ni, et = bi(o, Tt.__wbindgen_malloc, Tt.__wbindgen_realloc), _t = ni, wt = Tt.concat(M, J, et, _t);
           var x = wt[0], S = wt[1];
           if (wt[3]) throw x = 0, S = 0, rr(wt[2]);
           return l = x, g = S, es(x, S);
@@ -14245,20 +14260,20 @@ var require_stdin = __commonJS({
           Tt.__wbindgen_free(l, g, 1);
         }
       }
-      function Xl(c, o) {
-        const l = bi(c, Tt.__wbindgen_malloc, Tt.__wbindgen_realloc), g = ni, x = bi(o, Tt.__wbindgen_malloc, Tt.__wbindgen_realloc), S = ni, M = Tt.includes(l, g, x, S);
+      function $l(h, o) {
+        const l = bi(h, Tt.__wbindgen_malloc, Tt.__wbindgen_realloc), g = ni, x = bi(o, Tt.__wbindgen_malloc, Tt.__wbindgen_realloc), S = ni, M = Tt.includes(l, g, x, S);
         if (M[2]) throw rr(M[1]);
         return M[0] !== 0;
       }
-      function Jl(c, o) {
-        const l = bi(c, Tt.__wbindgen_malloc, Tt.__wbindgen_realloc), g = ni, x = bi(o, Tt.__wbindgen_malloc, Tt.__wbindgen_realloc), S = ni, M = Tt.intersects(l, g, x, S);
+      function th(h, o) {
+        const l = bi(h, Tt.__wbindgen_malloc, Tt.__wbindgen_realloc), g = ni, x = bi(o, Tt.__wbindgen_malloc, Tt.__wbindgen_realloc), S = ni, M = Tt.intersects(l, g, x, S);
         if (M[2]) throw rr(M[1]);
         return M[0] !== 0;
       }
-      function Ql(c) {
+      function eh(h) {
         let o, l;
         try {
-          const S = bi(c, Tt.__wbindgen_malloc, Tt.__wbindgen_realloc), M = ni, J = Tt.autocanonize(S, M);
+          const S = bi(h, Tt.__wbindgen_malloc, Tt.__wbindgen_realloc), M = ni, J = Tt.autocanonize(S, M);
           var g = J[0], x = J[1];
           if (J[3]) throw g = 0, x = 0, rr(J[2]);
           return o = g, l = x, es(g, x);
@@ -14266,43 +14281,43 @@ var require_stdin = __commonJS({
           Tt.__wbindgen_free(o, l, 1);
         }
       }
-      function $l() {
-        const c = Tt.__wbindgen_export_0, o = c.grow(4);
-        c.set(0, void 0), c.set(o + 0, void 0), c.set(o + 1, null), c.set(o + 2, true), c.set(o + 3, false);
+      function ih() {
+        const h = Tt.__wbindgen_export_0, o = h.grow(4);
+        h.set(0, void 0), h.set(o + 0, void 0), h.set(o + 1, null), h.set(o + 2, true), h.set(o + 3, false);
       }
-      function th(c, o) {
-        return es(c, o);
+      function nh(h, o) {
+        return es(h, o);
       }
-      function eh(c, o) {
-        throw new Error(es(c, o));
+      function rh(h, o) {
+        throw new Error(es(h, o));
       }
       URL = globalThis.URL;
-      const He = await Zl({
+      const He = await Vl({
         "./zenoh_keyexpr_wrapper_bg.js": {
-          __wbindgen_string_new: th,
-          __wbindgen_throw: eh,
-          __wbindgen_init_externref_table: $l
+          __wbindgen_string_new: nh,
+          __wbindgen_throw: rh,
+          __wbindgen_init_externref_table: ih
         }
-      }, Gl), ih = He.memory, nh = He.new_key_expr, rh = He.join, sh = He.concat, ah = He.includes, oh = He.intersects, uh = He.autocanonize, lh = He.__wbindgen_export_0, hh = He.__wbindgen_malloc, ch = He.__wbindgen_realloc, dh = He.__externref_table_dealloc, ph = He.__wbindgen_free, Tu = He.__wbindgen_start, fh = Object.freeze(Object.defineProperty({
+      }, ql), sh = He.memory, ah = He.new_key_expr, oh = He.join, uh = He.concat, lh = He.includes, hh = He.intersects, ch = He.autocanonize, dh = He.__wbindgen_export_0, ph = He.__wbindgen_malloc, fh = He.__wbindgen_realloc, _h = He.__externref_table_dealloc, mh = He.__wbindgen_free, Du = He.__wbindgen_start, gh = Object.freeze(Object.defineProperty({
         __proto__: null,
-        __externref_table_dealloc: dh,
-        __wbindgen_export_0: lh,
-        __wbindgen_free: ph,
-        __wbindgen_malloc: hh,
-        __wbindgen_realloc: ch,
-        __wbindgen_start: Tu,
-        autocanonize: uh,
-        concat: sh,
-        includes: ah,
-        intersects: oh,
-        join: rh,
-        memory: ih,
-        new_key_expr: nh
+        __externref_table_dealloc: _h,
+        __wbindgen_export_0: dh,
+        __wbindgen_free: mh,
+        __wbindgen_malloc: ph,
+        __wbindgen_realloc: fh,
+        __wbindgen_start: Du,
+        autocanonize: ch,
+        concat: uh,
+        includes: lh,
+        intersects: hh,
+        join: oh,
+        memory: sh,
+        new_key_expr: ah
       }, Symbol.toStringTag, {
         value: "Module"
       }));
-      jl(fh);
-      Tu();
+      Hl(gh);
+      Du();
       class Rt {
         constructor(o) {
           __publicField(this, "inner_");
@@ -14311,27 +14326,27 @@ var require_stdin = __commonJS({
             this.inner_ = o.inner_;
             return;
           } else o instanceof String ? l = o.toString() : l = o;
-          Wl(l), this.inner_ = l;
+          Xl(l), this.inner_ = l;
         }
         toString() {
           return this.inner_;
         }
         join(o) {
-          const l = Kl(this.inner_, Rt.intoString(o));
+          const l = Jl(this.inner_, Rt.intoString(o));
           return new Rt(l);
         }
         concat(o) {
-          const l = Yl(this.inner_, Rt.intoString(o));
+          const l = Ql(this.inner_, Rt.intoString(o));
           return new Rt(l);
         }
         includes(o) {
-          return Xl(this.inner_, Rt.intoString(o));
+          return $l(this.inner_, Rt.intoString(o));
         }
         intersects(o) {
-          return Jl(this.inner_, Rt.intoString(o));
+          return th(this.inner_, Rt.intoString(o));
         }
         static autocanonize(o) {
-          const l = Ql(Rt.intoString(o));
+          const l = eh(Rt.intoString(o));
           return new Rt(l);
         }
         static intoString(o) {
@@ -14364,38 +14379,38 @@ var require_stdin = __commonJS({
         }
       }
       var Ht;
-      (function(c) {
-        c[c.REAL_TIME = 1] = "REAL_TIME", c[c.INTERACTIVE_HIGH = 2] = "INTERACTIVE_HIGH", c[c.INTERACTIVE_LOW = 3] = "INTERACTIVE_LOW", c[c.DATA_HIGH = 4] = "DATA_HIGH", c[c.DATA = 5] = "DATA", c[c.DATA_LOW = 6] = "DATA_LOW", c[c.BACKGROUND = 7] = "BACKGROUND", c[c.DEFAULT = 5] = "DEFAULT";
+      (function(h) {
+        h[h.REAL_TIME = 1] = "REAL_TIME", h[h.INTERACTIVE_HIGH = 2] = "INTERACTIVE_HIGH", h[h.INTERACTIVE_LOW = 3] = "INTERACTIVE_LOW", h[h.DATA_HIGH = 4] = "DATA_HIGH", h[h.DATA = 5] = "DATA", h[h.DATA_LOW = 6] = "DATA_LOW", h[h.BACKGROUND = 7] = "BACKGROUND", h[h.DEFAULT = 5] = "DEFAULT";
       })(Ht || (Ht = {}));
       var Fe;
-      (function(c) {
-        c[c.DROP = 0] = "DROP", c[c.BLOCK = 1] = "BLOCK", c[c.DEFAULT_PUSH = 0] = "DEFAULT_PUSH", c[c.DEFAULT_REQUEST = 1] = "DEFAULT_REQUEST", c[c.DEFAULT_RESPONSE = 1] = "DEFAULT_RESPONSE";
+      (function(h) {
+        h[h.DROP = 0] = "DROP", h[h.BLOCK = 1] = "BLOCK", h[h.DEFAULT_PUSH = 0] = "DEFAULT_PUSH", h[h.DEFAULT_REQUEST = 1] = "DEFAULT_REQUEST", h[h.DEFAULT_RESPONSE = 1] = "DEFAULT_RESPONSE";
       })(Fe || (Fe = {}));
       var ze;
-      (function(c) {
-        c[c.BEST_EFFORT = 0] = "BEST_EFFORT", c[c.RELIABLE = 1] = "RELIABLE", c[c.DEFAULT = 1] = "DEFAULT";
+      (function(h) {
+        h[h.BEST_EFFORT = 0] = "BEST_EFFORT", h[h.RELIABLE = 1] = "RELIABLE", h[h.DEFAULT = 1] = "DEFAULT";
       })(ze || (ze = {}));
       var fe;
-      (function(c) {
-        c[c.SESSION_LOCAL = 0] = "SESSION_LOCAL", c[c.REMOTE = 1] = "REMOTE", c[c.ANY = 2] = "ANY", c[c.DEFAULT = 2] = "DEFAULT";
+      (function(h) {
+        h[h.SESSION_LOCAL = 0] = "SESSION_LOCAL", h[h.REMOTE = 1] = "REMOTE", h[h.ANY = 2] = "ANY", h[h.DEFAULT = 2] = "DEFAULT";
       })(fe || (fe = {}));
       var Tn;
-      (function(c) {
-        c[c.PUT = 0] = "PUT", c[c.DELETE = 1] = "DELETE";
+      (function(h) {
+        h[h.PUT = 0] = "PUT", h[h.DELETE = 1] = "DELETE";
       })(Tn || (Tn = {}));
-      var Ca;
-      (function(c) {
-        c[c.BEST_MATCHING = 0] = "BEST_MATCHING", c[c.ALL = 1] = "ALL", c[c.ALL_COMPLETE = 2] = "ALL_COMPLETE", c[c.DEFAULT = 0] = "DEFAULT";
-      })(Ca || (Ca = {}));
       var xa;
-      (function(c) {
-        c[c.AUTO = 0] = "AUTO", c[c.NONE = 1] = "NONE", c[c.MONOTONIC = 2] = "MONOTONIC", c[c.LATEST = 3] = "LATEST", c[c.DEFAULT = 0] = "DEFAULT";
+      (function(h) {
+        h[h.BEST_MATCHING = 0] = "BEST_MATCHING", h[h.ALL = 1] = "ALL", h[h.ALL_COMPLETE = 2] = "ALL_COMPLETE", h[h.DEFAULT = 0] = "DEFAULT";
       })(xa || (xa = {}));
+      var Ea;
+      (function(h) {
+        h[h.AUTO = 0] = "AUTO", h[h.NONE = 1] = "NONE", h[h.MONOTONIC = 2] = "MONOTONIC", h[h.LATEST = 3] = "LATEST", h[h.DEFAULT = 0] = "DEFAULT";
+      })(Ea || (Ea = {}));
       var Ri;
-      (function(c) {
-        c[c.ANY = 0] = "ANY", c[c.MATCHING_QUERY = 1] = "MATCHING_QUERY", c[c.DEFAULT = 1] = "DEFAULT";
+      (function(h) {
+        h[h.ANY = 0] = "ANY", h[h.MATCHING_QUERY = 1] = "MATCHING_QUERY", h[h.DEFAULT = 1] = "DEFAULT";
       })(Ri || (Ri = {}));
-      class _h {
+      class yh {
         constructor(o, l, g, x, S, M, J, et, _t) {
           __publicField(this, "keyexpr_");
           __publicField(this, "payload_");
@@ -14436,7 +14451,7 @@ var require_stdin = __commonJS({
           return this.attachment_;
         }
       }
-      class mh {
+      class vh {
         constructor(o, l) {
           __publicField(this, "zid");
           __publicField(this, "ntp64");
@@ -14456,7 +14471,7 @@ var require_stdin = __commonJS({
           return new Date(this.getMsSinceUnixEpoch());
         }
       }
-      const _Ea = class _Ea {
+      const _Ma = class _Ma {
         constructor(o) {
           __publicField(this, "zid");
           if (this.zid = o, o.length != 16) throw new Error("Zid should contain exactly 16 bytes");
@@ -14465,7 +14480,7 @@ var require_stdin = __commonJS({
           let o = "";
           for (let l = this.zid.length - 1; l >= 0; --l) {
             let g = this.zid[l];
-            o += _Ea.KEY[g >> 4], o += _Ea.KEY[g & 15];
+            o += _Ma.KEY[g >> 4], o += _Ma.KEY[g & 15];
           }
           return o;
         }
@@ -14473,14 +14488,14 @@ var require_stdin = __commonJS({
           return this.zid;
         }
       };
-      __publicField(_Ea, "KEY", "0123456789abcdef");
-      let Ea = _Ea;
+      __publicField(_Ma, "KEY", "0123456789abcdef");
+      let Ma = _Ma;
       var rt;
-      (function(c) {
-        c[c.ZENOH_BYTES = 0] = "ZENOH_BYTES", c[c.ZENOH_STRING = 1] = "ZENOH_STRING", c[c.ZENOH_SERIALIZED = 2] = "ZENOH_SERIALIZED", c[c.APPLICATION_OCTET_STREAM = 3] = "APPLICATION_OCTET_STREAM", c[c.TEXT_PLAIN = 4] = "TEXT_PLAIN", c[c.APPLICATION_JSON = 5] = "APPLICATION_JSON", c[c.TEXT_JSON = 6] = "TEXT_JSON", c[c.APPLICATION_CDR = 7] = "APPLICATION_CDR", c[c.APPLICATION_CBOR = 8] = "APPLICATION_CBOR", c[c.APPLICATION_YAML = 9] = "APPLICATION_YAML", c[c.TEXT_YAML = 10] = "TEXT_YAML", c[c.TEXT_JSON5 = 11] = "TEXT_JSON5", c[c.APPLICATION_PYTHON_SERIALIZED_OBJECT = 12] = "APPLICATION_PYTHON_SERIALIZED_OBJECT", c[c.APPLICATION_PROTOBUF = 13] = "APPLICATION_PROTOBUF", c[c.APPLICATION_JAVA_SERIALIZED_OBJECT = 14] = "APPLICATION_JAVA_SERIALIZED_OBJECT", c[c.APPLICATION_OPENMETRICS_TEXT = 15] = "APPLICATION_OPENMETRICS_TEXT", c[c.IMAGE_PNG = 16] = "IMAGE_PNG", c[c.IMAGE_JPEG = 17] = "IMAGE_JPEG", c[c.IMAGE_GIF = 18] = "IMAGE_GIF", c[c.IMAGE_BMP = 19] = "IMAGE_BMP", c[c.IMAGE_WEBP = 20] = "IMAGE_WEBP", c[c.APPLICATION_XML = 21] = "APPLICATION_XML", c[c.APPLICATION_X_WWW_FORM_URLENCODED = 22] = "APPLICATION_X_WWW_FORM_URLENCODED", c[c.TEXT_HTML = 23] = "TEXT_HTML", c[c.TEXT_XML = 24] = "TEXT_XML", c[c.TEXT_CSS = 25] = "TEXT_CSS", c[c.TEXT_JAVASCRIPT = 26] = "TEXT_JAVASCRIPT", c[c.TEXT_MARKDOWN = 27] = "TEXT_MARKDOWN", c[c.TEXT_CSV = 28] = "TEXT_CSV", c[c.APPLICATION_SQL = 29] = "APPLICATION_SQL", c[c.APPLICATION_COAP_PAYLOAD = 30] = "APPLICATION_COAP_PAYLOAD", c[c.APPLICATION_JSON_PATCH_JSON = 31] = "APPLICATION_JSON_PATCH_JSON", c[c.APPLICATION_JSON_SEQ = 32] = "APPLICATION_JSON_SEQ", c[c.APPLICATION_JSONPATH = 33] = "APPLICATION_JSONPATH", c[c.APPLICATION_JWT = 34] = "APPLICATION_JWT", c[c.APPLICATION_MP4 = 35] = "APPLICATION_MP4", c[c.APPLICATION_SOAP_XML = 36] = "APPLICATION_SOAP_XML", c[c.APPLICATION_YANG = 37] = "APPLICATION_YANG", c[c.AUDIO_AAC = 38] = "AUDIO_AAC", c[c.AUDIO_FLAC = 39] = "AUDIO_FLAC", c[c.AUDIO_MP4 = 40] = "AUDIO_MP4", c[c.AUDIO_OGG = 41] = "AUDIO_OGG", c[c.AUDIO_VORBIS = 42] = "AUDIO_VORBIS", c[c.VIDEO_H261 = 43] = "VIDEO_H261", c[c.VIDEO_H263 = 44] = "VIDEO_H263", c[c.VIDEO_H264 = 45] = "VIDEO_H264", c[c.VIDEO_H265 = 46] = "VIDEO_H265", c[c.VIDEO_H266 = 47] = "VIDEO_H266", c[c.VIDEO_MP4 = 48] = "VIDEO_MP4", c[c.VIDEO_OGG = 49] = "VIDEO_OGG", c[c.VIDEO_RAW = 50] = "VIDEO_RAW", c[c.VIDEO_VP8 = 51] = "VIDEO_VP8", c[c.VIDEO_VP9 = 52] = "VIDEO_VP9", c[c.CUSTOM = 65535] = "CUSTOM";
+      (function(h) {
+        h[h.ZENOH_BYTES = 0] = "ZENOH_BYTES", h[h.ZENOH_STRING = 1] = "ZENOH_STRING", h[h.ZENOH_SERIALIZED = 2] = "ZENOH_SERIALIZED", h[h.APPLICATION_OCTET_STREAM = 3] = "APPLICATION_OCTET_STREAM", h[h.TEXT_PLAIN = 4] = "TEXT_PLAIN", h[h.APPLICATION_JSON = 5] = "APPLICATION_JSON", h[h.TEXT_JSON = 6] = "TEXT_JSON", h[h.APPLICATION_CDR = 7] = "APPLICATION_CDR", h[h.APPLICATION_CBOR = 8] = "APPLICATION_CBOR", h[h.APPLICATION_YAML = 9] = "APPLICATION_YAML", h[h.TEXT_YAML = 10] = "TEXT_YAML", h[h.TEXT_JSON5 = 11] = "TEXT_JSON5", h[h.APPLICATION_PYTHON_SERIALIZED_OBJECT = 12] = "APPLICATION_PYTHON_SERIALIZED_OBJECT", h[h.APPLICATION_PROTOBUF = 13] = "APPLICATION_PROTOBUF", h[h.APPLICATION_JAVA_SERIALIZED_OBJECT = 14] = "APPLICATION_JAVA_SERIALIZED_OBJECT", h[h.APPLICATION_OPENMETRICS_TEXT = 15] = "APPLICATION_OPENMETRICS_TEXT", h[h.IMAGE_PNG = 16] = "IMAGE_PNG", h[h.IMAGE_JPEG = 17] = "IMAGE_JPEG", h[h.IMAGE_GIF = 18] = "IMAGE_GIF", h[h.IMAGE_BMP = 19] = "IMAGE_BMP", h[h.IMAGE_WEBP = 20] = "IMAGE_WEBP", h[h.APPLICATION_XML = 21] = "APPLICATION_XML", h[h.APPLICATION_X_WWW_FORM_URLENCODED = 22] = "APPLICATION_X_WWW_FORM_URLENCODED", h[h.TEXT_HTML = 23] = "TEXT_HTML", h[h.TEXT_XML = 24] = "TEXT_XML", h[h.TEXT_CSS = 25] = "TEXT_CSS", h[h.TEXT_JAVASCRIPT = 26] = "TEXT_JAVASCRIPT", h[h.TEXT_MARKDOWN = 27] = "TEXT_MARKDOWN", h[h.TEXT_CSV = 28] = "TEXT_CSV", h[h.APPLICATION_SQL = 29] = "APPLICATION_SQL", h[h.APPLICATION_COAP_PAYLOAD = 30] = "APPLICATION_COAP_PAYLOAD", h[h.APPLICATION_JSON_PATCH_JSON = 31] = "APPLICATION_JSON_PATCH_JSON", h[h.APPLICATION_JSON_SEQ = 32] = "APPLICATION_JSON_SEQ", h[h.APPLICATION_JSONPATH = 33] = "APPLICATION_JSONPATH", h[h.APPLICATION_JWT = 34] = "APPLICATION_JWT", h[h.APPLICATION_MP4 = 35] = "APPLICATION_MP4", h[h.APPLICATION_SOAP_XML = 36] = "APPLICATION_SOAP_XML", h[h.APPLICATION_YANG = 37] = "APPLICATION_YANG", h[h.AUDIO_AAC = 38] = "AUDIO_AAC", h[h.AUDIO_FLAC = 39] = "AUDIO_FLAC", h[h.AUDIO_MP4 = 40] = "AUDIO_MP4", h[h.AUDIO_OGG = 41] = "AUDIO_OGG", h[h.AUDIO_VORBIS = 42] = "AUDIO_VORBIS", h[h.VIDEO_H261 = 43] = "VIDEO_H261", h[h.VIDEO_H263 = 44] = "VIDEO_H263", h[h.VIDEO_H264 = 45] = "VIDEO_H264", h[h.VIDEO_H265 = 46] = "VIDEO_H265", h[h.VIDEO_H266 = 47] = "VIDEO_H266", h[h.VIDEO_MP4 = 48] = "VIDEO_MP4", h[h.VIDEO_OGG = 49] = "VIDEO_OGG", h[h.VIDEO_RAW = 50] = "VIDEO_RAW", h[h.VIDEO_VP8 = 51] = "VIDEO_VP8", h[h.VIDEO_VP9 = 52] = "VIDEO_VP9", h[h.CUSTOM = 65535] = "CUSTOM";
       })(rt || (rt = {}));
-      function Su(c) {
-        switch (c) {
+      function Iu(h) {
+        switch (h) {
           case rt.APPLICATION_OCTET_STREAM:
             return "application/octet-stream";
           case rt.APPLICATION_PYTHON_SERIALIZED_OBJECT:
@@ -14500,24 +14515,24 @@ var require_stdin = __commonJS({
           case rt.APPLICATION_SOAP_XML:
             return "application/soap+xml";
           default:
-            return rt[c].toLocaleLowerCase().replaceAll("_", "/");
+            return rt[h].toLocaleLowerCase().replaceAll("_", "/");
         }
       }
-      function gh() {
-        let c = /* @__PURE__ */ new Map();
+      function Lh() {
+        let h = /* @__PURE__ */ new Map();
         for (let o in rt) {
           let l = Number(o);
-          !isNaN(l) && l != rt.CUSTOM && c.set(l, Su(l));
+          !isNaN(l) && l != rt.CUSTOM && h.set(l, Iu(l));
         }
-        return c;
+        return h;
       }
-      function yh() {
-        let c = /* @__PURE__ */ new Map();
+      function bh() {
+        let h = /* @__PURE__ */ new Map();
         for (let o in rt) {
           let l = Number(o);
-          !isNaN(l) && l != rt.CUSTOM && c.set(Su(l), l);
+          !isNaN(l) && l != rt.CUSTOM && h.set(Iu(l), l);
         }
-        return c;
+        return h;
       }
       const _nt = class _nt {
         constructor(o, l) {
@@ -14557,8 +14572,8 @@ var require_stdin = __commonJS({
           ];
         }
       };
-      __publicField(_nt, "ID_TO_ENCODING", gh());
-      __publicField(_nt, "ENCODING_TO_ID", yh());
+      __publicField(_nt, "ID_TO_ENCODING", Lh());
+      __publicField(_nt, "ENCODING_TO_ID", bh());
       __publicField(_nt, "SEP", ";");
       __publicField(_nt, "ZENOH_BYTES", new _nt(rt.ZENOH_BYTES));
       __publicField(_nt, "ZENOH_STRING", new _nt(rt.ZENOH_STRING));
@@ -14614,20 +14629,20 @@ var require_stdin = __commonJS({
       __publicField(_nt, "VIDEO_VP8", new _nt(rt.VIDEO_VP8));
       __publicField(_nt, "VIDEO_VP9", new _nt(rt.VIDEO_VP9));
       let nt = _nt;
-      var Ao = {}, Bo = {}, mu;
-      function vh() {
-        return mu || (mu = 1, (function(c) {
-          Object.defineProperty(c, "__esModule", {
+      var Bo = {}, Po = {}, yu;
+      function wh() {
+        return yu || (yu = 1, (function(h) {
+          Object.defineProperty(h, "__esModule", {
             value: true
-          }), c.MultiReceiverChannel = c.SimpleChannel = c.TryReceivedKind = c.State = void 0;
+          }), h.MultiReceiverChannel = h.SimpleChannel = h.TryReceivedKind = h.State = void 0;
           var o;
           (function(S) {
             S.empty = "empty", S.receiver = "receiver", S.data = "data", S.close = "close";
-          })(o = c.State || (c.State = {}));
+          })(o = h.State || (h.State = {}));
           var l;
           (function(S) {
             S.value = "value", S.notReceived = "no", S.close = "close";
-          })(l = c.TryReceivedKind || (c.TryReceivedKind = {}));
+          })(l = h.TryReceivedKind || (h.TryReceivedKind = {}));
           class g {
             constructor() {
               this.receivers = [], this.data = [], this._state = o.empty;
@@ -14682,7 +14697,7 @@ var require_stdin = __commonJS({
               }
             }
           }
-          c.SimpleChannel = g;
+          h.SimpleChannel = g;
           class x {
             constructor() {
               this.chan = /* @__PURE__ */ new Set();
@@ -14701,19 +14716,19 @@ var require_stdin = __commonJS({
               this.chan.delete(M);
             }
           }
-          c.MultiReceiverChannel = x;
-        })(Bo)), Bo;
+          h.MultiReceiverChannel = x;
+        })(Po)), Po;
       }
-      var Xr = {}, gu;
-      function Lh() {
-        if (gu) return Xr;
-        gu = 1, Object.defineProperty(Xr, "__esModule", {
+      var Xr = {}, vu;
+      function Ch() {
+        if (vu) return Xr;
+        vu = 1, Object.defineProperty(Xr, "__esModule", {
           value: true
         }), Xr.observe = void 0;
-        const c = Du();
+        const h = Ou();
         return Xr.observe = (o) => (Object.defineProperties(o, {
           chan: {
-            value: new c.MultiReceiverChannel()
+            value: new h.MultiReceiverChannel()
           },
           notify: {
             value: function() {
@@ -14732,13 +14747,13 @@ var require_stdin = __commonJS({
           }
         }), o), Xr;
       }
-      var Bn = {}, yu;
-      function bh() {
-        if (yu) return Bn;
-        yu = 1, Object.defineProperty(Bn, "__esModule", {
+      var Bn = {}, Lu;
+      function xh() {
+        if (Lu) return Bn;
+        Lu = 1, Object.defineProperty(Bn, "__esModule", {
           value: true
         }), Bn.Guard = Bn.Mutex = void 0;
-        class c {
+        class h {
           constructor() {
             this.resolveList = [], this.locked = [
               false
@@ -14755,7 +14770,7 @@ var require_stdin = __commonJS({
             });
           }
         }
-        Bn.Mutex = c;
+        Bn.Mutex = h;
         class o {
           constructor(g, x) {
             this.resolveList = g, this.locked = x;
@@ -14767,62 +14782,62 @@ var require_stdin = __commonJS({
         }
         return Bn.Guard = o, Bn;
       }
-      var vu;
-      function Du() {
-        return vu || (vu = 1, (function(c) {
-          Object.defineProperty(c, "__esModule", {
+      var bu;
+      function Ou() {
+        return bu || (bu = 1, (function(h) {
+          Object.defineProperty(h, "__esModule", {
             value: true
           });
-          var o = vh();
-          Object.defineProperty(c, "SimpleChannel", {
+          var o = wh();
+          Object.defineProperty(h, "SimpleChannel", {
             enumerable: true,
             get: function() {
               return o.SimpleChannel;
             }
-          }), Object.defineProperty(c, "ChannelState", {
+          }), Object.defineProperty(h, "ChannelState", {
             enumerable: true,
             get: function() {
               return o.State;
             }
-          }), Object.defineProperty(c, "MultiReceiverChannel", {
+          }), Object.defineProperty(h, "MultiReceiverChannel", {
             enumerable: true,
             get: function() {
               return o.MultiReceiverChannel;
             }
-          }), Object.defineProperty(c, "TryReceivedKind", {
+          }), Object.defineProperty(h, "TryReceivedKind", {
             enumerable: true,
             get: function() {
               return o.TryReceivedKind;
             }
           });
-          var l = Lh();
-          Object.defineProperty(c, "observe", {
+          var l = Ch();
+          Object.defineProperty(h, "observe", {
             enumerable: true,
             get: function() {
               return l.observe;
             }
           });
-          var g = bh();
-          Object.defineProperty(c, "Mutex", {
+          var g = xh();
+          Object.defineProperty(h, "Mutex", {
             enumerable: true,
             get: function() {
               return g.Mutex;
             }
-          }), Object.defineProperty(c, "Guard", {
+          }), Object.defineProperty(h, "Guard", {
             enumerable: true,
             get: function() {
               return g.Guard;
             }
           });
-        })(Ao)), Ao;
+        })(Bo)), Bo;
       }
-      var Lu = Du();
-      function wh(c) {
-        return c.intoSenderReceiverPair != null;
+      var wu = Ou();
+      function Eh(h) {
+        return h.intoSenderReceiverPair != null;
       }
-      function ln(c) {
-        if (wh(c)) {
-          let [o, l] = c.intoSenderReceiverPair();
+      function ln(h) {
+        if (Eh(h)) {
+          let [o, l] = h.intoSenderReceiverPair();
           return [
             (S) => {
               o.send(S);
@@ -14832,12 +14847,12 @@ var require_stdin = __commonJS({
             },
             l
           ];
-        } else return Array.isArray(c) ? [
-          c[0],
-          c[1],
+        } else return Array.isArray(h) ? [
+          h[0],
+          h[1],
           void 0
         ] : [
-          c,
+          h,
           () => {
           },
           void 0
@@ -14848,7 +14863,7 @@ var require_stdin = __commonJS({
           __publicField(this, "chan");
           __publicField(this, "capacity");
           __publicField(this, "size");
-          this.capacity = o, this.size = 0, this.chan = new Lu.SimpleChannel();
+          this.capacity = o, this.size = 0, this.chan = new wu.SimpleChannel();
         }
         send(o) {
           this.size != this.capacity && (this.chan.send(o), this.size++);
@@ -14858,7 +14873,7 @@ var require_stdin = __commonJS({
         }
         tryReceive() {
           let o = this.chan.tryReceive();
-          return o.kind == Lu.TryReceivedKind.value && this.size--, o;
+          return o.kind == wu.TryReceivedKind.value && this.size--, o;
         }
         async receive() {
           let o = await this.chan.receive();
@@ -14880,62 +14895,62 @@ var require_stdin = __commonJS({
           ];
         }
       }
-      const Ch = () => typeof self < "u" && typeof self.WebAssembly < "u" || typeof global < "u" && typeof global.WebAssembly < "u", Iu = (c, o = (l) => l !== void 0 ? ": " + l : "") => class extends Error {
+      const Mh = () => typeof self < "u" && typeof self.WebAssembly < "u" || typeof global < "u" && typeof global.WebAssembly < "u", Ru = (h, o = (l) => l !== void 0 ? ": " + l : "") => class extends Error {
         constructor(l) {
-          super(c(l) + o(l));
+          super(h(l) + o(l));
           __publicField(this, "origMessage");
           this.origMessage = l !== void 0 ? String(l) : "";
         }
-      }, xh = Iu(() => "index out of bounds"), Eh = (c) => {
-        throw new xh(c);
-      }, Mh = (c, o, l) => (c < o || c >= l) && Eh(c), kh = Iu(() => "unsupported operation"), Ah = (c) => {
-        throw new kh(c);
-      }, Bh = "AGFzbQEAAAABCgJgAX4Bf2AAAX4DBQQAAQABBQMBABEGEQJ/AUGAgMAAC38AQYCAwAALB1gGBm1lbW9yeQIAD2xlYjEyOEVuY29kZVU2NAAAA2J1ZgMBD2xlYjEyOERlY29kZVU2NAABD2xlYjEyOEVuY29kZUk2NAACD2xlYjEyOERlY29kZUk2NAADCoYEBFsBAn8CQCAAQoABWgRAA0AgAUGAgEBrIACnQf8AcSAAQv8AVkEHdHI6AAAgAUEBaiEBIABCgAFUIABCB4ghAEUNAAsMAQtBgIDAACAAPAAAQQEhAQsgAUH/AXELdwIEfwF+IwBBEGsiACQAIABBADoADwNAAkAgACAALQAPIgJBB2pBP3E6AA8gAUGAgEBrLAAAIgNB/wBxrSACQT9xrYYgBIQhBCABQQFqIQIgAUEISw0AIAIhASADQQBIDQELC0GAgMAAIAI6AAAgAEEQaiQAIAQLkQEBA38CQCAAQkB9QoABWgRAQQEhAgNAIAJBAXFFDQIgAUGAgEBrQQBBgH8gAKciAkHAAHEiA0UgAEKAAVRxIANBBnYgAEIHhyIAQn9RcXIiAxsgAkH/AHFyOgAAIANFIQIgAUEBaiEBDAALAAtBgIDAACAAQjmIp0HAAHEgAKdBP3FyOgAAQQEhAQsgAUH/AXELnAECAX4EfyMAQRBrIgEkACABQQA6AA9BfyECA0ACQCABIAEtAA8iA0EHakE/cToADyACQYGAwABqLQAAIgRB/wBxrSADQT9xrYYgAIQhACAEwCEDIAJBAWoiAkEISw0AIANBAEgNAQsLIANBwABxRSACQQhLckUEQEJ/IAExAA+GIACEIQALQYCAwAAgAkEBajoAACABQRBqJAAgAAs=";
-      let nr, Ma;
-      Ch() && (nr = new WebAssembly.Instance(new WebAssembly.Module(new Uint8Array([
-        ...atob(Bh)
-      ].map((o) => o.charCodeAt(0))))).exports, Ma = new Uint8Array(nr.memory.buffer, nr.buf, 16));
-      const Ou = () => !nr && Ah("WASM module unavailable"), Ph = (c, o) => (l, g, x = 0) => {
-        Ou();
-        const S = BigInt.asIntN(64, BigInt(g)), M = nr[c](S);
-        return Mh(x, 0, l.length - M + 1), l.set(Ma.subarray(0, M), x), M;
-      }, Th = (c, o) => (l, g = 0) => {
-        Ou(), Ma.set(l.subarray(g, Math.min(g + 10, l.length)), 0);
-        const x = nr[c](0, 0);
+      }, kh = Ru(() => "index out of bounds"), Ah = (h) => {
+        throw new kh(h);
+      }, Bh = (h, o, l) => (h < o || h >= l) && Ah(h), Ph = Ru(() => "unsupported operation"), Th = (h) => {
+        throw new Ph(h);
+      }, Sh = "AGFzbQEAAAABCgJgAX4Bf2AAAX4DBQQAAQABBQMBABEGEQJ/AUGAgMAAC38AQYCAwAALB1gGBm1lbW9yeQIAD2xlYjEyOEVuY29kZVU2NAAAA2J1ZgMBD2xlYjEyOERlY29kZVU2NAABD2xlYjEyOEVuY29kZUk2NAACD2xlYjEyOERlY29kZUk2NAADCoYEBFsBAn8CQCAAQoABWgRAA0AgAUGAgEBrIACnQf8AcSAAQv8AVkEHdHI6AAAgAUEBaiEBIABCgAFUIABCB4ghAEUNAAsMAQtBgIDAACAAPAAAQQEhAQsgAUH/AXELdwIEfwF+IwBBEGsiACQAIABBADoADwNAAkAgACAALQAPIgJBB2pBP3E6AA8gAUGAgEBrLAAAIgNB/wBxrSACQT9xrYYgBIQhBCABQQFqIQIgAUEISw0AIAIhASADQQBIDQELC0GAgMAAIAI6AAAgAEEQaiQAIAQLkQEBA38CQCAAQkB9QoABWgRAQQEhAgNAIAJBAXFFDQIgAUGAgEBrQQBBgH8gAKciAkHAAHEiA0UgAEKAAVRxIANBBnYgAEIHhyIAQn9RcXIiAxsgAkH/AHFyOgAAIANFIQIgAUEBaiEBDAALAAtBgIDAACAAQjmIp0HAAHEgAKdBP3FyOgAAQQEhAQsgAUH/AXELnAECAX4EfyMAQRBrIgEkACABQQA6AA9BfyECA0ACQCABIAEtAA8iA0EHakE/cToADyACQYGAwABqLQAAIgRB/wBxrSADQT9xrYYgAIQhACAEwCEDIAJBAWoiAkEISw0AIANBAEgNAQsLIANBwABxRSACQQhLckUEQEJ/IAExAA+GIACEIQALQYCAwAAgAkEBajoAACABQRBqJAAgAAs=";
+      let nr, ka;
+      Mh() && (nr = new WebAssembly.Instance(new WebAssembly.Module(new Uint8Array([
+        ...atob(Sh)
+      ].map((o) => o.charCodeAt(0))))).exports, ka = new Uint8Array(nr.memory.buffer, nr.buf, 16));
+      const Fu = () => !nr && Th("WASM module unavailable"), Dh = (h, o) => (l, g, x = 0) => {
+        Fu();
+        const S = BigInt.asIntN(64, BigInt(g)), M = nr[h](S);
+        return Bh(x, 0, l.length - M + 1), l.set(ka.subarray(0, M), x), M;
+      }, Ih = (h, o) => (l, g = 0) => {
+        Fu(), ka.set(l.subarray(g, Math.min(g + 10, l.length)), 0);
+        const x = nr[h](0, 0);
         return [
           o ? BigInt.asIntN(64, x) : BigInt.asUintN(64, x),
-          Ma[0]
+          ka[0]
         ];
-      }, Sh = Th("leb128DecodeU64", false), Dh = Ph("leb128EncodeU64");
-      function Ih(c) {
-        return c instanceof Uint8Array;
+      }, Oh = Ih("leb128DecodeU64", false), Rh = Dh("leb128EncodeU64");
+      function Fh(h) {
+        return h instanceof Uint8Array;
       }
-      function Oh(c) {
-        return c instanceof Uint16Array;
+      function zh(h) {
+        return h instanceof Uint16Array;
       }
-      function Rh(c) {
-        return c instanceof Uint32Array;
+      function Nh(h) {
+        return h instanceof Uint32Array;
       }
-      function Fh(c) {
-        return c instanceof BigUint64Array;
+      function Uh(h) {
+        return h instanceof BigUint64Array;
       }
-      function zh(c) {
-        return c instanceof Int8Array;
+      function Gh(h) {
+        return h instanceof Int8Array;
       }
-      function Nh(c) {
-        return c instanceof Int16Array;
+      function Zh(h) {
+        return h instanceof Int16Array;
       }
-      function Uh(c) {
-        return c instanceof Int32Array;
+      function jh(h) {
+        return h instanceof Int32Array;
       }
-      function Gh(c) {
-        return c instanceof BigInt64Array;
+      function qh(h) {
+        return h instanceof BigInt64Array;
       }
-      function Zh(c) {
-        return c instanceof Float32Array;
+      function Vh(h) {
+        return h instanceof Float32Array;
       }
-      function jh(c) {
-        return c instanceof Float64Array;
+      function Hh(h) {
+        return h instanceof Float64Array;
       }
       const Me = new Uint32Array(new Uint8Array([
         1,
@@ -14943,8 +14958,8 @@ var require_stdin = __commonJS({
         3,
         4
       ]).buffer)[0] === 67305985;
-      function qh(c) {
-        return c.serializeWithZSerializer !== void 0;
+      function Wh(h) {
+        return h.serializeWithZSerializer !== void 0;
       }
       const _Sn = class _Sn {
         constructor() {
@@ -14968,7 +14983,7 @@ var require_stdin = __commonJS({
             this.serializeNumberUint8(o);
             return;
           }
-          let l = this.ensureBuffer(10), g = Dh(l, o);
+          let l = this.ensureBuffer(10), g = Rh(l, o);
           l = l.subarray(0, g), this.bufferLen -= 10 - g, this.append(l);
         }
         serializeString(o) {
@@ -15075,21 +15090,21 @@ var require_stdin = __commonJS({
           });
         }
         getDefaultSerializationTag(o) {
-          if (qh(o)) return ue.object();
+          if (Wh(o)) return ue.object();
           if (typeof o == "number") return ue.number();
           if (typeof o == "bigint") return ue.bigint();
           if (typeof o == "string") return ue.string();
           if (typeof o == "boolean") return ue.boolean();
-          if (Ih(o)) return ue.uint8array();
-          if (Oh(o)) return ue.uint16array();
-          if (Rh(o)) return ue.uint32array();
-          if (Fh(o)) return ue.biguint64array();
-          if (zh(o)) return ue.int8array();
-          if (Nh(o)) return ue.int16array();
-          if (Uh(o)) return ue.int32array();
-          if (Gh(o)) return ue.bigint64array();
-          if (Zh(o)) return ue.float32array();
-          if (jh(o)) return ue.float64array();
+          if (Fh(o)) return ue.uint8array();
+          if (zh(o)) return ue.uint16array();
+          if (Nh(o)) return ue.uint32array();
+          if (Uh(o)) return ue.biguint64array();
+          if (Gh(o)) return ue.int8array();
+          if (Zh(o)) return ue.int16array();
+          if (jh(o)) return ue.int32array();
+          if (qh(o)) return ue.bigint64array();
+          if (Vh(o)) return ue.float32array();
+          if (Hh(o)) return ue.float64array();
           if (Array.isArray(o)) {
             let l;
             return o.length > 0 && (l = this.getDefaultSerializationTag(o[0])), ue.array(l);
@@ -15123,12 +15138,12 @@ var require_stdin = __commonJS({
       __publicField(_Sn, "MAX_SEQUENCE_LENGTH_TO_FIT_IN_SINGLE_BYTE", 127);
       let Sn = _Sn;
       var Wt;
-      (function(c) {
-        c[c.Float64 = 1] = "Float64", c[c.Float32 = 2] = "Float32", c[c.Int64 = 3] = "Int64", c[c.Uint64 = 4] = "Uint64", c[c.Int32 = 5] = "Int32", c[c.Uint32 = 6] = "Uint32", c[c.Int16 = 7] = "Int16", c[c.Uint16 = 8] = "Uint16", c[c.Int8 = 9] = "Int8", c[c.Uint8 = 10] = "Uint8";
+      (function(h) {
+        h[h.Float64 = 1] = "Float64", h[h.Float32 = 2] = "Float32", h[h.Int64 = 3] = "Int64", h[h.Uint64 = 4] = "Uint64", h[h.Int32 = 5] = "Int32", h[h.Uint32 = 6] = "Uint32", h[h.Int16 = 7] = "Int16", h[h.Uint16 = 8] = "Uint16", h[h.Int8 = 9] = "Int8", h[h.Uint8 = 10] = "Uint8";
       })(Wt || (Wt = {}));
       var cn;
-      (function(c) {
-        c[c.Int64 = 1] = "Int64", c[c.Uint64 = 2] = "Uint64";
+      (function(h) {
+        h[h.Int64 = 1] = "Int64", h[h.Uint64 = 2] = "Uint64";
       })(cn || (cn = {}));
       class zt {
         constructor(o) {
@@ -15148,8 +15163,8 @@ var require_stdin = __commonJS({
           this.serialize_(o, l);
         }
       }
-      var ka;
-      (function(c) {
+      var Aa;
+      (function(h) {
         function o(W = Wt.Float64) {
           switch (W) {
             case Wt.Float64:
@@ -15174,7 +15189,7 @@ var require_stdin = __commonJS({
               return new zt((ot) => ot.deserializeNumberUint8());
           }
         }
-        c.number = o;
+        h.number = o;
         function l(W = cn.Int64) {
           switch (W) {
             case cn.Int64:
@@ -15183,74 +15198,74 @@ var require_stdin = __commonJS({
               return new zt((ot) => ot.deserializeBigintUint64());
           }
         }
-        c.bigint = l;
+        h.bigint = l;
         function g() {
           return new zt((W) => W.deserializeString());
         }
-        c.string = g;
+        h.string = g;
         function x() {
           return new zt((W) => W.deserializeBoolean());
         }
-        c.boolean = x;
+        h.boolean = x;
         function S() {
           return new zt((W) => W.deserializeUint8Array());
         }
-        c.uint8array = S;
+        h.uint8array = S;
         function M() {
           return new zt((W) => W.deserializeUint16Array());
         }
-        c.uint16array = M;
+        h.uint16array = M;
         function J() {
           return new zt((W) => W.deserializeUint32Array());
         }
-        c.uint32array = J;
+        h.uint32array = J;
         function et() {
           return new zt((W) => W.deserializeBiguint64Array());
         }
-        c.biguint64array = et;
+        h.biguint64array = et;
         function _t() {
           return new zt((W) => W.deserializeInt8Array());
         }
-        c.int8array = _t;
+        h.int8array = _t;
         function wt() {
           return new zt((W) => W.deserializeInt16Array());
         }
-        c.int16array = wt;
+        h.int16array = wt;
         function ht() {
           return new zt((W) => W.deserializeInt32Array());
         }
-        c.int32array = ht;
+        h.int32array = ht;
         function Nt() {
           return new zt((W) => W.deserializeBigint64Array());
         }
-        c.bigint64array = Nt;
+        h.bigint64array = Nt;
         function ie() {
           return new zt((W) => W.deserializeFloat32Array());
         }
-        c.float32array = ie;
+        h.float32array = ie;
         function ne() {
           return new zt((W) => W.deserializeFloat64Array());
         }
-        c.float64array = ne;
+        h.float64array = ne;
         function gt(W) {
           return new zt((ot) => ot.deserializeObject(W));
         }
-        c.object = gt;
+        h.object = gt;
         function le(W) {
           return new zt((ot) => W(ot));
         }
-        c.objectStatic = le;
+        h.objectStatic = le;
         function Zt(W) {
           return new zt((ot) => ot.deserializeArray(W));
         }
-        c.array = Zt;
+        h.array = Zt;
         function yt(W, ot) {
           return new zt((he) => he.deserializeMap(W, ot));
         }
-        c.map = yt;
-      })(ka || (ka = {}));
+        h.map = yt;
+      })(Aa || (Aa = {}));
       var ue;
-      (function(c) {
+      (function(h) {
         function o(yt = Wt.Float64) {
           switch (yt) {
             case Wt.Float64:
@@ -15295,7 +15310,7 @@ var require_stdin = __commonJS({
               });
           }
         }
-        c.number = o;
+        h.number = o;
         function l(yt = cn.Int64) {
           switch (yt) {
             case cn.Int64:
@@ -15308,99 +15323,99 @@ var require_stdin = __commonJS({
               });
           }
         }
-        c.bigint = l;
+        h.bigint = l;
         function g() {
           return new Gt((yt, W) => {
             yt.serializeString(W);
           });
         }
-        c.string = g;
+        h.string = g;
         function x() {
           return new Gt((yt, W) => {
             yt.serializeBoolean(W);
           });
         }
-        c.boolean = x;
+        h.boolean = x;
         function S() {
           return new Gt((yt, W) => {
             yt.serializeUint8Array(W);
           });
         }
-        c.uint8array = S;
+        h.uint8array = S;
         function M() {
           return new Gt((yt, W) => {
             yt.serializeUint16Array(W);
           });
         }
-        c.uint16array = M;
+        h.uint16array = M;
         function J() {
           return new Gt((yt, W) => {
             yt.serializeUint32Array(W);
           });
         }
-        c.uint32array = J;
+        h.uint32array = J;
         function et() {
           return new Gt((yt, W) => {
             yt.serializeBiguint64Array(W);
           });
         }
-        c.biguint64array = et;
+        h.biguint64array = et;
         function _t() {
           return new Gt((yt, W) => {
             yt.serializeInt8Array(W);
           });
         }
-        c.int8array = _t;
+        h.int8array = _t;
         function wt() {
           return new Gt((yt, W) => {
             yt.serializeInt16Array(W);
           });
         }
-        c.int16array = wt;
+        h.int16array = wt;
         function ht() {
           return new Gt((yt, W) => {
             yt.serializeInt32Array(W);
           });
         }
-        c.int32array = ht;
+        h.int32array = ht;
         function Nt() {
           return new Gt((yt, W) => {
             yt.serializeBigint64Array(W);
           });
         }
-        c.bigint64array = Nt;
+        h.bigint64array = Nt;
         function ie() {
           return new Gt((yt, W) => {
             yt.serializeFloat32Array(W);
           });
         }
-        c.float32array = ie;
+        h.float32array = ie;
         function ne() {
           return new Gt((yt, W) => {
             yt.serializeFloat64Array(W);
           });
         }
-        c.float64array = ne;
+        h.float64array = ne;
         function gt() {
           return new Gt((yt, W) => {
             W.serializeWithZSerializer(yt);
           });
         }
-        c.object = gt;
+        h.object = gt;
         function le(yt) {
           return new Gt((W, ot) => {
             W.serializeArray(ot, yt);
           });
         }
-        c.array = le;
+        h.array = le;
         function Zt(yt, W) {
           return new Gt((ot, he) => {
             ot.serializeMap(he, yt, W);
           });
         }
-        c.map = Zt;
+        h.map = Zt;
       })(ue || (ue = {}));
-      const _Fo = class _Fo {
+      const _zo = class _zo {
         constructor(o) {
           __publicField(this, "buffer_");
           __publicField(this, "idx_");
@@ -15421,8 +15436,8 @@ var require_stdin = __commonJS({
         }
         readSequenceLength() {
           const o = this.peekByte();
-          if (o != null && (o & _Fo.LEB128_CONTINUATION_MASK) == 0) return this.idx_ += 1, o;
-          let [l, g] = Sh(this.buffer_, this.idx_);
+          if (o != null && (o & _zo.LEB128_CONTINUATION_MASK) == 0) return this.idx_ += 1, o;
+          let [l, g] = Oh(this.buffer_, this.idx_);
           if (this.idx_ += g, l > Number.MAX_SAFE_INTEGER) throw new Error(`Array length overflow: ${l}`);
           return new Number(l).valueOf();
         }
@@ -15608,9 +15623,9 @@ var require_stdin = __commonJS({
           return this.buffer_.length == this.idx_;
         }
       };
-      __publicField(_Fo, "LEB128_CONTINUATION_MASK", 128);
-      let Fo = _Fo;
-      class Vh {
+      __publicField(_zo, "LEB128_CONTINUATION_MASK", 128);
+      let zo = _zo;
+      class Kh {
         constructor(o, l, g, x) {
           __publicField(this, "session");
           __publicField(this, "id");
@@ -15631,7 +15646,7 @@ var require_stdin = __commonJS({
           await this.session.undeclareQueryable(this.id);
         }
       }
-      class Hh {
+      class Yh {
         constructor(o, l, g, x, S, M, J) {
           __publicField(this, "queryId");
           __publicField(this, "keyexpr_");
@@ -15643,7 +15658,7 @@ var require_stdin = __commonJS({
           this.queryId = o, this.keyexpr_ = l, this.parameters_ = g, this.payload_ = x, this.encoding_ = S, this.attachment_ = M, this.replyKeyExpr_ = J;
         }
       }
-      class Wh {
+      class Xh {
         constructor(o, l) {
           __publicField(this, "session");
           __publicField(this, "inner");
@@ -15668,13 +15683,13 @@ var require_stdin = __commonJS({
           return this.inner.attachment_;
         }
         async reply(o, l, g) {
-          await this.session.replyOk(new Rc(this.inner.queryId, new Rt(o), new ee(l), (g == null ? void 0 : g.encoding) ? nt.from(g.encoding) : nt.default(), (g == null ? void 0 : g.attachment) ? new ee(g.attachment) : void 0, g == null ? void 0 : g.timestamp, new un((g == null ? void 0 : g.priority) ?? Ht.DEFAULT, (g == null ? void 0 : g.congestionControl) ?? Fe.DEFAULT_RESPONSE, (g == null ? void 0 : g.express) ?? false, ze.DEFAULT, fe.DEFAULT)));
+          await this.session.replyOk(new Nc(this.inner.queryId, new Rt(o), new ee(l), (g == null ? void 0 : g.encoding) ? nt.from(g.encoding) : nt.default(), (g == null ? void 0 : g.attachment) ? new ee(g.attachment) : void 0, g == null ? void 0 : g.timestamp, new un((g == null ? void 0 : g.priority) ?? Ht.DEFAULT, (g == null ? void 0 : g.congestionControl) ?? Fe.DEFAULT_RESPONSE, (g == null ? void 0 : g.express) ?? false, ze.DEFAULT, fe.DEFAULT)));
         }
         async replyErr(o, l) {
-          await this.session.replyErr(new zc(this.inner.queryId, new ee(o), (l == null ? void 0 : l.encoding) ? nt.from(l.encoding) : nt.default()));
+          await this.session.replyErr(new Gc(this.inner.queryId, new ee(o), (l == null ? void 0 : l.encoding) ? nt.from(l.encoding) : nt.default()));
         }
         async replyDel(o, l) {
-          await this.session.replyDel(new Fc(this.inner.queryId, new Rt(o), (l == null ? void 0 : l.attachment) ? new ee(l.attachment) : void 0, l == null ? void 0 : l.timestamp, new un((l == null ? void 0 : l.priority) ?? Ht.DEFAULT, (l == null ? void 0 : l.congestionControl) ?? Fe.DEFAULT_RESPONSE, (l == null ? void 0 : l.express) ?? false, ze.DEFAULT, fe.DEFAULT)));
+          await this.session.replyDel(new Uc(this.inner.queryId, new Rt(o), (l == null ? void 0 : l.attachment) ? new ee(l.attachment) : void 0, l == null ? void 0 : l.timestamp, new un((l == null ? void 0 : l.priority) ?? Ht.DEFAULT, (l == null ? void 0 : l.congestionControl) ?? Fe.DEFAULT_RESPONSE, (l == null ? void 0 : l.express) ?? false, ze.DEFAULT, fe.DEFAULT)));
         }
         async finalize() {
           this.session.sendResponseFinal(this.inner.queryId);
@@ -15764,7 +15779,7 @@ var require_stdin = __commonJS({
           return this.source;
         }
       }
-      class Kh {
+      class Jh {
         constructor(o, l) {
           __publicField(this, "payload_");
           __publicField(this, "encoding_");
@@ -15777,7 +15792,7 @@ var require_stdin = __commonJS({
           return this.encoding_;
         }
       }
-      class bu {
+      class Cu {
         constructor(o) {
           __publicField(this, "result_");
           this.result_ = o;
@@ -15815,19 +15830,19 @@ var require_stdin = __commonJS({
           }
         }
       }
-      var Jr = {}, Po = {}, wu;
-      function Yh() {
-        return wu || (wu = 1, (function(c) {
-          Object.defineProperty(c, "__esModule", {
+      var Jr = {}, To = {}, xu;
+      function Qh() {
+        return xu || (xu = 1, (function(h) {
+          Object.defineProperty(h, "__esModule", {
             value: true
-          }), c.daysFrom = c.hoursFrom = c.minutesFrom = c.secondsFrom = c.millisecondsFrom = c.numberFrom = c.daysOf = c.hoursOf = c.minutesOf = c.millisecondsOf = c.secondsOf = c.valueOf = c.valueFrom = c.isTypedDuration = void 0;
+          }), h.daysFrom = h.hoursFrom = h.minutesFrom = h.secondsFrom = h.millisecondsFrom = h.numberFrom = h.daysOf = h.hoursOf = h.minutesOf = h.millisecondsOf = h.secondsOf = h.valueOf = h.valueFrom = h.isTypedDuration = void 0;
           const o = (G) => typeof G == "object" && (G == null ? void 0 : G.valueType) === "TYPED_DURATION";
-          c.isTypedDuration = o;
-          const l = (G) => (0, c.isTypedDuration)(G) ? G.value : G;
-          c.valueFrom = l;
-          const g = (G, Ut = "") => `${(0, c.valueFrom)(G)}${(0, c.isTypedDuration)(G) ? G.unit : Ut}`;
-          c.valueOf = g;
-          const x = (G) => (0, c.isTypedDuration)(G) && G.type === "SECONDS", S = (G) => (0, c.isTypedDuration)(G) && G.type === "MILLISECONDS", M = (G) => (0, c.isTypedDuration)(G) && G.type === "MINUTES", J = (G) => (0, c.isTypedDuration)(G) && G.type === "HOURS", et = (G) => (0, c.isTypedDuration)(G) && G.type === "DAYS", _t = (G) => typeof G == "number", wt = (G) => ({
+          h.isTypedDuration = o;
+          const l = (G) => (0, h.isTypedDuration)(G) ? G.value : G;
+          h.valueFrom = l;
+          const g = (G, Ut = "") => `${(0, h.valueFrom)(G)}${(0, h.isTypedDuration)(G) ? G.unit : Ut}`;
+          h.valueOf = g;
+          const x = (G) => (0, h.isTypedDuration)(G) && G.type === "SECONDS", S = (G) => (0, h.isTypedDuration)(G) && G.type === "MILLISECONDS", M = (G) => (0, h.isTypedDuration)(G) && G.type === "MINUTES", J = (G) => (0, h.isTypedDuration)(G) && G.type === "HOURS", et = (G) => (0, h.isTypedDuration)(G) && G.type === "DAYS", _t = (G) => typeof G == "number", wt = (G) => ({
             type: "SECONDS",
             value: G,
             valueType: "TYPED_DURATION",
@@ -15836,7 +15851,7 @@ var require_stdin = __commonJS({
           function ht(G) {
             return x(G) ? G : _t(G) ? wt(G) : S(G) ? ht(G.value / 1e3) : M(G) ? ht(G.value * 60) : J(G) ? ht(gt(G)) : et(G) ? ht(gt(Zt(G))) : G;
           }
-          c.secondsOf = ht;
+          h.secondsOf = ht;
           const Nt = (G) => ({
             type: "MILLISECONDS",
             value: G,
@@ -15846,7 +15861,7 @@ var require_stdin = __commonJS({
           function ie(G) {
             return S(G) ? G : _t(G) ? Nt(G) : x(G) ? ie(G.value * 1e3) : M(G) ? ie(ht(G)) : J(G) ? ie(ht(gt(G))) : et(G) ? ie(ht(gt(Zt(G)))) : G;
           }
-          c.millisecondsOf = ie;
+          h.millisecondsOf = ie;
           const ne = (G) => ({
             type: "MINUTES",
             value: G,
@@ -15856,7 +15871,7 @@ var require_stdin = __commonJS({
           function gt(G) {
             return M(G) ? G : _t(G) ? ne(G) : S(G) ? gt(ht(G)) : x(G) ? ne(G.value / 60) : J(G) ? ne(G.value * 60) : et(G) ? gt(Zt(G)) : G;
           }
-          c.minutesOf = gt;
+          h.minutesOf = gt;
           const le = (G) => ({
             type: "HOURS",
             value: G,
@@ -15866,7 +15881,7 @@ var require_stdin = __commonJS({
           function Zt(G) {
             return J(G) ? G : _t(G) ? le(G) : S(G) ? Zt(gt(ht(G))) : x(G) ? Zt(gt(G)) : M(G) ? Zt(G.value / 60) : et(G) ? Zt(G.value * 24) : G;
           }
-          c.hoursOf = Zt;
+          h.hoursOf = Zt;
           const yt = (G) => ({
             type: "DAYS",
             value: G,
@@ -15876,65 +15891,65 @@ var require_stdin = __commonJS({
           function W(G) {
             return et(G) ? G : _t(G) ? yt(G) : S(G) ? W(Zt(gt(ht(G)))) : x(G) ? W(Zt(gt(G))) : M(G) ? W(Zt(G)) : J(G) ? W(G.value / 24) : G;
           }
-          c.daysOf = W;
-          const ot = (G) => (0, c.isTypedDuration)(G) ? G.value : G;
-          c.numberFrom = ot;
-          const he = (G) => _t(G) ? G : S(G) ? (0, c.numberFrom)(G) : (0, c.millisecondsFrom)(ie(G));
-          c.millisecondsFrom = he;
-          const Pe = (G) => _t(G) ? G : x(G) ? (0, c.numberFrom)(G) : (0, c.secondsFrom)(ht(G));
-          c.secondsFrom = Pe;
-          const Ne = (G) => _t(G) ? G : M(G) ? (0, c.numberFrom)(G) : (0, c.minutesFrom)(gt(G));
-          c.minutesFrom = Ne;
-          const Ci = (G) => _t(G) ? G : J(G) ? (0, c.numberFrom)(G) : (0, c.hoursFrom)(Zt(G));
-          c.hoursFrom = Ci;
-          const li = (G) => _t(G) ? G : et(G) ? (0, c.numberFrom)(G) : (0, c.daysFrom)(W(G));
-          c.daysFrom = li;
-        })(Po)), Po;
+          h.daysOf = W;
+          const ot = (G) => (0, h.isTypedDuration)(G) ? G.value : G;
+          h.numberFrom = ot;
+          const he = (G) => _t(G) ? G : S(G) ? (0, h.numberFrom)(G) : (0, h.millisecondsFrom)(ie(G));
+          h.millisecondsFrom = he;
+          const Pe = (G) => _t(G) ? G : x(G) ? (0, h.numberFrom)(G) : (0, h.secondsFrom)(ht(G));
+          h.secondsFrom = Pe;
+          const Ne = (G) => _t(G) ? G : M(G) ? (0, h.numberFrom)(G) : (0, h.minutesFrom)(gt(G));
+          h.minutesFrom = Ne;
+          const Ci = (G) => _t(G) ? G : J(G) ? (0, h.numberFrom)(G) : (0, h.hoursFrom)(Zt(G));
+          h.hoursFrom = Ci;
+          const li = (G) => _t(G) ? G : et(G) ? (0, h.numberFrom)(G) : (0, h.daysFrom)(W(G));
+          h.daysFrom = li;
+        })(To)), To;
       }
-      var Cu;
-      function Xh() {
-        if (Cu) return Jr;
-        Cu = 1, Object.defineProperty(Jr, "__esModule", {
+      var Eu;
+      function $h() {
+        if (Eu) return Jr;
+        Eu = 1, Object.defineProperty(Jr, "__esModule", {
           value: true
         }), Jr.Duration = void 0;
-        const c = Yh();
+        const h = Qh();
         return Jr.Duration = {
           milliseconds: {
-            of: c.millisecondsOf,
-            from: c.millisecondsFrom
+            of: h.millisecondsOf,
+            from: h.millisecondsFrom
           },
           seconds: {
-            of: c.secondsOf,
-            from: c.secondsFrom
+            of: h.secondsOf,
+            from: h.secondsFrom
           },
           minutes: {
-            of: c.minutesOf,
-            from: c.minutesFrom
+            of: h.minutesOf,
+            from: h.minutesFrom
           },
           hours: {
-            of: c.hoursOf,
-            from: c.hoursFrom
+            of: h.hoursOf,
+            from: h.hoursFrom
           },
           days: {
-            of: c.daysOf,
-            from: c.daysFrom
+            of: h.daysOf,
+            from: h.daysFrom
           },
           value: {
-            from: c.valueFrom,
-            of: c.valueOf
+            from: h.valueFrom,
+            of: h.valueOf
           },
-          isTypedDuration: c.isTypedDuration
+          isTypedDuration: h.isTypedDuration
         }, Jr;
       }
-      var Aa = Xh();
-      class Jh {
+      var Ba = $h();
+      class tc {
         constructor(o) {
           __publicField(this, "session");
           this.session = o;
         }
         async declareToken(o) {
           let l = await this.session.declareLivelinessToken(new Rt(o));
-          return new Qh(this.session, l);
+          return new ec(this.session, l);
         }
         async declareSubscriber(o, l) {
           let g = (l == null ? void 0 : l.handler) ?? new hn(256), [x, S, M] = ln(g), J = new Rt(o), et = await this.session.declareLivelinessSubscriber({
@@ -15944,14 +15959,14 @@ var require_stdin = __commonJS({
             callback: x,
             drop: S
           });
-          return new Gu(this.session, ts.LivelinessSubscriber, et, J, M);
+          return new ju(this.session, ts.LivelinessSubscriber, et, J, M);
         }
         async get(o, l) {
           let g = (l == null ? void 0 : l.handler) ?? new hn(256), [x, S, M] = ln(g), J = l == null ? void 0 : l.cancellationToken;
           if ((J == null ? void 0 : J.isCancelled()) ?? false) return S(), M;
           let et = await this.session.livelinessGet({
             keyexpr: new Rt(o),
-            timeoutMs: (l == null ? void 0 : l.timeout) ? Aa.Duration.milliseconds.from(l.timeout) : Io
+            timeoutMs: (l == null ? void 0 : l.timeout) ? Ba.Duration.milliseconds.from(l.timeout) : Oo
           }, {
             callback: x,
             drop: S
@@ -15959,7 +15974,7 @@ var require_stdin = __commonJS({
           return J == null ? void 0 : J.addCancelAction(() => this.session.cancelQuery(et)), M;
         }
       }
-      class Qh {
+      class ec {
         constructor(o, l) {
           __publicField(this, "session");
           __publicField(this, "id");
@@ -15972,7 +15987,7 @@ var require_stdin = __commonJS({
           await this.undeclare();
         }
       }
-      class To {
+      class So {
         constructor(o) {
           __publicField(this, "matching_");
           this.matching_ = o;
@@ -15981,7 +15996,7 @@ var require_stdin = __commonJS({
           return this.matching_;
         }
       }
-      class Ru {
+      class zu {
         constructor(o, l, g) {
           __publicField(this, "session");
           __publicField(this, "id");
@@ -15998,7 +16013,7 @@ var require_stdin = __commonJS({
           await this.session.undeclareMatchingListener(this.id);
         }
       }
-      class $h {
+      class ic {
         constructor(o, l, g, x, S, M) {
           __publicField(this, "session");
           __publicField(this, "querierId");
@@ -16048,14 +16063,14 @@ var require_stdin = __commonJS({
             callback: g,
             drop: x
           });
-          return new Ru(this.session, M, S);
+          return new zu(this.session, M, S);
         }
         async matchingStatus() {
           return await this.session.querierGetMatchingStatus(this.querierId);
         }
       }
-      const Io = 1e4;
-      class zo {
+      const Oo = 1e4;
+      class No {
         constructor(o) {
           __publicField(this, "inner");
           this.inner = o;
@@ -16064,8 +16079,8 @@ var require_stdin = __commonJS({
           await this.close();
         }
         static async open(o) {
-          let l = await Xo.open(o.locator, o.messageResponseTimeoutMs);
-          return new zo(l);
+          let l = await Jo.open(o.locator, o.messageResponseTimeoutMs);
+          return new No(l);
         }
         async close() {
           this.inner.close();
@@ -16074,7 +16089,7 @@ var require_stdin = __commonJS({
           return this.inner.isClosed();
         }
         async put(o, l, g) {
-          await this.inner.put(new Bc(new Rt(o), new ee(l), (g == null ? void 0 : g.encoding) ? nt.from(g.encoding) : nt.default(), (g == null ? void 0 : g.attachment) ? new ee(g.attachment) : void 0, g == null ? void 0 : g.timestamp, new un((g == null ? void 0 : g.priority) ?? Ht.DEFAULT, (g == null ? void 0 : g.congestionControl) ?? Fe.DEFAULT_PUSH, (g == null ? void 0 : g.express) ?? false, (g == null ? void 0 : g.reliability) ?? ze.DEFAULT, (g == null ? void 0 : g.allowedDestination) ?? fe.DEFAULT)));
+          await this.inner.put(new Sc(new Rt(o), new ee(l), (g == null ? void 0 : g.encoding) ? nt.from(g.encoding) : nt.default(), (g == null ? void 0 : g.attachment) ? new ee(g.attachment) : void 0, g == null ? void 0 : g.timestamp, new un((g == null ? void 0 : g.priority) ?? Ht.DEFAULT, (g == null ? void 0 : g.congestionControl) ?? Fe.DEFAULT_PUSH, (g == null ? void 0 : g.express) ?? false, (g == null ? void 0 : g.reliability) ?? ze.DEFAULT, (g == null ? void 0 : g.allowedDestination) ?? fe.DEFAULT)));
         }
         declareKeyexpr(o) {
           return new Rt(o);
@@ -16083,7 +16098,7 @@ var require_stdin = __commonJS({
           return await this.inner.getSessionInfo();
         }
         async delete(o, l) {
-          await this.inner.delete(new Pc(new Rt(o), (l == null ? void 0 : l.attachment) ? new ee(l.attachment) : void 0, l == null ? void 0 : l.timestamp, new un((l == null ? void 0 : l.priority) ?? Ht.DEFAULT, (l == null ? void 0 : l.congestionControl) ?? Fe.DEFAULT_PUSH, (l == null ? void 0 : l.express) ?? false, (l == null ? void 0 : l.reliability) ?? ze.DEFAULT, (l == null ? void 0 : l.allowedDestination) ?? fe.DEFAULT)));
+          await this.inner.delete(new Dc(new Rt(o), (l == null ? void 0 : l.attachment) ? new ee(l.attachment) : void 0, l == null ? void 0 : l.timestamp, new un((l == null ? void 0 : l.priority) ?? Ht.DEFAULT, (l == null ? void 0 : l.congestionControl) ?? Fe.DEFAULT_PUSH, (l == null ? void 0 : l.express) ?? false, (l == null ? void 0 : l.reliability) ?? ze.DEFAULT, (l == null ? void 0 : l.allowedDestination) ?? fe.DEFAULT)));
         }
         async get(o, l) {
           let g = (l == null ? void 0 : l.handler) ?? new hn(256), [x, S, M] = ln(g), J = on.from(o), et = l == null ? void 0 : l.cancellationToken;
@@ -16095,8 +16110,8 @@ var require_stdin = __commonJS({
             encoding: (l == null ? void 0 : l.encoding) ? nt.from(l.encoding) : void 0,
             attachment: (l == null ? void 0 : l.attachment) ? new ee(l.attachment) : void 0,
             qos: new un((l == null ? void 0 : l.priority) ?? Ht.DEFAULT, (l == null ? void 0 : l.congestionControl) ?? Fe.DEFAULT_REQUEST, (l == null ? void 0 : l.express) ?? false, ze.DEFAULT, (l == null ? void 0 : l.allowedDestination) ?? fe.DEFAULT),
-            querySettings: new xu((l == null ? void 0 : l.target) ?? Ca.DEFAULT, (l == null ? void 0 : l.consolidation) ?? xa.DEFAULT, (l == null ? void 0 : l.acceptReplies) ?? Ri.DEFAULT),
-            timeoutMs: (l == null ? void 0 : l.timeout) ? Aa.Duration.milliseconds.from(l.timeout) : Io
+            querySettings: new Mu((l == null ? void 0 : l.target) ?? xa.DEFAULT, (l == null ? void 0 : l.consolidation) ?? Ea.DEFAULT, (l == null ? void 0 : l.acceptReplies) ?? Ri.DEFAULT),
+            timeoutMs: (l == null ? void 0 : l.timeout) ? Ba.Duration.milliseconds.from(l.timeout) : Oo
           }, {
             callback: x,
             drop: S
@@ -16113,10 +16128,10 @@ var require_stdin = __commonJS({
             callback: S,
             drop: M
           });
-          return new Gu(this.inner, ts.Subscriber, et, x, J);
+          return new ju(this.inner, ts.Subscriber, et, x, J);
         }
         liveliness() {
-          return new Jh(this.inner);
+          return new tc(this.inner);
         }
         async newTimestamp() {
           return await this.inner.getTimestamp();
@@ -16130,7 +16145,7 @@ var require_stdin = __commonJS({
             callback: S,
             drop: M
           });
-          return new Vh(this.inner, et, g, J);
+          return new Kh(this.inner, et, g, J);
         }
         async declarePublisher(o, l) {
           let g = {
@@ -16139,23 +16154,23 @@ var require_stdin = __commonJS({
             qos: new un((l == null ? void 0 : l.priority) ?? Ht.DEFAULT, (l == null ? void 0 : l.congestionControl) ?? Fe.DEFAULT_PUSH, (l == null ? void 0 : l.express) ?? false, (l == null ? void 0 : l.reliability) ?? ze.DEFAULT, (l == null ? void 0 : l.allowedDestination) ?? fe.DEFAULT)
           };
           const x = await this.inner.declarePublisher(g);
-          return new Xc(this.inner, x, g);
+          return new $c(this.inner, x, g);
         }
         async declareQuerier(o, l) {
           const g = {
             keyexpr: new Rt(o),
             qos: new un((l == null ? void 0 : l.priority) ?? Ht.DEFAULT, (l == null ? void 0 : l.congestionControl) ?? Fe.DEFAULT_REQUEST, (l == null ? void 0 : l.express) ?? false, ze.DEFAULT, (l == null ? void 0 : l.allowedDestination) ?? fe.DEFAULT),
-            querySettings: new xu((l == null ? void 0 : l.target) ?? Ca.DEFAULT, (l == null ? void 0 : l.consolidation) ?? xa.DEFAULT, (l == null ? void 0 : l.acceptReplies) ?? Ri.DEFAULT),
-            timeoutMs: (l == null ? void 0 : l.timeout) ? Aa.Duration.milliseconds.from(l.timeout) : Io
+            querySettings: new Mu((l == null ? void 0 : l.target) ?? xa.DEFAULT, (l == null ? void 0 : l.consolidation) ?? Ea.DEFAULT, (l == null ? void 0 : l.acceptReplies) ?? Ri.DEFAULT),
+            timeoutMs: (l == null ? void 0 : l.timeout) ? Ba.Duration.milliseconds.from(l.timeout) : Oo
           };
           let x = await this.inner.declareQuerier(g);
-          return new $h(this.inner, x, g.keyexpr, g.qos.congestionControl, g.qos.priority, g.querySettings.replyKeyExpr);
+          return new ic(this.inner, x, g.keyexpr, g.qos.congestionControl, g.qos.priority, g.querySettings.replyKeyExpr);
         }
       }
-      async function tc(c) {
-        return await zo.open(c);
+      async function nc(h) {
+        return await No.open(h);
       }
-      class ec {
+      class rc {
         constructor(o, l, g) {
           __publicField(this, "zid_");
           __publicField(this, "peers_");
@@ -16172,18 +16187,18 @@ var require_stdin = __commonJS({
           return this.peers_;
         }
       }
-      function ic(c) {
-        switch (c) {
+      function sc(h) {
+        switch (h) {
           case Tn.PUT:
             return Tn.PUT;
           case Tn.DELETE:
             return Tn.DELETE;
           default:
-            return console.warn(`Unsupported SampleKind value ${c}`), Tn.PUT;
+            return console.warn(`Unsupported SampleKind value ${h}`), Tn.PUT;
         }
       }
-      function nc(c) {
-        switch (c) {
+      function ac(h) {
+        switch (h) {
           case Ht.REAL_TIME:
             return Ht.REAL_TIME;
           case Ht.INTERACTIVE_HIGH:
@@ -16199,31 +16214,31 @@ var require_stdin = __commonJS({
           case Ht.BACKGROUND:
             return Ht.BACKGROUND;
           default:
-            return console.warn(`Unsupported Priority value ${c}`), Ht.DEFAULT;
+            return console.warn(`Unsupported Priority value ${h}`), Ht.DEFAULT;
         }
       }
-      function rc(c) {
-        switch (c) {
+      function oc(h) {
+        switch (h) {
           case Fe.DROP:
             return Fe.DROP;
           case Fe.BLOCK:
             return Fe.BLOCK;
           default:
-            return console.warn(`Unsupported CongestionControl value ${c}`), Fe.DEFAULT_PUSH;
+            return console.warn(`Unsupported CongestionControl value ${h}`), Fe.DEFAULT_PUSH;
         }
       }
-      function sc(c) {
-        switch (c) {
+      function uc(h) {
+        switch (h) {
           case ze.BEST_EFFORT:
             return ze.BEST_EFFORT;
           case ze.RELIABLE:
             return ze.RELIABLE;
           default:
-            return console.warn(`Unsupported Reliability value ${c}`), ze.DEFAULT;
+            return console.warn(`Unsupported Reliability value ${h}`), ze.DEFAULT;
         }
       }
-      function ac(c) {
-        switch (c) {
+      function lc(h) {
+        switch (h) {
           case fe.SESSION_LOCAL:
             return fe.SESSION_LOCAL;
           case fe.REMOTE:
@@ -16231,7 +16246,7 @@ var require_stdin = __commonJS({
           case fe.ANY:
             return fe.ANY;
           default:
-            return console.warn(`Unsupported Locality value ${c}`), fe.DEFAULT;
+            return console.warn(`Unsupported Locality value ${h}`), fe.DEFAULT;
         }
       }
       class un {
@@ -16244,39 +16259,39 @@ var require_stdin = __commonJS({
           this.priority = o, this.congestionControl = l, this.express = g, this.reliability = x, this.locality = S;
         }
       }
-      function Dn(c) {
-        let o = c.express ? 1 : 0;
-        return c.priority | c.congestionControl << 3 | o << 4 | c.reliability << 5 | c.locality << 6;
+      function Dn(h) {
+        let o = h.express ? 1 : 0;
+        return h.priority | h.congestionControl << 3 | o << 4 | h.reliability << 5 | h.locality << 6;
       }
-      function oc(c) {
-        let o = c & 7, l = c >> 3 & 1, g = c >> 4 & 1, x = c >> 5 & 1, S = c >> 6 & 3;
-        return new un(nc(o), rc(l), g != 0, sc(x), ac(S));
+      function hc(h) {
+        let o = h & 7, l = h >> 3 & 1, g = h >> 4 & 1, x = h >> 5 & 1, S = h >> 6 & 3;
+        return new un(ac(o), oc(l), g != 0, uc(x), lc(S));
       }
-      function uc(c) {
-        switch (c) {
+      function cc(h) {
+        switch (h) {
           case Ri.ANY:
             return Ri.ANY;
           case Ri.MATCHING_QUERY:
             return Ri.MATCHING_QUERY;
           default:
-            return console.warn(`Unsupported ReplyKeyExpr value ${c}`), Ri.DEFAULT;
+            return console.warn(`Unsupported ReplyKeyExpr value ${h}`), Ri.DEFAULT;
         }
       }
-      function is(c, o) {
-        let [l, g] = c.toIdSchema();
+      function is(h, o) {
+        let [l, g] = h.toIdSchema();
         o.serializeNumberUint16(l), o.serializeString(g ?? "");
       }
-      function No(c, o) {
-        c == null ? o.serializeBoolean(false) : (o.serializeBoolean(true), is(c, o));
+      function Uo(h, o) {
+        h == null ? o.serializeBoolean(false) : (o.serializeBoolean(true), is(h, o));
       }
-      function Uo(c) {
-        let o = c.deserializeNumberUint16(), l = c.deserializeString();
+      function Go(h) {
+        let o = h.deserializeNumberUint16(), l = h.deserializeString();
         return l.length == 0 && (l = void 0), new nt(o, l);
       }
-      function lc(c) {
-        if (c.deserializeBoolean()) return Uo(c);
+      function dc(h) {
+        if (h.deserializeBoolean()) return Go(h);
       }
-      class xu {
+      class Mu {
         constructor(o, l, g) {
           __publicField(this, "target");
           __publicField(this, "consolidation");
@@ -16284,54 +16299,54 @@ var require_stdin = __commonJS({
           this.target = o, this.consolidation = l, this.replyKeyExpr = g;
         }
       }
-      function Fu(c) {
-        return c.target | c.consolidation << 2 | c.replyKeyExpr << 4;
+      function Nu(h) {
+        return h.target | h.consolidation << 2 | h.replyKeyExpr << 4;
       }
-      function Oo(c) {
-        return new Ea(c.deserializeUint8Array());
+      function Ro(h) {
+        return new Ma(h.deserializeUint8Array());
       }
-      function hc(c, o) {
-        o.serializeUint8Array(c.toLeBytes());
+      function pc(h, o) {
+        o.serializeUint8Array(h.toLeBytes());
       }
-      function cc(c, o) {
-        o.serializeBigintUint64(c.getNtp64()), hc(c.getId(), o);
+      function fc(h, o) {
+        o.serializeBigintUint64(h.getNtp64()), pc(h.getId(), o);
       }
-      function sr(c, o) {
-        c == null ? o.serializeBoolean(false) : (o.serializeBoolean(true), cc(c, o));
+      function sr(h, o) {
+        h == null ? o.serializeBoolean(false) : (o.serializeBoolean(true), fc(h, o));
       }
-      function zu(c) {
-        let o = c.deserializeBigintUint64(), l = Oo(c);
-        return new mh(l, o);
+      function Uu(h) {
+        let o = h.deserializeBigintUint64(), l = Ro(h);
+        return new vh(l, o);
       }
-      function dc(c) {
-        if (c.deserializeBoolean()) return zu(c);
+      function _c(h) {
+        if (h.deserializeBoolean()) return Uu(h);
       }
-      function wi(c, o) {
-        c == null ? o.serialize(false) : (o.serialize(true), o.serializeUint8Array(c.toBytes()));
+      function wi(h, o) {
+        h == null ? o.serialize(false) : (o.serialize(true), o.serializeUint8Array(h.toBytes()));
       }
-      function Ro(c) {
-        if (c.deserializeBoolean()) return new ee(c.deserializeUint8Array());
+      function Fo(h) {
+        if (h.deserializeBoolean()) return new ee(h.deserializeUint8Array());
       }
-      function Nu(c) {
-        let o = new Rt(c.deserializeString()), l = new ee(c.deserializeUint8Array()), g = ic(c.deserializeNumberUint8()), x = Uo(c), S = Ro(c), M = dc(c), J = oc(c.deserializeNumberUint8());
-        return new _h(o, l, g, x, S, M, J.priority, J.congestionControl, J.express);
+      function Gu(h) {
+        let o = new Rt(h.deserializeString()), l = new ee(h.deserializeUint8Array()), g = sc(h.deserializeNumberUint8()), x = Go(h), S = Fo(h), M = _c(h), J = hc(h.deserializeNumberUint8());
+        return new yh(o, l, g, x, S, M, J.priority, J.congestionControl, J.express);
       }
-      function pc(c) {
-        if (c.deserializeBoolean()) return new bu(Nu(c));
+      function mc(h) {
+        if (h.deserializeBoolean()) return new Cu(Gu(h));
         {
-          let o = new ee(c.deserializeUint8Array()), l = Uo(c);
-          return new bu(new Kh(o, l));
+          let o = new ee(h.deserializeUint8Array()), l = Go(h);
+          return new Cu(new Jh(o, l));
         }
       }
-      function fc(c) {
-        let o = c.deserializeNumberUint32(), l = new Rt(c.deserializeString()), g = new Ni(c.deserializeString()), x = Ro(c), S = lc(c), M = Ro(c), J = uc(c.deserializeNumberUint8());
-        return new Hh(o, l, g, x, S, M, J);
+      function gc(h) {
+        let o = h.deserializeNumberUint32(), l = new Rt(h.deserializeString()), g = new Ni(h.deserializeString()), x = Fo(h), S = dc(h), M = Fo(h), J = cc(h.deserializeNumberUint8());
+        return new Yh(o, l, g, x, S, M, J);
       }
       var It;
-      (function(c) {
-        c[c.DeclarePublisher = 0] = "DeclarePublisher", c[c.UndeclarePublisher = 1] = "UndeclarePublisher", c[c.DeclareSubscriber = 2] = "DeclareSubscriber", c[c.UndeclareSubscriber = 3] = "UndeclareSubscriber", c[c.DeclareQueryable = 4] = "DeclareQueryable", c[c.UndeclareQueryable = 5] = "UndeclareQueryable", c[c.DeclareQuerier = 6] = "DeclareQuerier", c[c.UndeclareQuerier = 7] = "UndeclareQuerier", c[c.DeclareLivelinessToken = 8] = "DeclareLivelinessToken", c[c.UndeclareLivelinessToken = 9] = "UndeclareLivelinessToken", c[c.DeclareLivelinessSubscriber = 10] = "DeclareLivelinessSubscriber", c[c.UndeclareLivelinessSubscriber = 11] = "UndeclareLivelinessSubscriber", c[c.GetSessionInfo = 12] = "GetSessionInfo", c[c.GetTimestamp = 13] = "GetTimestamp", c[c.Put = 14] = "Put", c[c.Delete = 15] = "Delete", c[c.PublisherPut = 16] = "PublisherPut", c[c.PublisherDelete = 17] = "PublisherDelete", c[c.Get = 18] = "Get", c[c.QuerierGet = 19] = "QuerierGet", c[c.LivelinessGet = 20] = "LivelinessGet", c[c.ReplyOk = 21] = "ReplyOk", c[c.ReplyDel = 22] = "ReplyDel", c[c.ReplyErr = 23] = "ReplyErr", c[c.QueryResponseFinal = 24] = "QueryResponseFinal", c[c.Ping = 25] = "Ping", c[c.PublisherDeclareMatchingListener = 26] = "PublisherDeclareMatchingListener", c[c.UndeclareMatchingListener = 27] = "UndeclareMatchingListener", c[c.PublisherGetMatchingStatus = 28] = "PublisherGetMatchingStatus", c[c.QuerierDeclareMatchingListener = 29] = "QuerierDeclareMatchingListener", c[c.QuerierGetMatchingStatus = 30] = "QuerierGetMatchingStatus";
+      (function(h) {
+        h[h.DeclarePublisher = 0] = "DeclarePublisher", h[h.UndeclarePublisher = 1] = "UndeclarePublisher", h[h.DeclareSubscriber = 2] = "DeclareSubscriber", h[h.UndeclareSubscriber = 3] = "UndeclareSubscriber", h[h.DeclareQueryable = 4] = "DeclareQueryable", h[h.UndeclareQueryable = 5] = "UndeclareQueryable", h[h.DeclareQuerier = 6] = "DeclareQuerier", h[h.UndeclareQuerier = 7] = "UndeclareQuerier", h[h.DeclareLivelinessToken = 8] = "DeclareLivelinessToken", h[h.UndeclareLivelinessToken = 9] = "UndeclareLivelinessToken", h[h.DeclareLivelinessSubscriber = 10] = "DeclareLivelinessSubscriber", h[h.UndeclareLivelinessSubscriber = 11] = "UndeclareLivelinessSubscriber", h[h.GetSessionInfo = 12] = "GetSessionInfo", h[h.GetTimestamp = 13] = "GetTimestamp", h[h.Put = 14] = "Put", h[h.Delete = 15] = "Delete", h[h.PublisherPut = 16] = "PublisherPut", h[h.PublisherDelete = 17] = "PublisherDelete", h[h.Get = 18] = "Get", h[h.QuerierGet = 19] = "QuerierGet", h[h.LivelinessGet = 20] = "LivelinessGet", h[h.ReplyOk = 21] = "ReplyOk", h[h.ReplyDel = 22] = "ReplyDel", h[h.ReplyErr = 23] = "ReplyErr", h[h.QueryResponseFinal = 24] = "QueryResponseFinal", h[h.Ping = 25] = "Ping", h[h.PublisherDeclareMatchingListener = 26] = "PublisherDeclareMatchingListener", h[h.UndeclareMatchingListener = 27] = "UndeclareMatchingListener", h[h.PublisherGetMatchingStatus = 28] = "PublisherGetMatchingStatus", h[h.QuerierDeclareMatchingListener = 29] = "QuerierDeclareMatchingListener", h[h.QuerierGetMatchingStatus = 30] = "QuerierGetMatchingStatus";
       })(It || (It = {}));
-      class _c {
+      class yc {
         constructor(o, l) {
           __publicField(this, "id");
           __publicField(this, "properties");
@@ -16342,7 +16357,7 @@ var require_stdin = __commonJS({
           o.serializeNumberUint32(this.id), o.serializeString(this.properties.keyexpr.toString()), is(this.properties.encoding, o), o.serializeNumberUint8(Dn(this.properties.qos));
         }
       }
-      class mc {
+      class vc {
         constructor(o) {
           __publicField(this, "id");
           __publicField(this, "outMessageId", It.UndeclarePublisher);
@@ -16352,7 +16367,7 @@ var require_stdin = __commonJS({
           o.serializeNumberUint32(this.id);
         }
       }
-      class gc {
+      class Lc {
         constructor(o, l) {
           __publicField(this, "id");
           __publicField(this, "properties");
@@ -16363,7 +16378,7 @@ var require_stdin = __commonJS({
           o.serializeNumberUint32(this.id), o.serializeString(this.properties.keyexpr.toString()), o.serializeNumberUint8(this.properties.allowedOrigin);
         }
       }
-      class yc {
+      class bc {
         constructor(o) {
           __publicField(this, "id");
           __publicField(this, "outMessageId", It.UndeclareSubscriber);
@@ -16373,7 +16388,7 @@ var require_stdin = __commonJS({
           o.serializeNumberUint32(this.id);
         }
       }
-      class vc {
+      class wc {
         constructor(o, l) {
           __publicField(this, "id");
           __publicField(this, "properties");
@@ -16384,7 +16399,7 @@ var require_stdin = __commonJS({
           o.serializeNumberUint32(this.id), o.serializeString(this.properties.keyexpr.toString()), o.serializeBoolean(this.properties.complete), o.serializeNumberUint8(this.properties.allowedOrigin);
         }
       }
-      class Lc {
+      class Cc {
         constructor(o) {
           __publicField(this, "id");
           __publicField(this, "outMessageId", It.UndeclareQueryable);
@@ -16394,7 +16409,7 @@ var require_stdin = __commonJS({
           o.serializeNumberUint32(this.id);
         }
       }
-      class bc {
+      class xc {
         constructor(o, l) {
           __publicField(this, "id");
           __publicField(this, "properties");
@@ -16402,10 +16417,10 @@ var require_stdin = __commonJS({
           this.id = o, this.properties = l;
         }
         serializeWithZSerializer(o) {
-          o.serializeNumberUint32(this.id), o.serializeString(this.properties.keyexpr.toString()), o.serializeNumberUint8(Dn(this.properties.qos)), o.serializeNumberUint8(Fu(this.properties.querySettings)), o.serializeNumberUint32(this.properties.timeoutMs);
+          o.serializeNumberUint32(this.id), o.serializeString(this.properties.keyexpr.toString()), o.serializeNumberUint8(Dn(this.properties.qos)), o.serializeNumberUint8(Nu(this.properties.querySettings)), o.serializeNumberUint32(this.properties.timeoutMs);
         }
       }
-      class wc {
+      class Ec {
         constructor(o) {
           __publicField(this, "id");
           __publicField(this, "outMessageId", It.UndeclareQuerier);
@@ -16415,7 +16430,7 @@ var require_stdin = __commonJS({
           o.serializeNumberUint32(this.id);
         }
       }
-      class Cc {
+      class Mc {
         constructor(o, l) {
           __publicField(this, "id");
           __publicField(this, "keyexpr");
@@ -16426,7 +16441,7 @@ var require_stdin = __commonJS({
           o.serializeNumberUint32(this.id), o.serializeString(this.keyexpr.toString());
         }
       }
-      class xc {
+      class kc {
         constructor(o) {
           __publicField(this, "id");
           __publicField(this, "outMessageId", It.UndeclareLivelinessToken);
@@ -16436,7 +16451,7 @@ var require_stdin = __commonJS({
           o.serializeNumberUint32(this.id);
         }
       }
-      class Ec {
+      class Ac {
         constructor(o, l) {
           __publicField(this, "id");
           __publicField(this, "properties");
@@ -16447,7 +16462,7 @@ var require_stdin = __commonJS({
           o.serializeNumberUint32(this.id), o.serializeString(this.properties.keyexpr.toString()), o.serializeBoolean(this.properties.history);
         }
       }
-      class Mc {
+      class Bc {
         constructor(o) {
           __publicField(this, "id");
           __publicField(this, "outMessageId", It.UndeclareLivelinessSubscriber);
@@ -16457,21 +16472,21 @@ var require_stdin = __commonJS({
           o.serializeNumberUint32(this.id);
         }
       }
-      class kc {
+      class Pc {
         constructor() {
           __publicField(this, "outMessageId", It.GetSessionInfo);
         }
         serializeWithZSerializer(o) {
         }
       }
-      class Ac {
+      class Tc {
         constructor() {
           __publicField(this, "outMessageId", It.GetTimestamp);
         }
         serializeWithZSerializer(o) {
         }
       }
-      class Bc {
+      class Sc {
         constructor(o, l, g, x, S, M) {
           __publicField(this, "keyexpr");
           __publicField(this, "payload");
@@ -16486,7 +16501,7 @@ var require_stdin = __commonJS({
           o.serializeString(this.keyexpr.toString()), o.serializeUint8Array(this.payload.toBytes()), is(this.encoding, o), wi(this.attachment, o), sr(this.timestamp, o), o.serializeNumberUint8(Dn(this.qos));
         }
       }
-      class Pc {
+      class Dc {
         constructor(o, l, g, x) {
           __publicField(this, "keyexpr");
           __publicField(this, "attachment");
@@ -16499,7 +16514,7 @@ var require_stdin = __commonJS({
           o.serializeString(this.keyexpr.toString()), wi(this.attachment, o), sr(this.timestamp, o), o.serializeNumberUint8(Dn(this.qos));
         }
       }
-      class Tc {
+      class Ic {
         constructor(o, l, g, x, S) {
           __publicField(this, "publisherId");
           __publicField(this, "payload");
@@ -16510,10 +16525,10 @@ var require_stdin = __commonJS({
           this.publisherId = o, this.payload = l, this.encoding = g, this.attachment = x, this.timestamp = S;
         }
         serializeWithZSerializer(o) {
-          o.serializeNumberUint32(this.publisherId), o.serializeUint8Array(this.payload.toBytes()), No(this.encoding, o), wi(this.attachment, o), sr(this.timestamp, o);
+          o.serializeNumberUint32(this.publisherId), o.serializeUint8Array(this.payload.toBytes()), Uo(this.encoding, o), wi(this.attachment, o), sr(this.timestamp, o);
         }
       }
-      class Sc {
+      class Oc {
         constructor(o, l, g) {
           __publicField(this, "publisherId");
           __publicField(this, "attachment");
@@ -16525,7 +16540,7 @@ var require_stdin = __commonJS({
           o.serializeNumberUint32(this.publisherId), wi(this.attachment, o), sr(this.timestamp, o);
         }
       }
-      class Dc {
+      class Rc {
         constructor(o, l) {
           __publicField(this, "id");
           __publicField(this, "properties");
@@ -16533,10 +16548,10 @@ var require_stdin = __commonJS({
           this.id = o, this.properties = l;
         }
         serializeWithZSerializer(o) {
-          o.serializeNumberUint32(this.id), o.serializeString(this.properties.keyexpr.toString()), o.serializeString(this.properties.parameters), wi(this.properties.payload, o), No(this.properties.encoding, o), wi(this.properties.attachment, o), o.serializeNumberUint8(Dn(this.properties.qos)), o.serializeNumberUint8(Fu(this.properties.querySettings)), o.serializeNumberUint32(this.properties.timeoutMs);
+          o.serializeNumberUint32(this.id), o.serializeString(this.properties.keyexpr.toString()), o.serializeString(this.properties.parameters), wi(this.properties.payload, o), Uo(this.properties.encoding, o), wi(this.properties.attachment, o), o.serializeNumberUint8(Dn(this.properties.qos)), o.serializeNumberUint8(Nu(this.properties.querySettings)), o.serializeNumberUint32(this.properties.timeoutMs);
         }
       }
-      class Ic {
+      class Fc {
         constructor(o, l) {
           __publicField(this, "id");
           __publicField(this, "properties");
@@ -16544,10 +16559,10 @@ var require_stdin = __commonJS({
           this.id = o, this.properties = l;
         }
         serializeWithZSerializer(o) {
-          o.serializeNumberUint32(this.id), o.serializeNumberUint32(this.properties.querierId), o.serializeString(this.properties.parameters), wi(this.properties.payload, o), No(this.properties.encoding, o), wi(this.properties.attachment, o);
+          o.serializeNumberUint32(this.id), o.serializeNumberUint32(this.properties.querierId), o.serializeString(this.properties.parameters), wi(this.properties.payload, o), Uo(this.properties.encoding, o), wi(this.properties.attachment, o);
         }
       }
-      class Oc {
+      class zc {
         constructor(o, l) {
           __publicField(this, "id");
           __publicField(this, "properties");
@@ -16558,7 +16573,7 @@ var require_stdin = __commonJS({
           o.serializeNumberUint32(this.id), o.serializeString(this.properties.keyexpr.toString()), o.serializeNumberUint32(this.properties.timeoutMs);
         }
       }
-      class Rc {
+      class Nc {
         constructor(o, l, g, x, S, M, J) {
           __publicField(this, "queryId");
           __publicField(this, "keyexpr");
@@ -16574,7 +16589,7 @@ var require_stdin = __commonJS({
           o.serializeNumberUint32(this.queryId), o.serializeString(this.keyexpr.toString()), o.serializeUint8Array(this.payload.toBytes()), is(this.encoding, o), wi(this.attachment, o), sr(this.timestamp, o), o.serializeNumberUint8(Dn(this.qos));
         }
       }
-      class Fc {
+      class Uc {
         constructor(o, l, g, x, S) {
           __publicField(this, "queryId");
           __publicField(this, "keyexpr");
@@ -16588,7 +16603,7 @@ var require_stdin = __commonJS({
           o.serializeNumberUint32(this.queryId), o.serializeString(this.keyexpr.toString()), wi(this.attachment, o), sr(this.timestamp, o), o.serializeNumberUint8(Dn(this.qos));
         }
       }
-      class zc {
+      class Gc {
         constructor(o, l, g) {
           __publicField(this, "queryId");
           __publicField(this, "payload");
@@ -16600,7 +16615,7 @@ var require_stdin = __commonJS({
           o.serializeNumberUint32(this.queryId), o.serializeUint8Array(this.payload.toBytes()), is(this.encoding, o);
         }
       }
-      class Ba {
+      class Pa {
         constructor(o) {
           __publicField(this, "queryId");
           __publicField(this, "outMessageId", It.QueryResponseFinal);
@@ -16612,17 +16627,17 @@ var require_stdin = __commonJS({
         }
         static deserialize(o) {
           let l = o.deserializeNumberUint32();
-          return new Ba(l);
+          return new Pa(l);
         }
       }
-      class Nc {
+      class Zc {
         constructor() {
           __publicField(this, "outMessageId", It.Ping);
         }
         serializeWithZSerializer(o) {
         }
       }
-      class Uc {
+      class jc {
         constructor(o, l) {
           __publicField(this, "id");
           __publicField(this, "publisherId");
@@ -16633,7 +16648,7 @@ var require_stdin = __commonJS({
           o.serializeNumberUint32(this.id), o.serializeNumberUint32(this.publisherId);
         }
       }
-      class Gc {
+      class qc {
         constructor(o) {
           __publicField(this, "id");
           __publicField(this, "outMessageId", It.UndeclareMatchingListener);
@@ -16643,7 +16658,7 @@ var require_stdin = __commonJS({
           o.serializeNumberUint32(this.id);
         }
       }
-      class Zc {
+      class Vc {
         constructor(o) {
           __publicField(this, "publisherId");
           __publicField(this, "outMessageId", It.PublisherGetMatchingStatus);
@@ -16653,7 +16668,7 @@ var require_stdin = __commonJS({
           o.serializeNumberUint32(this.publisherId);
         }
       }
-      class jc {
+      class Hc {
         constructor(o, l) {
           __publicField(this, "id");
           __publicField(this, "querierId");
@@ -16664,7 +16679,7 @@ var require_stdin = __commonJS({
           o.serializeNumberUint32(this.id), o.serializeNumberUint32(this.querierId);
         }
       }
-      class qc {
+      class Wc {
         constructor(o) {
           __publicField(this, "querierId");
           __publicField(this, "outMessageId", It.QuerierGetMatchingStatus);
@@ -16675,10 +16690,10 @@ var require_stdin = __commonJS({
         }
       }
       var Et;
-      (function(c) {
-        c[c.ResponsePing = 0] = "ResponsePing", c[c.ResponseOk = 1] = "ResponseOk", c[c.ResponseError = 2] = "ResponseError", c[c.ResponseTimestamp = 3] = "ResponseTimestamp", c[c.ResponseSessionInfo = 4] = "ResponseSessionInfo", c[c.InSample = 5] = "InSample", c[c.InQuery = 6] = "InQuery", c[c.InReply = 7] = "InReply", c[c.QueryResponseFinal = 8] = "QueryResponseFinal", c[c.ResponseMatchingStatus = 9] = "ResponseMatchingStatus", c[c.MatchingStatusUpdate = 10] = "MatchingStatusUpdate";
+      (function(h) {
+        h[h.ResponsePing = 0] = "ResponsePing", h[h.ResponseOk = 1] = "ResponseOk", h[h.ResponseError = 2] = "ResponseError", h[h.ResponseTimestamp = 3] = "ResponseTimestamp", h[h.ResponseSessionInfo = 4] = "ResponseSessionInfo", h[h.InSample = 5] = "InSample", h[h.InQuery = 6] = "InQuery", h[h.InReply = 7] = "InReply", h[h.QueryResponseFinal = 8] = "QueryResponseFinal", h[h.ResponseMatchingStatus = 9] = "ResponseMatchingStatus", h[h.MatchingStatusUpdate = 10] = "MatchingStatusUpdate";
       })(Et || (Et = {}));
-      class Go {
+      class Zo {
         constructor(o) {
           __publicField(this, "uuid");
           __publicField(this, "inMessageId", Et.ResponsePing);
@@ -16686,7 +16701,7 @@ var require_stdin = __commonJS({
         }
         static deserialize(o) {
           let l = o.deserializeString();
-          return new Go(l);
+          return new Zo(l);
         }
       }
       class Le {
@@ -16700,7 +16715,7 @@ var require_stdin = __commonJS({
           return new Le(l);
         }
       }
-      class Zo {
+      class jo {
         constructor(o) {
           __publicField(this, "error");
           __publicField(this, "inMessageId", Et.ResponseError);
@@ -16708,31 +16723,31 @@ var require_stdin = __commonJS({
         }
         static deserialize(o) {
           let l = o.deserializeString();
-          return new Zo(l);
+          return new jo(l);
         }
       }
-      class jo {
+      class qo {
         constructor(o) {
           __publicField(this, "timestamp");
           __publicField(this, "inMessageId", Et.ResponseTimestamp);
           this.timestamp = o;
         }
         static deserialize(o) {
-          return new jo(zu(o));
+          return new qo(Uu(o));
         }
       }
-      class qo {
+      class Vo {
         constructor(o) {
           __publicField(this, "info");
           __publicField(this, "inMessageId", Et.ResponseSessionInfo);
           this.info = o;
         }
         static deserialize(o) {
-          let l = Oo(o), g = ka.array(ka.objectStatic(Oo)), x = o.deserialize(g), S = o.deserialize(g);
-          return new qo(new ec(l, S, x));
+          let l = Ro(o), g = Aa.array(Aa.objectStatic(Ro)), x = o.deserialize(g), S = o.deserialize(g);
+          return new Vo(new rc(l, S, x));
         }
       }
-      class Vo {
+      class Ho {
         constructor(o, l) {
           __publicField(this, "subscriberId");
           __publicField(this, "sample");
@@ -16740,11 +16755,11 @@ var require_stdin = __commonJS({
           this.subscriberId = o, this.sample = l;
         }
         static deserialize(o) {
-          let l = o.deserializeNumberUint32(), g = Nu(o);
-          return new Vo(l, g);
+          let l = o.deserializeNumberUint32(), g = Gu(o);
+          return new Ho(l, g);
         }
       }
-      class Ho {
+      class Wo {
         constructor(o, l) {
           __publicField(this, "queryableId");
           __publicField(this, "query");
@@ -16752,11 +16767,11 @@ var require_stdin = __commonJS({
           this.queryableId = o, this.query = l;
         }
         static deserialize(o) {
-          let l = o.deserializeNumberUint32(), g = fc(o);
-          return new Ho(l, g);
+          let l = o.deserializeNumberUint32(), g = gc(o);
+          return new Wo(l, g);
         }
       }
-      class Wo {
+      class Ko {
         constructor(o, l) {
           __publicField(this, "queryId");
           __publicField(this, "reply");
@@ -16764,11 +16779,11 @@ var require_stdin = __commonJS({
           this.queryId = o, this.reply = l;
         }
         static deserialize(o) {
-          let l = o.deserializeNumberUint32(), g = pc(o);
-          return new Wo(l, g);
+          let l = o.deserializeNumberUint32(), g = mc(o);
+          return new Ko(l, g);
         }
       }
-      class Pa {
+      class Ta {
         constructor(o) {
           __publicField(this, "matching");
           __publicField(this, "inMessageId", Et.ResponseMatchingStatus);
@@ -16776,10 +16791,10 @@ var require_stdin = __commonJS({
         }
         static deserialize(o) {
           let l = o.deserializeBoolean();
-          return new Pa(l);
+          return new Ta(l);
         }
       }
-      class Ko {
+      class Yo {
         constructor(o, l) {
           __publicField(this, "matchingListenerId");
           __publicField(this, "matching");
@@ -16788,37 +16803,37 @@ var require_stdin = __commonJS({
         }
         static deserialize(o) {
           let l = o.deserializeNumberUint32(), g = o.deserializeBoolean();
-          return new Ko(l, g);
+          return new Yo(l, g);
         }
       }
-      const Uu = 128, Vc = 127;
-      function Hc(c) {
-        let o = c.deserializeNumberUint8();
-        if ((o & Uu) == 0) return [
+      const Zu = 128, Kc = 127;
+      function Yc(h) {
+        let o = h.deserializeNumberUint8();
+        if ((o & Zu) == 0) return [
           o,
           void 0
         ];
         {
-          o = o & Vc;
-          const l = c.deserializeNumberUint32();
+          o = o & Kc;
+          const l = h.deserializeNumberUint32();
           return [
             o,
             l
           ];
         }
       }
-      function Wc(c, o) {
-        c[1] == null ? o.serializeNumberUint8(c[0]) : (o.serializeNumberUint8(c[0] | Uu), o.serializeNumberUint32(c[1]));
+      function Xc(h, o) {
+        h[1] == null ? o.serializeNumberUint8(h[0]) : (o.serializeNumberUint8(h[0] | Zu), o.serializeNumberUint32(h[1]));
       }
-      const Kc = 2 * 1024 * 1024, Yc = 2e3, Eu = 10;
-      class Yo {
+      const Jc = 2 * 1024 * 1024, Qc = 2e3, ku = 10;
+      class Xo {
         constructor(o) {
           __publicField(this, "ws");
           this.ws = o, this.ws = o;
         }
         static async new(o) {
-          let l = this.parseZenohLocator(o), g = 0, x = Yc;
-          for (; g < Eu; ) {
+          let l = this.parseZenohLocator(o), g = 0, x = Qc;
+          for (; g < ku; ) {
             let S = new WebSocket(l);
             S.binaryType = "arraybuffer", S.onerror = function(J) {
               console.warn("WebSocket error: ", J);
@@ -16826,14 +16841,14 @@ var require_stdin = __commonJS({
               console.warn(`WebSocket has been disconnected from remote-api-plugin: ${J.code}`);
             };
             let M = 0;
-            for (; S.readyState != 1; ) if (await Mu(100), M += 100, M > x) {
+            for (; S.readyState != 1; ) if (await Au(100), M += 100, M > x) {
               S.close(), x *= 2;
               break;
             }
-            if (S.readyState == 1) return console.warn("Connected to", l), new Yo(S);
+            if (S.readyState == 1) return console.warn("Connected to", l), new Xo(S);
             S = new WebSocket(l), console.warn("Restart connection");
           }
-          throw new Error(`Failed to connect to locator endpoint: ${o} after ${Eu}`);
+          throw new Error(`Failed to connect to locator endpoint: ${o} after ${ku}`);
         }
         onmessage(o) {
           this.ws.onmessage = function(l) {
@@ -16842,7 +16857,7 @@ var require_stdin = __commonJS({
         }
         async send(o) {
           if (!this.isOk) throw new Error("WebSocket is closed");
-          for (; this.ws.bufferedAmount > Kc; ) if (await Mu(10), !this.isOk) throw new Error("WebSocket is closed");
+          for (; this.ws.bufferedAmount > Jc; ) if (await Au(10), !this.isOk) throw new Error("WebSocket is closed");
           this.ws.send(o);
         }
         isOk() {
@@ -16864,12 +16879,12 @@ var require_stdin = __commonJS({
           return g != "ws" && g != "wss" ? o : `${g}://${x}`;
         }
       }
-      function Mu(c) {
-        return new Promise((o) => setTimeout(o, c));
+      function Au(h) {
+        return new Promise((o) => setTimeout(o, h));
       }
       var ts;
-      (function(c) {
-        c[c.Subscriber = 0] = "Subscriber", c[c.LivelinessSubscriber = 1] = "LivelinessSubscriber";
+      (function(h) {
+        h[h.Subscriber = 0] = "Subscriber", h[h.LivelinessSubscriber = 1] = "LivelinessSubscriber";
       })(ts || (ts = {}));
       const _be = class _be {
         static get() {
@@ -16880,7 +16895,7 @@ var require_stdin = __commonJS({
       __publicField(_be, "MAX", 1 << 31);
       __publicField(_be, "current", 0);
       let be = _be;
-      class Xo {
+      class Jo {
         constructor(o, l) {
           __publicField(this, "isClosed_", false);
           __publicField(this, "link");
@@ -16901,7 +16916,7 @@ var require_stdin = __commonJS({
           });
         }
         onMessageReceived(o) {
-          let l = new Fo(o), [g, x] = Hc(l);
+          let l = new zo(o), [g, x] = Yc(l);
           if (x != null) {
             let S = this.pendingMessageResponses.get(x);
             S == null ? console.warn(`Received unexpected response ${g}:${x}`) : (S([
@@ -16910,33 +16925,33 @@ var require_stdin = __commonJS({
             ]), this.pendingMessageResponses.delete(x));
           } else switch (g) {
             case Et.InQuery: {
-              const S = Ho.deserialize(l);
+              const S = Wo.deserialize(l);
               let M = this.queryables.get(S.queryableId);
-              M == null ? console.warn(`Received query for inexistant queryable ${S.queryableId}`) : M.callback(new Wh(this, S.query));
+              M == null ? console.warn(`Received query for inexistant queryable ${S.queryableId}`) : M.callback(new Xh(this, S.query));
               break;
             }
             case Et.InReply: {
-              const S = Wo.deserialize(l);
+              const S = Ko.deserialize(l);
               let M = this.gets.get(S.queryId);
               M == null ? console.warn(`Received reply for inexistant query ${S.queryId}`) : M.callback(S.reply);
               break;
             }
             case Et.InSample: {
-              const S = Vo.deserialize(l);
+              const S = Ho.deserialize(l);
               let M = this.subscribers.get(S.subscriberId);
               M == null ? console.warn(`Received sample for inexistant subscriber ${S.subscriberId}`) : M.callback(S.sample);
               break;
             }
             case Et.QueryResponseFinal: {
-              const S = Ba.deserialize(l);
+              const S = Pa.deserialize(l);
               let M = this.gets.get(S.queryId);
               M == null ? console.warn(`Received responseFinal for inexistant get ${S.queryId}`) : (this.gets.delete(S.queryId), M.drop());
               break;
             }
             case Et.MatchingStatusUpdate: {
-              const S = Ko.deserialize(l);
+              const S = Yo.deserialize(l);
               let M = this.matchingListeners.get(S.matchingListenerId);
-              M == null ? console.warn(`Received matching status update for inexistant matching listener ${S.matchingListenerId}`) : M.callback(new To(S.matching));
+              M == null ? console.warn(`Received matching status update for inexistant matching listener ${S.matchingListenerId}`) : M.callback(new So(S.matching));
               break;
             }
             default:
@@ -16950,7 +16965,7 @@ var require_stdin = __commonJS({
         async sendRequest(o, l, g) {
           let x = new Sn();
           const S = this.nextMessageId;
-          this.nextMessageId = (this.nextMessageId + 1) % (1 << 31), Wc([
+          this.nextMessageId = (this.nextMessageId + 1) % (1 << 31), Xc([
             o.outMessageId,
             S
           ], x), o.serializeWithZSerializer(x);
@@ -16965,7 +16980,7 @@ var require_stdin = __commonJS({
               case l:
                 return g(J[1]);
               case Et.ResponseError: {
-                const et = Zo.deserialize(J[1]);
+                const et = jo.deserialize(J[1]);
                 throw new Error(et.error);
               }
               default:
@@ -16976,24 +16991,24 @@ var require_stdin = __commonJS({
           });
         }
         async ping() {
-          return await this.sendRequest(new Nc(), Et.ResponsePing, Go.deserialize);
+          return await this.sendRequest(new Zc(), Et.ResponsePing, Zo.deserialize);
         }
         static async open(o, l) {
-          let g = await Yo.new(o), x = new Xo(g, l);
+          let g = await Xo.new(o), x = new Jo(g, l);
           return x.id = (await x.ping()).uuid, console.log(`Successfully opened session with id: ${x.id}`), x;
         }
         async declarePublisher(o) {
           let l = be.get();
-          return await this.sendRequest(new _c(l, o), Et.ResponseOk, Le.deserialize), l;
+          return await this.sendRequest(new yc(l, o), Et.ResponseOk, Le.deserialize), l;
         }
         async undeclarePublisher(o) {
-          await this.sendRequest(new mc(o), Et.ResponseOk, Le.deserialize);
+          await this.sendRequest(new vc(o), Et.ResponseOk, Le.deserialize);
         }
         async declareSubscriber(o, l) {
           let g = be.get();
           this.subscribers.set(g, l);
           try {
-            await this.sendRequest(new gc(g, o), Et.ResponseOk, Le.deserialize);
+            await this.sendRequest(new Lc(g, o), Et.ResponseOk, Le.deserialize);
           } catch (x) {
             throw this.subscribers.delete(g), x;
           }
@@ -17001,35 +17016,35 @@ var require_stdin = __commonJS({
         }
         async undeclareSubscriber(o) {
           const l = this.subscribers.get(o);
-          l == null || (this.subscribers.delete(o), l.drop()), await this.sendRequest(new yc(o), Et.ResponseOk, Le.deserialize);
+          l == null || (this.subscribers.delete(o), l.drop()), await this.sendRequest(new bc(o), Et.ResponseOk, Le.deserialize);
         }
         async declareQueryable(o, l) {
           let g = be.get();
-          return await this.sendRequest(new vc(g, o), Et.ResponseOk, Le.deserialize), this.queryables.set(g, l), g;
+          return await this.sendRequest(new wc(g, o), Et.ResponseOk, Le.deserialize), this.queryables.set(g, l), g;
         }
         async undeclareQueryable(o) {
           const l = this.queryables.get(o);
-          l == null || (this.queryables.delete(o), l.drop()), await this.sendRequest(new Lc(o), Et.ResponseOk, Le.deserialize);
+          l == null || (this.queryables.delete(o), l.drop()), await this.sendRequest(new Cc(o), Et.ResponseOk, Le.deserialize);
         }
         async declareQuerier(o) {
           let l = be.get();
-          return await this.sendRequest(new bc(l, o), Et.ResponseOk, Le.deserialize), l;
+          return await this.sendRequest(new xc(l, o), Et.ResponseOk, Le.deserialize), l;
         }
         async undeclareQuerier(o) {
-          await this.sendRequest(new wc(o), Et.ResponseOk, Le.deserialize);
+          await this.sendRequest(new Ec(o), Et.ResponseOk, Le.deserialize);
         }
         async declareLivelinessToken(o) {
           let l = be.get();
-          return await this.sendRequest(new Cc(l, o), Et.ResponseOk, Le.deserialize), l;
+          return await this.sendRequest(new Mc(l, o), Et.ResponseOk, Le.deserialize), l;
         }
         async undeclareLivelinessToken(o) {
-          await this.sendRequest(new xc(o), Et.ResponseOk, Le.deserialize);
+          await this.sendRequest(new kc(o), Et.ResponseOk, Le.deserialize);
         }
         async declareLivelinessSubscriber(o, l) {
           let g = be.get();
           this.subscribers.set(g, l);
           try {
-            await this.sendRequest(new Ec(g, o), Et.ResponseOk, Le.deserialize);
+            await this.sendRequest(new Ac(g, o), Et.ResponseOk, Le.deserialize);
           } catch (x) {
             throw this.subscribers.delete(g), x;
           }
@@ -17037,13 +17052,13 @@ var require_stdin = __commonJS({
         }
         async undeclareLivelinessSubscriber(o) {
           const l = this.subscribers.get(o);
-          l == null || (this.subscribers.delete(o), l.drop()), await this.sendRequest(new Mc(o), Et.ResponseOk, Le.deserialize);
+          l == null || (this.subscribers.delete(o), l.drop()), await this.sendRequest(new Bc(o), Et.ResponseOk, Le.deserialize);
         }
         async getSessionInfo() {
-          return await this.sendRequest(new kc(), Et.ResponseSessionInfo, qo.deserialize).then((o) => o.info);
+          return await this.sendRequest(new Pc(), Et.ResponseSessionInfo, Vo.deserialize).then((o) => o.info);
         }
         async getTimestamp() {
-          return await this.sendRequest(new Ac(), Et.ResponseTimestamp, jo.deserialize).then((o) => o.timestamp);
+          return await this.sendRequest(new Tc(), Et.ResponseTimestamp, qo.deserialize).then((o) => o.timestamp);
         }
         async put(o) {
           return await this.sendMessage(o);
@@ -17061,7 +17076,7 @@ var require_stdin = __commonJS({
           let g = be.get();
           this.gets.set(g, l);
           try {
-            return await this.sendMessage(new Dc(g, o)), g;
+            return await this.sendMessage(new Rc(g, o)), g;
           } catch (x) {
             throw this.gets.delete(g), x;
           }
@@ -17070,7 +17085,7 @@ var require_stdin = __commonJS({
           let g = be.get();
           this.gets.set(g, l);
           try {
-            return await this.sendMessage(new Ic(g, o)), g;
+            return await this.sendMessage(new Fc(g, o)), g;
           } catch (x) {
             throw this.gets.delete(g), x;
           }
@@ -17079,7 +17094,7 @@ var require_stdin = __commonJS({
           let g = be.get();
           this.gets.set(g, l);
           try {
-            return await this.sendMessage(new Oc(g, o)), g;
+            return await this.sendMessage(new zc(g, o)), g;
           } catch (x) {
             throw this.gets.delete(g), x;
           }
@@ -17094,26 +17109,9 @@ var require_stdin = __commonJS({
           await this.sendMessage(o);
         }
         async sendResponseFinal(o) {
-          await this.sendMessage(new Ba(o));
+          await this.sendMessage(new Pa(o));
         }
         async publisherDeclareMatchingListener(o, l) {
-          let g = be.get();
-          this.matchingListeners.set(g, l);
-          try {
-            await this.sendRequest(new Uc(g, o), Et.ResponseOk, Le.deserialize);
-          } catch (x) {
-            throw this.matchingListeners.delete(g), x;
-          }
-          return g;
-        }
-        async undeclareMatchingListener(o) {
-          const l = this.matchingListeners.get(o);
-          l == null || (this.matchingListeners.delete(o), l.drop()), await this.sendRequest(new Gc(o), Et.ResponseOk, Le.deserialize);
-        }
-        async publisherGetMatchingStatus(o) {
-          return await this.sendRequest(new Zc(o), Et.ResponseMatchingStatus, Pa.deserialize).then((l) => new To(l.matching));
-        }
-        async querierDeclareMatchingListener(o, l) {
           let g = be.get();
           this.matchingListeners.set(g, l);
           try {
@@ -17123,8 +17121,25 @@ var require_stdin = __commonJS({
           }
           return g;
         }
+        async undeclareMatchingListener(o) {
+          const l = this.matchingListeners.get(o);
+          l == null || (this.matchingListeners.delete(o), l.drop()), await this.sendRequest(new qc(o), Et.ResponseOk, Le.deserialize);
+        }
+        async publisherGetMatchingStatus(o) {
+          return await this.sendRequest(new Vc(o), Et.ResponseMatchingStatus, Ta.deserialize).then((l) => new So(l.matching));
+        }
+        async querierDeclareMatchingListener(o, l) {
+          let g = be.get();
+          this.matchingListeners.set(g, l);
+          try {
+            await this.sendRequest(new Hc(g, o), Et.ResponseOk, Le.deserialize);
+          } catch (x) {
+            throw this.matchingListeners.delete(g), x;
+          }
+          return g;
+        }
         async querierGetMatchingStatus(o) {
-          return await this.sendRequest(new qc(o), Et.ResponseMatchingStatus, Pa.deserialize).then((l) => new To(l.matching));
+          return await this.sendRequest(new Wc(o), Et.ResponseMatchingStatus, Ta.deserialize).then((l) => new So(l.matching));
         }
         async close() {
           await this.link.close();
@@ -17145,7 +17160,7 @@ var require_stdin = __commonJS({
           l != null && (this.gets.delete(o), l.drop());
         }
       }
-      class Gu {
+      class ju {
         constructor(o, l, g, x, S) {
           __publicField(this, "session");
           __publicField(this, "kind");
@@ -17167,7 +17182,7 @@ var require_stdin = __commonJS({
           this.kind === ts.Subscriber ? await this.session.undeclareSubscriber(this.id) : await this.session.undeclareLivelinessSubscriber(this.id);
         }
       }
-      class Xc {
+      class $c {
         constructor(o, l, g) {
           __publicField(this, "session");
           __publicField(this, "publisherId");
@@ -17181,7 +17196,7 @@ var require_stdin = __commonJS({
           return this.properties.keyexpr;
         }
         async put(o, l) {
-          await this.session.publisherPut(new Tc(this.publisherId, new ee(o), (l == null ? void 0 : l.encoding) ? nt.from(l.encoding) : void 0, (l == null ? void 0 : l.attachment) ? new ee(l.attachment) : void 0, l == null ? void 0 : l.timestamp));
+          await this.session.publisherPut(new Ic(this.publisherId, new ee(o), (l == null ? void 0 : l.encoding) ? nt.from(l.encoding) : void 0, (l == null ? void 0 : l.attachment) ? new ee(l.attachment) : void 0, l == null ? void 0 : l.timestamp));
         }
         encoding() {
           return this.properties.encoding;
@@ -17196,7 +17211,7 @@ var require_stdin = __commonJS({
           return this.properties.qos.congestionControl;
         }
         async delete(o) {
-          await this.session.publisherDelete(new Sc(this.publisherId, (o == null ? void 0 : o.attachment) ? new ee(o.attachment) : void 0, o == null ? void 0 : o.timestamp));
+          await this.session.publisherDelete(new Oc(this.publisherId, (o == null ? void 0 : o.attachment) ? new ee(o.attachment) : void 0, o == null ? void 0 : o.timestamp));
         }
         async matchingListener(o) {
           const l = (o == null ? void 0 : o.handler) ?? new hn(256);
@@ -17205,7 +17220,7 @@ var require_stdin = __commonJS({
             callback: g,
             drop: x
           });
-          return new Ru(this.session, M, S);
+          return new zu(this.session, M, S);
         }
         async matchingStatus() {
           return await this.session.publisherGetMatchingStatus(this.publisherId);
@@ -17214,26 +17229,26 @@ var require_stdin = __commonJS({
           await this.session.undeclarePublisher(this.publisherId);
         }
       }
-      class Jc {
+      class td {
         constructor(o, l = 500) {
           __publicField(this, "locator");
           __publicField(this, "messageResponseTimeoutMs");
           this.locator = o, this.messageResponseTimeoutMs = l;
         }
       }
-      const So = Aa.Duration.milliseconds.of(5e3);
-      class Qc {
+      const ed = "v0", Do = Ba.Duration.milliseconds.of(5e3);
+      class id {
         constructor(o) {
           this.session = null, this.reconnectTimer = null, this.realm = o.realm, this.entityId = o.entityId, this.remoteApiUrl = o.remoteApiUrl, this.onFrame = o.onFrame;
         }
         prefix() {
-          return `${this.realm}/@v1/${this.entityId}`;
+          return `${this.realm}/@${ed}/${this.entityId}`;
         }
         async connect() {
           this.reconnectTimer && (clearTimeout(this.reconnectTimer), this.reconnectTimer = null);
           try {
-            const o = new Jc(this.remoteApiUrl);
-            this.session = await tc(o), console.log("[zenoh] session opened to", this.remoteApiUrl), await this.subscribeSimFrame();
+            const o = new td(this.remoteApiUrl);
+            this.session = await nc(o), console.log("[zenoh] session opened to", this.remoteApiUrl), await this.subscribeSimFrame();
           } catch (o) {
             console.error("[zenoh] connection failed, retrying in 2s:", o), this.scheduleReconnect();
           }
@@ -17285,7 +17300,7 @@ var require_stdin = __commonJS({
             payload: JSON.stringify({
               waypoints: o
             }),
-            timeout: So
+            timeout: Do
           });
           if (!l) return {
             ok: false,
@@ -17310,7 +17325,7 @@ var require_stdin = __commonJS({
         async getSettings() {
           if (!this.session) return null;
           const o = await this.session.get(`${this.prefix()}/service/settings`, {
-            timeout: So
+            timeout: Do
           });
           if (!o) return null;
           try {
@@ -17328,7 +17343,7 @@ var require_stdin = __commonJS({
           if (!this.session) return null;
           const l = await this.session.get(`${this.prefix()}/service/settings`, {
             payload: JSON.stringify(o),
-            timeout: So
+            timeout: Do
           });
           if (!l) return null;
           try {
@@ -17343,19 +17358,19 @@ var require_stdin = __commonJS({
           }
         }
       }
-      const Jo = new URLSearchParams(window.location.search), $c = Jo.get("realm") ?? "ghost-drone", td = Jo.get("entity_id") ?? "sim001", ed = [
+      const Qo = new URLSearchParams(window.location.search), nd = Qo.get("realm") ?? "rise", rd = Qo.get("entity_id") ?? "ghost-drone", sd = [
         "localhost",
         "127.0.0.1"
-      ].includes(window.location.hostname) ? "localhost" : window.location.hostname, id = Jo.get("remote_api") ?? `ws://${ed}:10001`, Ve = new Sl();
+      ].includes(window.location.hostname) ? "localhost" : window.location.hostname, ad = Qo.get("remote_api") ?? `ws://${sd}:10001`, Ve = new Il();
       let Fi;
-      const zi = new Dl({
+      const zi = new Ol({
         onPlay: async () => {
           if (!(Ve.waypoints.length < 2)) {
             if (zi.simState === "stopped") {
-              const c = Ve.waypoints.map((l) => [
+              const h = Ve.waypoints.map((l) => [
                 l.lat,
                 l.lng
-              ]), o = await Fi.loadRoute(c);
+              ]), o = await Fi.loadRoute(h);
               if (!o.ok) {
                 console.error("[loadRoute]", o.error);
                 return;
@@ -17366,7 +17381,7 @@ var require_stdin = __commonJS({
         },
         onPause: () => Fi.pause(),
         onStop: () => Fi.stop(),
-        onSpeedChange: (c) => Fi.setSpeed(c),
+        onSpeedChange: (h) => Fi.setSpeed(h),
         onClear: () => {
           zi.simState === "stopped" && (Ve.clearWaypoints(), zi.updateControlStates(0));
         },
@@ -17379,27 +17394,27 @@ var require_stdin = __commonJS({
       });
       Ve.getSimState = () => zi.simState;
       Ve.onWaypointsChanged = () => zi.updateControlStates(Ve.waypoints.length);
-      Fi = new Qc({
-        realm: $c,
-        entityId: td,
-        remoteApiUrl: id,
-        onFrame: (c) => {
-          zi.simState = c.state, Ve.updateDronePosition(c.lat, c.lng, c.heading, c.state), zi.updateControlStates(Ve.waypoints.length), Fl(c);
+      Fi = new id({
+        realm: nd,
+        entityId: rd,
+        remoteApiUrl: ad,
+        onFrame: (h) => {
+          zi.simState = h.state, Ve.updateDronePosition(h.lat, h.lng, h.heading, h.state), zi.updateControlStates(Ve.waypoints.length), Ul(h);
         }
       });
-      Nl();
-      Ul(async (c) => {
-        const o = await Fi.updateSettings(c);
-        o && Bu(o);
+      Zl();
+      jl(async (h) => {
+        const o = await Fi.updateSettings(h);
+        o && Tu(o);
       });
-      Ml(() => {
+      Al(() => {
         Ve.refreshRoute(), Ve.refreshDroneIcon();
       });
-      El();
+      kl();
       zi.updateControlStates(0);
       Fi.connect().then(async () => {
-        const c = await Fi.getSettings();
-        c && Bu(c);
+        const h = await Fi.getSettings();
+        h && Tu(h);
       });
     })();
   }

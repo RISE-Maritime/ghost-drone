@@ -260,6 +260,54 @@
 
     .sparkline-svg { display: block; width: 100%; }
 
+    /* Health panel */
+    .health-overall {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .health-level {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .health-level[data-level="nominal"]  { color: var(--alert-running-color); }
+    .health-level[data-level="degraded"] { color: var(--alert-caution-color); }
+    .health-level[data-level="critical"] { color: var(--alert-alarm-color); }
+    .health-level[data-level="inactive"] { color: var(--element-inactive-color); }
+    .health-level[data-level="unknown"]  { color: var(--element-inactive-color); }
+
+    .health-sub-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 3px 0;
+      border-top: 1px solid var(--border-divider-color);
+    }
+
+    .health-sub-name {
+      font-size: 11px;
+      color: var(--element-neutral-color);
+      text-transform: capitalize;
+    }
+
+    .health-sub-level {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .health-sub-level[data-level="nominal"]  { color: var(--alert-running-color); }
+    .health-sub-level[data-level="degraded"] { color: var(--alert-caution-color); }
+    .health-sub-level[data-level="critical"] { color: var(--alert-alarm-color); }
+    .health-sub-level[data-level="inactive"] { color: var(--element-inactive-color); }
+    .health-sub-level[data-level="unknown"]  { color: var(--element-inactive-color); }
+
     /* =====================================================================
        Bottom control bar
        ===================================================================== */
@@ -573,6 +621,18 @@
             <span class="gauge-unit">&deg;</span>
           </div>
           <svg id="spark-pitch" class="sparkline-svg" width="196" height="32" stroke-width="1.5"></svg>
+        </div>
+
+        <div class="sidebar-header" style="margin-top: 4px;">
+          <span class="sidebar-label">Health</span>
+        </div>
+
+        <div class="gauge-block" id="health-panel">
+          <div class="health-overall">
+            <span class="gauge-tag">STATUS</span>
+            <span class="health-level" id="health-level">&mdash;</span>
+          </div>
+          <div id="health-subsystems"></div>
         </div>
       </div>
     </div>

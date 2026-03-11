@@ -1,6 +1,6 @@
 import { sparkline } from "@fnando/sparkline";
 import { cssVar } from "./theme";
-import type { SimFrame } from "./types";
+import type { SimFrame, HealthSummary } from "./types";
 
 const HISTORY_SAMPLES = 30 * 20;
 
@@ -22,7 +22,33 @@ const svgEls = {
   pitch: document.getElementById("spark-pitch") as unknown as SVGSVGElement,
 };
 
+const healthLevelEl = document.getElementById("health-level")!;
+const healthSubsystemsEl = document.getElementById("health-subsystems")!;
+
+function updateHealthDisplay(health: HealthSummary | undefined): void {
+  if (!health) {
+    healthLevelEl.textContent = "\u2014";
+    healthLevelEl.removeAttribute("data-level");
+    healthSubsystemsEl.innerHTML = "";
+    return;
+  }
+
+  healthLevelEl.textContent = health.level.toUpperCase();
+  healthLevelEl.setAttribute("data-level", health.level);
+
+  const rows = health.subsystems.map((sub) => {
+    const detail = sub.detail ? ` (${sub.detail})` : "";
+    return `<div class="health-sub-row">
+      <span class="health-sub-name">${sub.name}</span>
+      <span class="health-sub-level" data-level="${sub.level}">${sub.level.toUpperCase()}${detail}</span>
+    </div>`;
+  });
+  healthSubsystemsEl.innerHTML = rows.join("");
+}
+
 export function onTelemetryFrame(frame: SimFrame): void {
+  updateHealthDisplay(frame.health);
+
   if (frame.state === "stopped") {
     for (const k of Object.keys(history)) history[k] = [];
     for (const k of Object.keys(gaugeEls) as (keyof typeof gaugeEls)[]) {
