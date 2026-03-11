@@ -65,6 +65,9 @@ def _publish_telemetry(
         ("roll_deg",                encode_timestamped_float, roll),
         ("pitch_deg",               encode_timestamped_float, pitch),
     ]:
+        # Skip subjects with active "drop" fault
+        if sim.faults.has_fault(subject, "drop"):
+            continue
         sc = settings.subjects[subject]
         if not throttle.should_publish(subject, sc.rate_hz):
             continue

@@ -10,11 +10,46 @@ protected by the GIL. Adequate for single-operator tool.
 """
 
 import dataclasses
-from typing import Dict
+import threading
+from typing import Dict, Set
 
 from ghost_drone.simulation.engine import SimEngine
 from ghost_drone.simulation.roll_pitch import RollPitchModel
 from ghost_drone.zenoh_bridge.telemetry import SubjectThrottle
+
+# Supported fault types
+FAULT_TYPES = {"drop", "stuck", "nan", "wrong_rate"}
+
+
+class FaultState:
+    """Tracks active faults per subject. Thread-safe."""
+
+    def __init__(self) -> None:
+        self._lock = threading.Lock()
+        self._faults: Dict[str, Set[str]] = {}
+
+    def inject(self, subject: str, fault_type: str) -> None:
+        with self._lock:
+            self._faults.setdefault(subject, set()).add(fault_type)
+
+    def clear(self, subject: str, fault_type: str) -> None:
+        with self._lock:
+            if subject in self._faults:
+                self._faults[subject].discard(fault_type)
+                if not self._faults[subject]:
+                    del self._faults[subject]
+
+    def has_fault(self, subject: str, fault_type: str) -> bool:
+        with self._lock:
+            return fault_type in self._faults.get(subject, set())
+
+    def active_faults(self, subject: str) -> Set[str]:
+        with self._lock:
+            return set(self._faults.get(subject, set()))
+
+    def all_faults(self) -> Dict[str, list]:
+        with self._lock:
+            return {s: sorted(f) for s, f in self._faults.items()}
 
 
 @dataclasses.dataclass
@@ -64,6 +99,7 @@ class SimGlobals:
         self.settings = PublishSettings()
         self.roll_pitch = RollPitchModel()
         self.throttle = SubjectThrottle()
+        self.faults = FaultState()
 
     def apply_settings(self, msg: dict) -> None:
         """Apply a settings update dict (from frontend or zenoh query)."""

@@ -13,7 +13,7 @@ import logging
 import zenoh
 
 from ghost_drone.config import AppConfig
-from ghost_drone.sim_state import SimGlobals
+from ghost_drone.sim_state import FAULT_TYPES, SimGlobals
 
 logger = logging.getLogger(__name__)
 
@@ -99,6 +99,53 @@ def register_control_handlers(
             logger.exception("settings: handler error")
 
     declared.append(session.declare_queryable(f"{prefix}/service/settings", on_settings))
+
+    # --- Queryable: fault injection ---
+
+    def on_fault(query: zenoh.Query) -> None:
+        try:
+            payload_bytes = bytes(query.payload) if query.payload is not None else b""
+            if not payload_bytes:
+                # No payload — return current fault state
+                query.reply(query.key_expr, json.dumps({"ok": True, "faults": sim.faults.all_faults()}))
+                return
+
+            msg = json.loads(payload_bytes)
+            action = msg.get("action")
+            subject = msg.get("subject", "")
+            fault_type = msg.get("fault_type", "")
+
+            if fault_type not in FAULT_TYPES:
+                query.reply(query.key_expr, json.dumps({
+                    "ok": False,
+                    "error": f"unknown fault type: {fault_type!r}, must be one of {sorted(FAULT_TYPES)}",
+                }))
+                return
+
+            if subject not in sim.settings.subjects:
+                query.reply(query.key_expr, json.dumps({
+                    "ok": False,
+                    "error": f"unknown subject: {subject!r}",
+                }))
+                return
+
+            if action == "inject":
+                sim.faults.inject(subject, fault_type)
+                logger.info("fault: injected %s on %s", fault_type, subject)
+                query.reply(query.key_expr, json.dumps({"ok": True, "faults": sim.faults.all_faults()}))
+            elif action == "clear":
+                sim.faults.clear(subject, fault_type)
+                logger.info("fault: cleared %s on %s", fault_type, subject)
+                query.reply(query.key_expr, json.dumps({"ok": True, "faults": sim.faults.all_faults()}))
+            else:
+                query.reply(query.key_expr, json.dumps({
+                    "ok": False,
+                    "error": f"unknown action: {action!r}, must be 'inject' or 'clear'",
+                }))
+        except Exception:
+            logger.exception("fault: handler error")
+
+    declared.append(session.declare_queryable(f"{prefix}/service/fault", on_fault))
 
     logger.info("Registered control handlers on prefix %s", prefix)
     return declared
