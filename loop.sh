@@ -78,23 +78,13 @@ while true; do
                 echo
             fi
 
-            # Extract tool uses
+            # Extract tool uses (only show Bash commands and TodoWrite, skip file read/search noise)
             tool_info=$(echo "$line" | jq -r '.message.content[]? | select(.type == "tool_use") |
                 if .name == "TodoWrite" then
                     "📝 Managing todo list:\n" +
                     (.input.todos[]? | "   [\(.status)] \(.content)" | gsub("in_progress"; "▶️ in_progress") | gsub("completed"; "✅ completed") | gsub("pending"; "⏸️  pending"))
-                elif .name == "Bash" then
-                    "🔧 \(.input.description // "Running bash command")\n   $ \(.input.command)"
-                elif .name == "Write" then
-                    "✍️  Writing file: \(.input.file_path)"
-                elif .name == "Edit" then
-                    "✏️  Editing file: \(.input.file_path)"
-                elif .name == "Read" then
-                    "📖 Reading file: \(.input.file_path)"
-                elif .name == "Grep" then
-                    "🔍 Searching for: \(.input.pattern)"
                 else
-                    "🔧 Using tool: \(.name)" + (if .input.description then " - \(.input.description)" else "" end)
+                    empty
                 end' 2>/dev/null)
 
             if [ -n "$tool_info" ]; then
