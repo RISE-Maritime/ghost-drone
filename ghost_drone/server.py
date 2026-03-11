@@ -276,6 +276,7 @@ def _tick_loop(
         frame_dict["roll"] = roll
         frame_dict["pitch"] = pitch
         frame_dict["health"] = _compute_health_summary(sim, frame.state == SimState.PLAYING)
+        frame_dict["faults"] = sim.faults.all_faults()
         _publish_sim_frame(publisher, cfg, frame_dict)
 
         time.sleep(dt)
