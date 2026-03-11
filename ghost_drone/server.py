@@ -50,6 +50,7 @@ def _publish_telemetry(
     roll: float,
     pitch: float,
     sim: SimGlobals,
+    stuck_values: dict,
 ) -> None:
     """Publish all 5 keelson subjects if their throttle interval has elapsed.
 
@@ -71,19 +72,39 @@ def _publish_telemetry(
         sc = settings.subjects[subject]
         if not throttle.should_publish(subject, sc.rate_hz):
             continue
-        key = make_key(cfg, subject, sc.source_id)
-        if subject == "location_fix":
-            lat_noise = random.gauss(0, settings.location_noise_sigma_m / 111_320)
-            lng_noise = random.gauss(
-                0,
-                settings.location_noise_sigma_m
-                / (111_320 * math.cos(math.radians(frame.lat))),
-            )
-            noisy_lat = frame.lat + lat_noise
-            noisy_lng = frame.lng + lng_noise
-            payload = encode_location_fix(noisy_lat, noisy_lng)
+
+        # Handle "stuck" fault: freeze the value at the first reading
+        if sim.faults.has_fault(subject, "stuck"):
+            if subject not in stuck_values:
+                # Capture the current value to freeze on
+                if subject == "location_fix":
+                    stuck_values[subject] = (frame.lat, frame.lng)
+                else:
+                    stuck_values[subject] = value
+            # Use the frozen value
+            if subject == "location_fix":
+                frozen_lat, frozen_lng = stuck_values[subject]
+                payload = encode_location_fix(frozen_lat, frozen_lng)
+            else:
+                payload = encode_fn(stuck_values[subject])
         else:
-            payload = encode_fn(value)
+            # Clear any stale stuck value so re-injection captures fresh
+            stuck_values.pop(subject, None)
+
+            if subject == "location_fix":
+                lat_noise = random.gauss(0, settings.location_noise_sigma_m / 111_320)
+                lng_noise = random.gauss(
+                    0,
+                    settings.location_noise_sigma_m
+                    / (111_320 * math.cos(math.radians(frame.lat))),
+                )
+                noisy_lat = frame.lat + lat_noise
+                noisy_lng = frame.lng + lng_noise
+                payload = encode_location_fix(noisy_lat, noisy_lng)
+            else:
+                payload = encode_fn(value)
+
+        key = make_key(cfg, subject, sc.source_id)
         publisher.publish(key, payload)
 
 
@@ -151,6 +172,7 @@ def _tick_loop(
     """Daemon thread body: advance simulation at TICK_HZ, publish frames."""
     dt = 1.0 / TICK_HZ
     prev_state = None
+    stuck_values: dict = {}
 
     while not stop_event.is_set():
         frame = sim.engine.tick(dt, cruise_speed_mps=sim.cruise_speed_mps)
@@ -164,7 +186,7 @@ def _tick_loop(
 
         # Publish keelson telemetry only when PLAYING
         if frame.state == SimState.PLAYING:
-            _publish_telemetry(publisher, cfg, frame, roll, pitch, sim)
+            _publish_telemetry(publisher, cfg, frame, roll, pitch, sim, stuck_values)
 
         # Health is always published (so subscribers know inactive vs nominal)
         _publish_health(publisher, cfg, sim, frame.state == SimState.PLAYING)
