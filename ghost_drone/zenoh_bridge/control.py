@@ -82,7 +82,13 @@ def register_control_handlers(
                 return
 
             msg = json.loads(payload_bytes)
-            wps = [tuple(p) for p in msg.get("waypoints", [])]
+            raw_wps = msg.get("waypoints")
+            if not isinstance(raw_wps, list):
+                query.reply(query.key_expr, json.dumps({
+                    "ok": False, "error": "waypoints must be a JSON array",
+                }))
+                return
+            wps = [tuple(p) for p in raw_wps]
             try:
                 sim.engine.load_route(wps)
                 query.reply(query.key_expr, json.dumps({"ok": True}))
