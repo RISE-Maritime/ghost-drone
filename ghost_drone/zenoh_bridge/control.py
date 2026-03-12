@@ -88,7 +88,13 @@ def register_control_handlers(
                     "ok": False, "error": "waypoints must be a JSON array",
                 }))
                 return
-            wps = [tuple(p) for p in raw_wps]
+            try:
+                wps = [(float(p[0]), float(p[1])) for p in raw_wps]
+            except (TypeError, ValueError, IndexError) as e:
+                query.reply(query.key_expr, json.dumps({
+                    "ok": False, "error": f"invalid waypoint coordinates: {e}",
+                }))
+                return
             try:
                 sim.engine.load_route(wps)
                 query.reply(query.key_expr, json.dumps({"ok": True}))
