@@ -151,6 +151,7 @@ class SimEngine:
 
     def _reset_to_start(self) -> None:
         """Place drone at first waypoint, zero progress, heading toward second waypoint."""
+        self._remote_heading = None
         if not self._waypoints:
             return
         lat0, lng0 = self._waypoints[0]
@@ -245,6 +246,7 @@ class SimEngine:
                 # Route complete — stop at final waypoint
                 self._lat, self._lng = self._waypoints[-1]
                 self._state = SimState.STOPPED
+                self._remote_heading = None
                 self._seg_idx = len(self._waypoints) - 2  # clamp
                 self._seg_progress_m = 0.0
                 break
