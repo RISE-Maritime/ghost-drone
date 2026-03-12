@@ -141,6 +141,16 @@ class SimEngine:
         """Clear the remote heading override, resuming autonomous navigation."""
         self._remote_heading = None
 
+    def set_home(self, lat: float, lng: float) -> None:
+        """Set the drone's home position while STOPPED and without a route.
+
+        This allows spawning a drone at a specific location before any route
+        is loaded. No-op if a route is already loaded or state is not STOPPED.
+        """
+        if self._state == SimState.STOPPED and not self._waypoints:
+            self._lat = lat
+            self._lng = lng
+
     @property
     def is_remote(self) -> bool:
         """True when a remote heading override is active."""
