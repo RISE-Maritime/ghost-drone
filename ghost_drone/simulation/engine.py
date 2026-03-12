@@ -112,9 +112,9 @@ class SimEngine:
     def play(self) -> None:
         """Transition STOPPED -> PLAYING or PAUSED -> PLAYING.
 
-        No-op if already PLAYING.
+        No-op if already PLAYING or if no route is loaded.
         """
-        if self._state in (SimState.STOPPED, SimState.PAUSED):
+        if self._state in (SimState.STOPPED, SimState.PAUSED) and self._waypoints:
             self._state = SimState.PLAYING
 
     def pause(self) -> None:
