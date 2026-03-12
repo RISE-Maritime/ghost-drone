@@ -156,12 +156,14 @@ class FleetManager:
                 drones = []
                 for entity_id, (handle, _exit_stack) in self._drones.items():
                     lat, lng = handle.sim.engine.position
+                    wps = handle.sim.engine.waypoints
                     drones.append({
                         "entity_id": entity_id,
                         "lat": lat,
                         "lng": lng,
                         "heading": handle.sim.engine.heading,
                         "state": handle.sim.engine.state.value,
+                        "route": [list(wp) for wp in wps] if wps else None,
                     })
             query.reply(query.key_expr, json.dumps({"ok": True, "drones": drones}))
         except Exception:
