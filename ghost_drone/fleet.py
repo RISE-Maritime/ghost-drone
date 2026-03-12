@@ -160,6 +160,7 @@ class FleetManager:
                         "entity_id": entity_id,
                         "lat": lat,
                         "lng": lng,
+                        "heading": handle.sim.engine.heading,
                         "state": handle.sim.engine.state.value,
                     })
             query.reply(query.key_expr, json.dumps({"ok": True, "drones": drones}))

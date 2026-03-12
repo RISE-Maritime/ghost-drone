@@ -277,6 +277,11 @@ class SimEngine:
         return (self._lat, self._lng)
 
     @property
+    def heading(self) -> float:
+        """Current heading in degrees [0, 360)."""
+        return self._heading
+
+    @property
     def waypoints(self) -> list[tuple[float, float]]:
         """Copy of the loaded waypoints (read-only view)."""
         return list(self._waypoints)
