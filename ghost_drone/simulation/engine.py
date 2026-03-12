@@ -272,6 +272,11 @@ class SimEngine:
         return self._state
 
     @property
+    def position(self) -> tuple[float, float]:
+        """Current (lat, lng) position of the drone."""
+        return (self._lat, self._lng)
+
+    @property
     def waypoints(self) -> list[tuple[float, float]]:
         """Copy of the loaded waypoints (read-only view)."""
         return list(self._waypoints)

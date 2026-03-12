@@ -41,6 +41,7 @@ class FleetManager:
         self._drones: Dict[str, tuple] = {}  # entity_id -> (handle, exit_stack)
         self._session = None
         self._queryable = None
+        self._list_queryable = None
 
     def __enter__(self):
         self._start()
@@ -59,9 +60,13 @@ class FleetManager:
         self._session = zenoh.open(conf)
         time.sleep(0.1)
 
-        key = f"{self._realm}/@v0/service/spawn_drone"
-        self._queryable = self._session.declare_queryable(key, self._on_spawn)
-        logger.info("FleetManager: listening on %s", key)
+        spawn_key = f"{self._realm}/@v0/service/spawn_drone"
+        self._queryable = self._session.declare_queryable(spawn_key, self._on_spawn)
+        logger.info("FleetManager: listening on %s", spawn_key)
+
+        list_key = f"{self._realm}/@v0/service/list_drones"
+        self._list_queryable = self._session.declare_queryable(list_key, self._on_list)
+        logger.info("FleetManager: listening on %s", list_key)
 
     def _stop(self) -> None:
         with self._lock:
@@ -69,6 +74,8 @@ class FleetManager:
                 exit_stack.__exit__(None, None, None)
             self._drones.clear()
 
+        if hasattr(self, '_list_queryable') and self._list_queryable is not None:
+            self._list_queryable.undeclare()
         if self._queryable is not None:
             self._queryable.undeclare()
         if self._session is not None:
@@ -136,6 +143,27 @@ class FleetManager:
 
         except Exception:
             logger.exception("FleetManager: spawn error")
+            try:
+                query.reply(query.key_expr, json.dumps({
+                    "ok": False, "error": "internal error",
+                }))
+            except Exception:
+                pass
+
+    def _on_list(self, query: zenoh.Query) -> None:
+        try:
+            with self._lock:
+                drones = []
+                for entity_id, (handle, _exit_stack) in self._drones.items():
+                    lat, lng = handle.sim.engine.position
+                    drones.append({
+                        "entity_id": entity_id,
+                        "lat": lat,
+                        "lng": lng,
+                    })
+            query.reply(query.key_expr, json.dumps({"ok": True, "drones": drones}))
+        except Exception:
+            logger.exception("FleetManager: list_drones error")
             try:
                 query.reply(query.key_expr, json.dumps({
                     "ok": False, "error": "internal error",
