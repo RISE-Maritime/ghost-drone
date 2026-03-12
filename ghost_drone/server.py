@@ -269,14 +269,16 @@ def _tick_loop(
         if frame.state == SimState.PLAYING:
             _publish_telemetry(publisher, cfg, frame, roll, pitch, sim, stuck_values)
 
-        # Health is always published (so subscribers know inactive vs nominal)
-        _publish_health(publisher, cfg, sim, frame.state == SimState.PLAYING)
+        # Health is always published (so subscribers know inactive vs nominal).
+        # PAUSED is still mid-mission, so report active health (not INACTIVE).
+        is_active = frame.state != SimState.STOPPED
+        _publish_health(publisher, cfg, sim, is_active)
 
         # Always publish sim_frame for the browser UI
         frame_dict = frame.to_dict()
         frame_dict["roll"] = roll
         frame_dict["pitch"] = pitch
-        frame_dict["health"] = _compute_health_summary(sim, frame.state == SimState.PLAYING)
+        frame_dict["health"] = _compute_health_summary(sim, is_active)
         frame_dict["faults"] = sim.faults.all_faults()
         _publish_sim_frame(publisher, cfg, frame_dict)
 
