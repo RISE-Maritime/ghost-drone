@@ -107,6 +107,7 @@ class SimEngine:
         if len(waypoints) < 2:
             raise ValueError("Route requires at least 2 waypoints")
         self._waypoints = list(waypoints)
+        self._state = SimState.STOPPED
         self._reset_to_start()
 
     def play(self) -> None:
