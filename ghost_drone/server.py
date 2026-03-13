@@ -201,9 +201,17 @@ _HEALTH_LEVEL_NAMES = {
 }
 
 
+_MODE_NAMES = {
+    MODE_IDLE: "idle",
+    MODE_AUTONOMOUS: "autonomous",
+    MODE_REMOTE: "remote",
+}
+
+
 def _compute_health_summary(sim: SimGlobals, is_playing: bool) -> dict:
     """Return a health summary dict suitable for inclusion in sim_frame JSON."""
     if is_playing:
+        operation_mode = MODE_REMOTE if sim.engine.is_remote else MODE_AUTONOMOUS
         subsystems = []
         worst_level = HEALTH_NOMINAL
         for name, subject in _SUBSYSTEM_SUBJECT_MAP.items():
@@ -218,6 +226,7 @@ def _compute_health_summary(sim: SimGlobals, is_playing: bool) -> dict:
         level = worst_level
     else:
         level = HEALTH_INACTIVE
+        operation_mode = MODE_IDLE
         subsystems = [
             {"name": name, "level": "inactive", "detail": ""}
             for name in _SUBSYSTEM_SUBJECT_MAP
@@ -225,6 +234,7 @@ def _compute_health_summary(sim: SimGlobals, is_playing: bool) -> dict:
 
     return {
         "level": _HEALTH_LEVEL_NAMES.get(level, "unknown"),
+        "mode": _MODE_NAMES.get(operation_mode, "unknown"),
         "subsystems": subsystems,
     }
 
