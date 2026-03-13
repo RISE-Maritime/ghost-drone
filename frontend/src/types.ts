@@ -14,6 +14,7 @@ export type FaultType = "drop" | "stuck" | "nan" | "wrong_rate";
 export type FaultState = Record<string, FaultType[]>;
 
 export interface SimFrame {
+  entity_id: string;
   lat: number;
   lng: number;
   heading: number;

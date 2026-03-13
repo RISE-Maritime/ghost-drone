@@ -28,8 +28,8 @@ export class ZenohClient {
     this.onFrame = opts.onFrame;
   }
 
-  private prefix(): string {
-    return `${this.realm}/@${KEELSON_VERSION}/${this.entityId}`;
+  private prefix(entityId?: string): string {
+    return `${this.realm}/@${KEELSON_VERSION}/${entityId ?? this.entityId}`;
   }
 
   async connect(): Promise<void> {
@@ -54,7 +54,7 @@ export class ZenohClient {
 
   private async subscribeSimFrame(): Promise<void> {
     if (!this.session) return;
-    const keyExpr = `${this.prefix()}/pubsub/sim_frame/engine/0`;
+    const keyExpr = `${this.realm}/@${KEELSON_VERSION}/*/pubsub/sim_frame/engine/0`;
     await this.session.declareSubscriber(keyExpr, {
       handler: (sample: Sample) => {
         try {
@@ -66,29 +66,36 @@ export class ZenohClient {
         }
       },
     });
-    console.log("[zenoh] subscribed to sim_frame");
+    console.log("[zenoh] subscribed to sim_frame (wildcard)");
   }
 
-  // --- Pub/Sub control commands ---
+  // --- Per-entity pub/sub control commands ---
 
-  async play(): Promise<void> {
-    await this.session?.put(`${this.prefix()}/control/play`, "");
+  async playFor(entityId: string): Promise<void> {
+    await this.session?.put(`${this.prefix(entityId)}/control/play`, "");
   }
 
-  async pause(): Promise<void> {
-    await this.session?.put(`${this.prefix()}/control/pause`, "");
+  async pauseFor(entityId: string): Promise<void> {
+    await this.session?.put(`${this.prefix(entityId)}/control/pause`, "");
   }
 
-  async stop(): Promise<void> {
-    await this.session?.put(`${this.prefix()}/control/stop`, "");
+  async stopFor(entityId: string): Promise<void> {
+    await this.session?.put(`${this.prefix(entityId)}/control/stop`, "");
   }
 
-  async setSpeed(speed: number): Promise<void> {
+  async setSpeedFor(entityId: string, speed: number): Promise<void> {
     await this.session?.put(
-      `${this.prefix()}/control/set_speed`,
+      `${this.prefix(entityId)}/control/set_speed`,
       JSON.stringify({ value: speed }),
     );
   }
+
+  // --- Backward-compat single-entity methods ---
+
+  async play(): Promise<void> { return this.playFor(this.entityId); }
+  async pause(): Promise<void> { return this.pauseFor(this.entityId); }
+  async stop(): Promise<void> { return this.stopFor(this.entityId); }
+  async setSpeed(speed: number): Promise<void> { return this.setSpeedFor(this.entityId, speed); }
 
   // --- Queryable/Get for request-response ---
 
@@ -96,11 +103,59 @@ export class ZenohClient {
     return typeof (result as Sample).keyexpr === "function";
   }
 
-  async loadRoute(waypoints: [number, number][]): Promise<{ ok: boolean; error?: string }> {
+  async loadRouteFor(entityId: string, waypoints: [number, number][]): Promise<{ ok: boolean; error?: string }> {
     if (!this.session) return { ok: false, error: "not connected" };
     const receiver = await this.session.get(
-      `${this.prefix()}/service/load_route`,
+      `${this.prefix(entityId)}/service/load_route`,
       { payload: JSON.stringify({ waypoints }), timeout: QUERY_TIMEOUT },
+    );
+    if (!receiver) return { ok: false, error: "no reply channel" };
+    try {
+      const reply: Reply = await receiver.receive();
+      const result = reply.result();
+      if (this.isSample(result)) {
+        const text = result.payload().toString();
+        return JSON.parse(text);
+      } else {
+        const errPayload = (result as ReplyError).payload().toString();
+        return { ok: false, error: errPayload };
+      }
+    } catch {
+      return { ok: false, error: "query timeout" };
+    }
+  }
+
+  async loadRoute(waypoints: [number, number][]): Promise<{ ok: boolean; error?: string }> {
+    return this.loadRouteFor(this.entityId, waypoints);
+  }
+
+  async spawnDrone(lat: number, lng: number): Promise<{ ok: boolean; entity_id?: string; error?: string }> {
+    if (!this.session) return { ok: false, error: "not connected" };
+    const receiver = await this.session.get(
+      `${this.realm}/@${KEELSON_VERSION}/service/spawn_drone`,
+      { payload: JSON.stringify({ lat, lng }), timeout: QUERY_TIMEOUT },
+    );
+    if (!receiver) return { ok: false, error: "no reply channel" };
+    try {
+      const reply: Reply = await receiver.receive();
+      const result = reply.result();
+      if (this.isSample(result)) {
+        const text = result.payload().toString();
+        return JSON.parse(text);
+      } else {
+        const errPayload = (result as ReplyError).payload().toString();
+        return { ok: false, error: errPayload };
+      }
+    } catch {
+      return { ok: false, error: "query timeout" };
+    }
+  }
+
+  async listDrones(): Promise<{ ok: boolean; drones?: { entity_id: string; state: string }[]; error?: string }> {
+    if (!this.session) return { ok: false, error: "not connected" };
+    const receiver = await this.session.get(
+      `${this.realm}/@${KEELSON_VERSION}/service/list_drones`,
+      { timeout: QUERY_TIMEOUT },
     );
     if (!receiver) return { ok: false, error: "no reply channel" };
     try {

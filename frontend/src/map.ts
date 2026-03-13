@@ -14,13 +14,20 @@ export class MapController {
   waypoints: Waypoint[] = [];
   private wpMarkers: L.Marker[] = [];
   private routeLayer: L.Polyline | null = null;
-  private droneMarker: L.Marker;
+  private droneMarkers: Map<string, L.Marker> = new Map();
+  private droneOpacities: Map<string, number> = new Map();
   private isZooming = false;
-  private lastOpacity = 0.4;
   drawModeActive = false;
+  selectedDroneId: string | null = null;
 
   /** External callback for control state refresh */
   onWaypointsChanged: () => void = () => {};
+
+  /** External callback for spawn-on-click */
+  onSpawnClick: ((lat: number, lng: number) => void) | null = null;
+
+  /** External callback when a drone marker is clicked to select it */
+  onDroneSelected: ((entityId: string) => void) | null = null;
 
   constructor() {
     this.map = L.map("map", { zoomAnimation: true }).setView([57.7069, 11.9381], 15);
@@ -37,13 +44,16 @@ export class MapController {
       removalMode: false, rotateMode: false, drawPolyline: false,
     });
 
-    this.droneMarker = L.marker([57.7069, 11.9381], {
-      icon: this.createDroneIcon(0.4),
-      zIndexOffset: 1000,
-    }).addTo(this.map);
-
     this.map.on("zoomstart", () => { this.isZooming = true; });
     this.map.on("zoomend", () => { this.isZooming = false; });
+
+    // Spawn click: fires when not in draw mode
+    this.map.on("click", (e: L.LeafletMouseEvent) => {
+      if (this.drawModeActive) return;
+      if (this.onSpawnClick) {
+        this.onSpawnClick(e.latlng.lat, e.latlng.lng);
+      }
+    });
   }
 
   private createWpIcon(number: number): L.DivIcon {
@@ -65,11 +75,12 @@ export class MapController {
     });
   }
 
-  private createDroneIcon(opacity?: number): L.DivIcon {
-    if (opacity === undefined) opacity = 1.0;
-    this.lastOpacity = opacity;
-    const hull = cssVar("--instrument-enhanced-primary-color") || "rgb(90,132,191)";
+  private createDroneIcon(opacity: number, selected: boolean): L.DivIcon {
+    const hull = selected
+      ? (cssVar("--alert-running-color") || "rgb(0,200,120)")
+      : (cssVar("--instrument-enhanced-primary-color") || "rgb(90,132,191)");
     const dark = cssVar("--container-backdrop-color") || "rgb(3,3,3)";
+    const borderStyle = selected ? `border: 2px solid ${hull}; border-radius: 50%; padding: 2px;` : "";
 
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
       <path d="M20,3 L30,14 L28,34 Q20,38 12,34 L10,14 Z"
@@ -81,14 +92,16 @@ export class MapController {
       <polygon points="20,3 17,10 23,10" fill="white" opacity="0.4"/>
     </svg>`;
 
+    const size = selected ? 48 : 40;
+    const anchor = size / 2;
     return L.divIcon({
       className: "",
-      html: `<div id="drone-icon-inner" style="
-        width:40px;height:40px;opacity:${opacity};
+      html: `<div class="drone-icon-inner" style="
+        width:${size}px;height:${size}px;opacity:${opacity};
         transform-origin:center;
-        transition:opacity 0.3s">${svg}</div>`,
-      iconSize: [40, 40],
-      iconAnchor: [20, 20],
+        transition:opacity 0.3s;${borderStyle}">${svg}</div>`,
+      iconSize: [size, size],
+      iconAnchor: [anchor, anchor],
     });
   }
 
@@ -161,30 +174,80 @@ export class MapController {
     this.map.off("click", this.onMapClick);
   }
 
-  updateDronePosition(lat: number, lng: number, heading: number, state: string): void {
+  updateDronePosition(entityId: string, lat: number, lng: number, heading: number, state: string): void {
     const latlng = L.latLng(lat, lng);
-    this.droneMarker.setLatLng(latlng);
+    const opacity = state === "playing" ? 1.0 : 0.4;
+    const isSelected = entityId === this.selectedDroneId;
 
-    if (state === "playing" && !this.isZooming) {
+    let marker = this.droneMarkers.get(entityId);
+    if (!marker) {
+      marker = L.marker(latlng, {
+        icon: this.createDroneIcon(opacity, isSelected),
+        zIndexOffset: isSelected ? 1000 : 500,
+      }).addTo(this.map);
+      marker.on("click", () => {
+        if (this.onDroneSelected) this.onDroneSelected(entityId);
+      });
+      this.droneMarkers.set(entityId, marker);
+    }
+
+    marker.setLatLng(latlng);
+    this.droneOpacities.set(entityId, opacity);
+
+    // Only pan to follow the selected drone
+    if (isSelected && state === "playing" && !this.isZooming) {
       this.map.panTo(latlng, { animate: true, duration: 0.1 });
     }
 
     // Heading rotation
-    const el = this.droneMarker.getElement();
-    const inner = el && el.querySelector("#drone-icon-inner") as HTMLElement | null;
-    if (inner) inner.style.transform = `rotate(${heading}deg)`;
-
-    // Opacity
-    const opacity = state === "playing" ? 1.0 : 0.4;
+    const el = marker.getElement();
+    const inner = el && el.querySelector(".drone-icon-inner") as HTMLElement | null;
     if (inner) {
+      inner.style.transform = `rotate(${heading}deg)`;
       inner.style.opacity = String(opacity);
-      this.lastOpacity = opacity;
     }
   }
 
-  /** Refresh drone icon (e.g. after theme change) */
+  selectDrone(entityId: string): void {
+    const prevId = this.selectedDroneId;
+    this.selectedDroneId = entityId;
+
+    // Refresh icons for old and new selection
+    if (prevId && prevId !== entityId) {
+      this.refreshMarkerIcon(prevId);
+    }
+    this.refreshMarkerIcon(entityId);
+
+    // Pan to the newly selected drone
+    const marker = this.droneMarkers.get(entityId);
+    if (marker) {
+      this.map.panTo(marker.getLatLng(), { animate: true, duration: 0.3 });
+    }
+  }
+
+  private refreshMarkerIcon(entityId: string): void {
+    const marker = this.droneMarkers.get(entityId);
+    if (!marker) return;
+    const opacity = this.droneOpacities.get(entityId) ?? 0.4;
+    const isSelected = entityId === this.selectedDroneId;
+    marker.setIcon(this.createDroneIcon(opacity, isSelected));
+    marker.setZIndexOffset(isSelected ? 1000 : 500);
+  }
+
+  removeDrone(entityId: string): void {
+    const marker = this.droneMarkers.get(entityId);
+    if (marker) {
+      marker.remove();
+      this.droneMarkers.delete(entityId);
+      this.droneOpacities.delete(entityId);
+    }
+  }
+
+  /** Refresh all drone icons (e.g. after theme change) */
   refreshDroneIcon(): void {
-    this.droneMarker.setIcon(this.createDroneIcon(this.lastOpacity));
+    for (const [entityId] of this.droneMarkers) {
+      this.refreshMarkerIcon(entityId);
+    }
   }
 
   clearWaypoints(): void {

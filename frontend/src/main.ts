@@ -21,31 +21,36 @@ const wsHost = ["localhost", "127.0.0.1"].includes(window.location.hostname)
   : window.location.hostname;
 const remoteApi = params.get("remote_api") ?? `ws://${wsHost}:10001`;
 
+// --- Selected drone tracking ---
+let selectedDroneId: string = entityId;
+
 // --- Map ---
 const mapCtrl = new MapController();
+mapCtrl.selectedDroneId = selectedDroneId;
 
 // --- Controls (wired below after zenoh client is created) ---
 let zenoh: ZenohClient;
 
 const controls = new ControlsManager({
   onPlay: async () => {
+    if (!selectedDroneId) return;
     if (mapCtrl.waypoints.length < 2) return;
     if (controls.simState === "stopped") {
       const wps: [number, number][] = mapCtrl.waypoints.map((w) => [
         w.lat,
         w.lng,
       ]);
-      const result = await zenoh.loadRoute(wps);
+      const result = await zenoh.loadRouteFor(selectedDroneId, wps);
       if (!result.ok) {
         console.error("[loadRoute]", result.error);
         return;
       }
     }
-    await zenoh.play();
+    await zenoh.playFor(selectedDroneId);
   },
-  onPause: () => zenoh.pause(),
-  onStop: () => zenoh.stop(),
-  onSpeedChange: (speed) => zenoh.setSpeed(speed),
+  onPause: () => { if (selectedDroneId) zenoh.pauseFor(selectedDroneId); },
+  onStop: () => { if (selectedDroneId) zenoh.stopFor(selectedDroneId); },
+  onSpeedChange: (speed) => { if (selectedDroneId) zenoh.setSpeedFor(selectedDroneId, speed); },
   onClear: () => {
     if (controls.simState !== "stopped") return;
     mapCtrl.clearWaypoints();
@@ -61,6 +66,16 @@ const controls = new ControlsManager({
   },
 });
 
+// --- Drone selection wiring ---
+function selectDrone(id: string): void {
+  selectedDroneId = id;
+  mapCtrl.selectDrone(id);
+  controls.setSelectedDrone(id);
+}
+
+controls.onDroneSelected = (id) => selectDrone(id);
+mapCtrl.onDroneSelected = (id) => selectDrone(id);
+
 // Wire map -> controls state sync
 mapCtrl.getSimState = () => controls.simState;
 mapCtrl.onWaypointsChanged = () =>
@@ -72,18 +87,43 @@ zenoh = new ZenohClient({
   entityId,
   remoteApiUrl: remoteApi,
   onFrame: (frame: SimFrame) => {
-    controls.simState = frame.state;
+    const eid = frame.entity_id;
     mapCtrl.updateDronePosition(
+      eid,
       frame.lat,
       frame.lng,
       frame.heading,
       frame.state,
     );
-    controls.updateControlStates(mapCtrl.waypoints.length);
-    onTelemetryFrame(frame);
-    updateFaultPanel(frame.faults);
+
+    // Only update sidebar/controls for the selected drone
+    if (eid === selectedDroneId) {
+      controls.simState = frame.state;
+      controls.updateControlStates(mapCtrl.waypoints.length);
+      onTelemetryFrame(frame);
+      updateFaultPanel(frame.faults);
+    }
   },
 });
+
+// --- Spawn drone on map click ---
+mapCtrl.onSpawnClick = async (lat, lng) => {
+  const result = await zenoh.spawnDrone(lat, lng);
+  if (result.ok && result.entity_id) {
+    selectDrone(result.entity_id);
+    refreshDroneList();
+  } else {
+    console.error("[spawn]", result.error);
+  }
+};
+
+// --- Drone list refresh ---
+async function refreshDroneList(): Promise<void> {
+  const result = await zenoh.listDrones();
+  if (result.ok && result.drones) {
+    controls.updateDroneList(result.drones);
+  }
+}
 
 // --- Fault injection panel ---
 initFaultPanel((subject, faultType, active) => {
@@ -113,8 +153,12 @@ initClock();
 // --- Init ---
 controls.updateControlStates(0);
 
-// Connect and fetch initial settings
+// Connect and fetch initial settings + drone list
 zenoh.connect().then(async () => {
   const settings = await zenoh.getSettings();
   if (settings) applySettingsToUI(settings);
+  await refreshDroneList();
 });
+
+// Periodically refresh drone list
+setInterval(refreshDroneList, 5000);

@@ -18,9 +18,14 @@ export class ControlsManager {
   private btnSettings = document.getElementById("btn-settings") as HTMLButtonElement;
   private simStatusBadge = document.getElementById("sim-status-badge")!;
   private simStatusText = document.getElementById("sim-status-text")!;
+  private droneSelect = document.getElementById("drone-select") as HTMLSelectElement;
 
   simState: string = "stopped";
+  selectedDroneId: string | null = null;
   private drawModeActive = false;
+
+  /** External callback when user picks a drone from the selector */
+  onDroneSelected: ((entityId: string) => void) | null = null;
 
   constructor(private callbacks: ControlCallbacks) {
     this.btnPlay.addEventListener("click", () => callbacks.onPlay());
@@ -32,11 +37,40 @@ export class ControlsManager {
     this.speedInput.addEventListener("change", () => {
       callbacks.onSpeedChange(parseFloat(this.speedInput.value));
     });
+
+    this.droneSelect.addEventListener("change", () => {
+      const id = this.droneSelect.value;
+      if (id && this.onDroneSelected) {
+        this.onDroneSelected(id);
+      }
+    });
   }
 
   setDrawModeActive(active: boolean): void {
     this.drawModeActive = active;
     this.btnDraw.classList.toggle("active", active);
+  }
+
+  updateDroneList(drones: { entity_id: string; state: string }[]): void {
+    const currentValue = this.droneSelect.value;
+    this.droneSelect.innerHTML = "";
+    for (const d of drones) {
+      const opt = document.createElement("option");
+      opt.value = d.entity_id;
+      opt.textContent = `${d.entity_id} (${d.state})`;
+      this.droneSelect.appendChild(opt);
+    }
+    // Restore selection if still in list
+    if (this.selectedDroneId && drones.some(d => d.entity_id === this.selectedDroneId)) {
+      this.droneSelect.value = this.selectedDroneId;
+    } else if (currentValue && drones.some(d => d.entity_id === currentValue)) {
+      this.droneSelect.value = currentValue;
+    }
+  }
+
+  setSelectedDrone(entityId: string): void {
+    this.selectedDroneId = entityId;
+    this.droneSelect.value = entityId;
   }
 
   updateControlStates(waypointCount: number): void {
