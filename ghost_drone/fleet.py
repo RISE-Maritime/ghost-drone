@@ -165,8 +165,9 @@ class FleetManager:
                     lat, lng = handle.sim.engine.position
                     wps = handle.sim.engine.waypoints
                     is_playing = handle.sim.engine.state == SimState.PLAYING
+                    is_active = handle.sim.engine.state != SimState.STOPPED
                     speed = handle.sim.cruise_speed_mps if is_playing else 0.0
-                    health_summary = _compute_health_summary(handle.sim, is_playing)
+                    health_summary = _compute_health_summary(handle.sim, is_active)
                     drones.append({
                         "entity_id": entity_id,
                         "lat": lat,
