@@ -177,6 +177,7 @@ class FleetManager:
                         "state": handle.sim.engine.state.value,
                         "route": [list(wp) for wp in wps] if wps else None,
                         "health": health_summary,
+                        "faults": handle.sim.faults.all_faults(),
                     })
             query.reply(query.key_expr, json.dumps({"ok": True, "drones": drones}))
         except Exception:
