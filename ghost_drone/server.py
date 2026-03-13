@@ -338,6 +338,34 @@ def start_simulator(cfg: AppConfig):
 
 
 # ---------------------------------------------------------------------------
+# Server context manager (simulator + fleet manager)
+# ---------------------------------------------------------------------------
+
+@contextlib.contextmanager
+def start_server(cfg: AppConfig):
+    """Start the simulator with fleet management (spawn/list drones).
+
+    Yields a SimHandle for the initial drone.  The FleetManager runs
+    alongside, exposing spawn_drone and list_drones queryables at the
+    realm level.  The initial drone is registered with the fleet so
+    that list_drones includes it.
+    """
+    from ghost_drone.fleet import FleetManager  # noqa: PLC0415
+
+    with start_simulator(cfg) as handle:
+        fleet = FleetManager(
+            zenoh_endpoint=cfg.zenoh_endpoint,
+            realm=cfg.keelson_realm,
+        )
+        fleet._start()
+        fleet.register_drone(cfg.entity_id, handle)
+        try:
+            yield handle
+        finally:
+            fleet._stop()
+
+
+# ---------------------------------------------------------------------------
 # Blocking entry point for CLI
 # ---------------------------------------------------------------------------
 
@@ -351,7 +379,7 @@ def run(cfg: AppConfig) -> None:
     signal.signal(signal.SIGINT, _on_signal)
     signal.signal(signal.SIGTERM, _on_signal)
 
-    with start_simulator(cfg):
+    with start_server(cfg) as handle:
         print("Simulator running. Press Ctrl+C to stop.")
         stop.wait()
 

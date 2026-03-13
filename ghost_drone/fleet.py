@@ -72,7 +72,8 @@ class FleetManager:
     def _stop(self) -> None:
         with self._lock:
             for entity_id, (handle, exit_stack) in list(self._drones.items()):
-                exit_stack.__exit__(None, None, None)
+                if exit_stack is not None:
+                    exit_stack.__exit__(None, None, None)
             self._drones.clear()
 
         if hasattr(self, '_list_queryable') and self._list_queryable is not None:
@@ -150,6 +151,11 @@ class FleetManager:
                 }))
             except Exception:
                 pass
+
+    def register_drone(self, entity_id: str, handle: SimHandle) -> None:
+        """Register an externally-created drone so list_drones includes it."""
+        with self._lock:
+            self._drones[entity_id] = (handle, None)
 
     def _on_list(self, query: zenoh.Query) -> None:
         try:
