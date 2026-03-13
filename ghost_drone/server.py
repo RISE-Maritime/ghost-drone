@@ -276,6 +276,7 @@ def _tick_loop(
 
         # Always publish sim_frame for the browser UI
         frame_dict = frame.to_dict()
+        frame_dict["entity_id"] = cfg.entity_id
         frame_dict["roll"] = roll
         frame_dict["pitch"] = pitch
         frame_dict["health"] = _compute_health_summary(sim, is_active)
