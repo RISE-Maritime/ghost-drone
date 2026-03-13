@@ -135,8 +135,26 @@ def test_list_drones_health_nominal_when_paused(zenoh_router):
 
             # A paused drone is mid-mission — health should be 'nominal',
             # NOT 'inactive' (which is only for stopped/idle drones).
-            assert drone["health"] == "nominal", (
-                f"Paused drone health should be 'nominal', got '{drone['health']}'"
+            health = drone["health"]
+            assert isinstance(health, dict), (
+                f"health should be a dict with level+subsystems, got {type(health).__name__}: {health!r}"
             )
+            assert health["level"] == "nominal", (
+                f"Paused drone health level should be 'nominal', got '{health['level']}'"
+            )
+
+            # Subsystems should also be nominal (not inactive), since
+            # the drone is mid-mission, just paused.
+            subsystems = health["subsystems"]
+            assert isinstance(subsystems, list)
+            sub_names = {s["name"] for s in subsystems}
+            assert sub_names == {"position", "heading", "speed"}, (
+                f"Expected subsystems position/heading/speed, got {sub_names}"
+            )
+            for sub in subsystems:
+                assert sub["level"] == "nominal", (
+                    f"Subsystem {sub['name']} should be 'nominal' when paused, "
+                    f"got '{sub['level']}'"
+                )
         finally:
             client.close()

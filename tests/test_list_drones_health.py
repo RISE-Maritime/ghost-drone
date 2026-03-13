@@ -104,9 +104,18 @@ def test_list_drones_health_inactive_when_stopped(zenoh_router):
 
             drone = by_id[entity_id]
             assert "health" in drone, "list_drones response must include 'health' field"
-            assert drone["health"] == "inactive", (
-                f"Stopped drone health should be 'inactive', got '{drone['health']}'"
+            health = drone["health"]
+            assert isinstance(health, dict), (
+                f"health should be a dict, got {type(health).__name__}: {health!r}"
             )
+            assert health["level"] == "inactive", (
+                f"Stopped drone health level should be 'inactive', got '{health['level']}'"
+            )
+            for sub in health["subsystems"]:
+                assert sub["level"] == "inactive", (
+                    f"Subsystem {sub['name']} should be 'inactive' when stopped, "
+                    f"got '{sub['level']}'"
+                )
         finally:
             client.close()
 
@@ -147,9 +156,18 @@ def test_list_drones_health_nominal_when_playing(zenoh_router):
             by_id = {d["entity_id"]: d for d in result["drones"]}
             drone = by_id[entity_id]
             assert "health" in drone, "list_drones response must include 'health' field"
-            assert drone["health"] == "nominal", (
-                f"Playing drone (no faults) health should be 'nominal', got '{drone['health']}'"
+            health = drone["health"]
+            assert isinstance(health, dict), (
+                f"health should be a dict, got {type(health).__name__}: {health!r}"
             )
+            assert health["level"] == "nominal", (
+                f"Playing drone health level should be 'nominal', got '{health['level']}'"
+            )
+            for sub in health["subsystems"]:
+                assert sub["level"] == "nominal", (
+                    f"Subsystem {sub['name']} should be 'nominal' when playing, "
+                    f"got '{sub['level']}'"
+                )
         finally:
             client.close()
 
@@ -205,8 +223,12 @@ def test_list_drones_health_reflects_fault(zenoh_router):
             by_id = {d["entity_id"]: d for d in result["drones"]}
             drone = by_id[entity_id]
             assert "health" in drone, "list_drones response must include 'health' field"
-            assert drone["health"] in ("degraded", "critical"), (
-                f"Drone with drop fault should be degraded or critical, got '{drone['health']}'"
+            health = drone["health"]
+            assert isinstance(health, dict), (
+                f"health should be a dict, got {type(health).__name__}: {health!r}"
+            )
+            assert health["level"] in ("degraded", "critical"), (
+                f"Drone with drop fault should be degraded or critical, got '{health['level']}'"
             )
         finally:
             client.close()
