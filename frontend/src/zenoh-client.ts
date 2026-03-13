@@ -173,10 +173,10 @@ export class ZenohClient {
     }
   }
 
-  async getSettings(): Promise<SettingsPayload | null> {
+  async getSettingsFor(entityId: string): Promise<SettingsPayload | null> {
     if (!this.session) return null;
     const receiver = await this.session.get(
-      `${this.prefix()}/service/settings`,
+      `${this.prefix(entityId)}/service/settings`,
       { timeout: QUERY_TIMEOUT },
     );
     if (!receiver) return null;
@@ -193,10 +193,14 @@ export class ZenohClient {
     }
   }
 
-  async injectFault(subject: string, faultType: FaultType): Promise<boolean> {
+  async getSettings(): Promise<SettingsPayload | null> {
+    return this.getSettingsFor(this.entityId);
+  }
+
+  async injectFaultFor(entityId: string, subject: string, faultType: FaultType): Promise<boolean> {
     if (!this.session) return false;
     const receiver = await this.session.get(
-      `${this.prefix()}/service/fault`,
+      `${this.prefix(entityId)}/service/fault`,
       {
         payload: JSON.stringify({ action: "inject", subject, fault_type: faultType }),
         timeout: QUERY_TIMEOUT,
@@ -216,10 +220,14 @@ export class ZenohClient {
     }
   }
 
-  async clearFault(subject: string, faultType: FaultType): Promise<boolean> {
+  async injectFault(subject: string, faultType: FaultType): Promise<boolean> {
+    return this.injectFaultFor(this.entityId, subject, faultType);
+  }
+
+  async clearFaultFor(entityId: string, subject: string, faultType: FaultType): Promise<boolean> {
     if (!this.session) return false;
     const receiver = await this.session.get(
-      `${this.prefix()}/service/fault`,
+      `${this.prefix(entityId)}/service/fault`,
       {
         payload: JSON.stringify({ action: "clear", subject, fault_type: faultType }),
         timeout: QUERY_TIMEOUT,
@@ -239,10 +247,14 @@ export class ZenohClient {
     }
   }
 
-  async updateSettings(payload: SettingsPayload): Promise<SettingsPayload | null> {
+  async clearFault(subject: string, faultType: FaultType): Promise<boolean> {
+    return this.clearFaultFor(this.entityId, subject, faultType);
+  }
+
+  async updateSettingsFor(entityId: string, payload: SettingsPayload): Promise<SettingsPayload | null> {
     if (!this.session) return null;
     const receiver = await this.session.get(
-      `${this.prefix()}/service/settings`,
+      `${this.prefix(entityId)}/service/settings`,
       { payload: JSON.stringify(payload), timeout: QUERY_TIMEOUT },
     );
     if (!receiver) return null;
@@ -257,5 +269,9 @@ export class ZenohClient {
     } catch {
       return null;
     }
+  }
+
+  async updateSettings(payload: SettingsPayload): Promise<SettingsPayload | null> {
+    return this.updateSettingsFor(this.entityId, payload);
   }
 }

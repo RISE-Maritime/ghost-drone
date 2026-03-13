@@ -127,17 +127,19 @@ async function refreshDroneList(): Promise<void> {
 
 // --- Fault injection panel ---
 initFaultPanel((subject, faultType, active) => {
+  if (!selectedDroneId) return;
   if (active) {
-    zenoh.injectFault(subject, faultType);
+    zenoh.injectFaultFor(selectedDroneId, subject, faultType);
   } else {
-    zenoh.clearFault(subject, faultType);
+    zenoh.clearFaultFor(selectedDroneId, subject, faultType);
   }
 });
 
 // --- Settings ---
 buildSubjectRows();
 initSettingsModal(async (payload: SettingsPayload) => {
-  const result = await zenoh.updateSettings(payload);
+  if (!selectedDroneId) return;
+  const result = await zenoh.updateSettingsFor(selectedDroneId, payload);
   if (result) applySettingsToUI(result);
 });
 
@@ -155,7 +157,7 @@ controls.updateControlStates(0);
 
 // Connect and fetch initial settings + drone list
 zenoh.connect().then(async () => {
-  const settings = await zenoh.getSettings();
+  const settings = await zenoh.getSettingsFor(selectedDroneId);
   if (settings) applySettingsToUI(settings);
   await refreshDroneList();
 });
