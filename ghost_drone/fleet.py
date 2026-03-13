@@ -19,6 +19,7 @@ import zenoh
 
 from ghost_drone.config import AppConfig
 from ghost_drone.server import SimHandle, start_simulator
+from ghost_drone.simulation.models import SimState
 
 logger = logging.getLogger(__name__)
 
@@ -157,11 +158,13 @@ class FleetManager:
                 for entity_id, (handle, _exit_stack) in self._drones.items():
                     lat, lng = handle.sim.engine.position
                     wps = handle.sim.engine.waypoints
+                    speed = handle.sim.cruise_speed_mps if handle.sim.engine.state == SimState.PLAYING else 0.0
                     drones.append({
                         "entity_id": entity_id,
                         "lat": lat,
                         "lng": lng,
                         "heading": handle.sim.engine.heading,
+                        "speed": speed,
                         "state": handle.sim.engine.state.value,
                         "route": [list(wp) for wp in wps] if wps else None,
                     })
