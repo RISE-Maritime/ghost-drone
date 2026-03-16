@@ -14,6 +14,7 @@ import zenoh
 
 from ghost_drone.config import AppConfig
 from ghost_drone.sim_state import FAULT_TYPES, SimGlobals
+from ghost_drone.simulation.models import OperationMode
 
 logger = logging.getLogger(__name__)
 
@@ -71,6 +72,33 @@ def register_control_handlers(
     declared.append(session.declare_subscriber(f"{prefix}/control/set_speed", on_set_speed))
     declared.append(session.declare_subscriber(f"{prefix}/control/move", on_move))
     declared.append(session.declare_subscriber(f"{prefix}/control/cancel_remote", on_cancel_remote))
+
+    def on_set_mode(sample: zenoh.Sample) -> None:
+        try:
+            payload = json.loads(bytes(sample.payload))
+            mode_str = payload.get("mode", "autonomous")
+            try:
+                mode = OperationMode(mode_str)
+            except ValueError:
+                logger.warning("control/set_mode: unknown mode %r", mode_str)
+                return
+            sim.engine.set_mode(mode)
+            logger.debug("control/set_mode -> %s", mode.value)
+        except Exception:
+            logger.warning("control/set_mode: bad payload")
+
+    def on_manual_control(sample: zenoh.Sample) -> None:
+        try:
+            payload = json.loads(bytes(sample.payload))
+            rudder_deg = float(payload.get("rudder_deg", 0.0))
+            engine = float(payload.get("engine", 0.0))
+            sim.engine.manual_control(rudder_deg, engine)
+            logger.debug("control/manual -> rudder %.1f°, engine %.2f", rudder_deg, engine)
+        except Exception:
+            logger.warning("control/manual: bad payload")
+
+    declared.append(session.declare_subscriber(f"{prefix}/control/set_mode", on_set_mode))
+    declared.append(session.declare_subscriber(f"{prefix}/control/manual", on_manual_control))
 
     # --- Queryable: load_route ---
 
@@ -173,6 +201,42 @@ def register_control_handlers(
             logger.exception("fault: handler error")
 
     declared.append(session.declare_queryable(f"{prefix}/service/fault", on_fault))
+
+    # --- Queryable: set_home (relocate stopped drone) ---
+
+    def on_set_home(query: zenoh.Query) -> None:
+        try:
+            payload_bytes = bytes(query.payload) if query.payload is not None else b""
+            if not payload_bytes:
+                query.reply(query.key_expr, json.dumps({"ok": False, "error": "empty payload"}))
+                return
+
+            msg = json.loads(payload_bytes)
+            lat = msg.get("lat")
+            lng = msg.get("lng")
+
+            if lat is None or lng is None:
+                query.reply(query.key_expr, json.dumps({
+                    "ok": False, "error": "lat and lng are required",
+                }))
+                return
+
+            try:
+                lat = float(lat)
+                lng = float(lng)
+            except (TypeError, ValueError) as e:
+                query.reply(query.key_expr, json.dumps({
+                    "ok": False, "error": f"invalid coordinates: {e}",
+                }))
+                return
+
+            sim.engine.set_home(lat, lng)
+            query.reply(query.key_expr, json.dumps({"ok": True}))
+            logger.info("set_home: moved to (%.4f, %.4f)", lat, lng)
+        except Exception:
+            logger.exception("set_home: handler error")
+
+    declared.append(session.declare_queryable(f"{prefix}/service/set_home", on_set_home))
 
     logger.info("Registered control handlers on prefix %s", prefix)
     return declared

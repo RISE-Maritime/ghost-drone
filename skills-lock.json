@@ -6,6 +6,11 @@
       "sourceType": "github",
       "computedHash": "1c40cac8fc7b0f3e4187881b256525ffc6b19fa4859f5f7847c9a87448ccf56a"
     },
+    "dispatch": {
+      "source": "bassimeledath/dispatch",
+      "sourceType": "github",
+      "computedHash": "3f25b9ec7e52f2bc4266d3efcbf39f52ea7ef9f83a991e765d045946d2283a94"
+    },
     "dogfood": {
       "source": "vercel-labs/agent-browser",
       "sourceType": "github",

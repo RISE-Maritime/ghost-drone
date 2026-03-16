@@ -103,6 +103,7 @@ def test_all_five_subjects_published_and_decode(zenoh_router):
     try:
         with start_simulator(cfg) as handle:
             _wait_for_publisher(handle)
+            handle.sim.engine.set_home(_ROUTE[0][0], _ROUTE[0][1])
 
             # Load route via queryable (GET with payload)
             replies = client_session.get(
@@ -256,12 +257,12 @@ def test_settings_queryable_returns_current_values(zenoh_router):
 
             assert settings is not None, "No reply from settings queryable"
             assert "subjects" in settings
-            assert "roll_amplitude_deg" in settings
-            assert settings["roll_amplitude_deg"] == 5.0
+            assert "location_noise_sigma_m" in settings
+            assert settings["location_noise_sigma_m"] == 0.5
 
             # UPDATE settings
             new_settings = dict(settings)
-            new_settings["roll_amplitude_deg"] = 12.0
+            new_settings["location_noise_sigma_m"] = 2.0
             replies = client_session.get(
                 f"{_PREFIX}/service/settings",
                 payload=json.dumps(new_settings).encode(),
@@ -272,7 +273,7 @@ def test_settings_queryable_returns_current_values(zenoh_router):
                 updated = json.loads(bytes(reply.ok.payload))
 
             assert updated is not None
-            assert updated["roll_amplitude_deg"] == 12.0
+            assert updated["location_noise_sigma_m"] == 2.0
     finally:
         client_session.close()
 

@@ -9,10 +9,6 @@ const SUBJECTS_LIST = [
 ];
 
 const SLIDER_PAIRS: [string, string][] = [
-  ["sl-roll-amp", "lbl-roll-amp"],
-  ["sl-roll-period", "lbl-roll-period"],
-  ["sl-pitch-amp", "lbl-pitch-amp"],
-  ["sl-pitch-period", "lbl-pitch-period"],
   ["sl-loc-noise", "lbl-loc-noise"],
 ];
 
@@ -56,10 +52,6 @@ export function applySettingsToUI(settings: SettingsPayload): void {
   }
   // Sliders
   const sliderMap: Record<string, [string, string]> = {
-    roll_amplitude_deg: ["sl-roll-amp", "lbl-roll-amp"],
-    roll_period_s: ["sl-roll-period", "lbl-roll-period"],
-    pitch_amplitude_deg: ["sl-pitch-amp", "lbl-pitch-amp"],
-    pitch_period_s: ["sl-pitch-period", "lbl-pitch-period"],
     location_noise_sigma_m: ["sl-loc-noise", "lbl-loc-noise"],
   };
   for (const [key, [sliderId, lblId]] of Object.entries(sliderMap)) {
@@ -103,10 +95,6 @@ export function initSettingsModal(onSave: (payload: SettingsPayload) => void): v
 
     const payload: SettingsPayload = {
       subjects: subjectsPayload,
-      roll_amplitude_deg: parseFloat((document.getElementById("sl-roll-amp") as HTMLInputElement).value),
-      roll_period_s: parseFloat((document.getElementById("sl-roll-period") as HTMLInputElement).value),
-      pitch_amplitude_deg: parseFloat((document.getElementById("sl-pitch-amp") as HTMLInputElement).value),
-      pitch_period_s: parseFloat((document.getElementById("sl-pitch-period") as HTMLInputElement).value),
       location_noise_sigma_m: parseFloat((document.getElementById("sl-loc-noise") as HTMLInputElement).value),
     };
 

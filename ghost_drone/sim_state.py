@@ -14,7 +14,6 @@ import threading
 from typing import Dict, Set
 
 from ghost_drone.simulation.engine import SimEngine
-from ghost_drone.simulation.roll_pitch import RollPitchModel
 from ghost_drone.zenoh_bridge.telemetry import SubjectThrottle
 
 # Supported fault types
@@ -69,10 +68,6 @@ class PublishSettings:
             "pitch_deg":               SubjectConfig(rate_hz=1.0, source_id="imu/0"),
         }
     )
-    roll_amplitude_deg: float = 5.0
-    roll_period_s: float = 10.0
-    pitch_amplitude_deg: float = 3.0
-    pitch_period_s: float = 8.0
     location_noise_sigma_m: float = 0.5
 
     def to_dict(self) -> dict:
@@ -82,10 +77,6 @@ class PublishSettings:
                 k: {"rate_hz": v.rate_hz, "source_id": v.source_id}
                 for k, v in self.subjects.items()
             },
-            "roll_amplitude_deg": self.roll_amplitude_deg,
-            "roll_period_s": self.roll_period_s,
-            "pitch_amplitude_deg": self.pitch_amplitude_deg,
-            "pitch_period_s": self.pitch_period_s,
             "location_noise_sigma_m": self.location_noise_sigma_m,
         }
 
@@ -95,9 +86,8 @@ class SimGlobals:
 
     def __init__(self) -> None:
         self.engine = SimEngine()
-        self.cruise_speed_mps: float = 10.0
+        self.cruise_speed_mps: float = 1.5
         self.settings = PublishSettings()
-        self.roll_pitch = RollPitchModel()
         self.throttle = SubjectThrottle()
         self.faults = FaultState()
 
@@ -109,18 +99,5 @@ class SimGlobals:
                     self.settings.subjects[subj].rate_hz = float(sc_data["rate_hz"])
                 if "source_id" in sc_data:
                     self.settings.subjects[subj].source_id = str(sc_data["source_id"])
-        if "roll_amplitude_deg" in msg:
-            self.settings.roll_amplitude_deg = float(msg["roll_amplitude_deg"])
-        if "roll_period_s" in msg:
-            self.settings.roll_period_s = float(msg["roll_period_s"])
-        if "pitch_amplitude_deg" in msg:
-            self.settings.pitch_amplitude_deg = float(msg["pitch_amplitude_deg"])
-        if "pitch_period_s" in msg:
-            self.settings.pitch_period_s = float(msg["pitch_period_s"])
         if "location_noise_sigma_m" in msg:
             self.settings.location_noise_sigma_m = float(msg["location_noise_sigma_m"])
-        # Apply to live roll/pitch model
-        self.roll_pitch.roll_amplitude_deg = self.settings.roll_amplitude_deg
-        self.roll_pitch.roll_period_s = self.settings.roll_period_s
-        self.roll_pitch.pitch_amplitude_deg = self.settings.pitch_amplitude_deg
-        self.roll_pitch.pitch_period_s = self.settings.pitch_period_s

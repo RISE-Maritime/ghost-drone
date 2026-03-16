@@ -23,7 +23,7 @@ import time
 from ghost_drone.config import AppConfig
 from ghost_drone.sim_state import SimGlobals
 from ghost_drone.simulation.engine import TICK_HZ
-from ghost_drone.simulation.models import SimState
+from ghost_drone.simulation.models import OperationMode, SimState
 from ghost_drone.zenoh_bridge.control import register_control_handlers
 from ghost_drone.zenoh_bridge.publisher import ZenohPublisher
 from ghost_drone.zenoh_bridge.telemetry import (
@@ -266,11 +266,10 @@ def _tick_loop(
 
     while not stop_event.is_set():
         frame = sim.engine.tick(dt, cruise_speed_mps=sim.cruise_speed_mps)
-        roll, pitch = sim.roll_pitch.tick(dt, frame.state)
+        roll, pitch = frame.roll, frame.pitch
 
-        # Reset roll/pitch elapsed time, throttle, and stuck values on STOPPED transition
+        # Reset throttle and stuck values on STOPPED transition
         if frame.state == SimState.STOPPED and prev_state != SimState.STOPPED:
-            sim.roll_pitch.reset()
             sim.throttle.reset()
             stuck_values.clear()
         prev_state = frame.state
@@ -292,6 +291,21 @@ def _tick_loop(
         frame_dict["health"] = _compute_health_summary(sim, is_active)
         frame_dict["faults"] = sim.faults.all_faults()
         _publish_sim_frame(publisher, cfg, frame_dict)
+
+        # Publish manual setpoint separately so the frontend can show
+        # commanded values without them being overwritten by actuals.
+        if (
+            frame.state == SimState.PLAYING
+            and sim.engine.operation_mode == OperationMode.MANUAL
+        ):
+            setpoint = json.dumps({
+                "rudder_deg": sim.engine._manual_rudder,
+                "engine": sim.engine._manual_engine,
+            }).encode()
+            publisher.publish(
+                f"{cfg.keelson_prefix}/pubsub/manual_setpoint/engine/0",
+                setpoint,
+            )
 
         time.sleep(dt)
 

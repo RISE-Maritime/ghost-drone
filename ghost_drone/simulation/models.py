@@ -18,6 +18,12 @@ class SimState(enum.Enum):
     PAUSED  = "paused"    # drone frozen mid-route, route locked
 
 
+class OperationMode(enum.Enum):
+    """Drone operation mode."""
+    AUTONOMOUS = "autonomous"  # follow loaded route via LOS guidance
+    MANUAL     = "manual"      # direct keyboard heading/thrust control
+
+
 @dataclass
 class TelemetryFrame:
     """A single telemetry snapshot from the simulation engine.
@@ -29,6 +35,11 @@ class TelemetryFrame:
     heading: float  # degrees, true north, [0, 360)
     speed: float    # m/s
     state: SimState # current engine state
+    roll: float = 0.0   # degrees (positive = starboard down)
+    pitch: float = 0.0  # degrees (positive = bow down)
+    rudder_deg: float = 0.0   # rudder angle, degrees (positive = starboard)
+    thrust_pct: float = 0.0   # engine thrust, percentage of max [0, 100]
+    operation_mode: OperationMode = OperationMode.AUTONOMOUS
 
     def to_dict(self) -> dict:
         """Return a JSON-serialisable dict (state is the enum .value string)."""
@@ -38,4 +49,9 @@ class TelemetryFrame:
             "heading": self.heading,
             "speed":   self.speed,
             "state":   self.state.value,
+            "roll":    self.roll,
+            "pitch":   self.pitch,
+            "rudder_deg":  self.rudder_deg,
+            "thrust_pct":  self.thrust_pct,
+            "operation_mode": self.operation_mode.value,
         }

@@ -1,5 +1,5 @@
 import { Config, Session, open, Duration, type Sample, type Reply, type ReplyError } from "@eclipse-zenoh/zenoh-ts";
-import type { SimFrame, SettingsPayload, FaultType } from "./types";
+import type { SimFrame, SettingsPayload, FaultType, OperationMode } from "./types";
 
 const KEELSON_VERSION = "v0";
 const QUERY_TIMEOUT = Duration.milliseconds.of(5000);
@@ -8,12 +8,18 @@ const QUERY_TIMEOUT = Duration.milliseconds.of(5000);
  * ZenohClient wraps a zenoh-ts Session for browser-to-backend communication
  * via the zenoh-bridge-remote-api WebSocket bridge.
  */
+export interface ManualSetpoint {
+  rudder_deg: number;
+  engine: number;
+}
+
 export class ZenohClient {
   private session: Session | null = null;
   private realm: string;
   private entityId: string;
   private remoteApiUrl: string;
   private onFrame: (frame: SimFrame) => void;
+  private onManualSetpoint: ((entityId: string, sp: ManualSetpoint) => void) | null;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(opts: {
@@ -21,11 +27,13 @@ export class ZenohClient {
     entityId: string;
     remoteApiUrl: string;
     onFrame: (frame: SimFrame) => void;
+    onManualSetpoint?: (entityId: string, sp: ManualSetpoint) => void;
   }) {
     this.realm = opts.realm;
     this.entityId = opts.entityId;
     this.remoteApiUrl = opts.remoteApiUrl;
     this.onFrame = opts.onFrame;
+    this.onManualSetpoint = opts.onManualSetpoint ?? null;
   }
 
   private prefix(entityId?: string): string {
@@ -42,6 +50,7 @@ export class ZenohClient {
       this.session = await open(config);
       console.log("[zenoh] session opened to", this.remoteApiUrl);
       await this.subscribeSimFrame();
+      await this.subscribeManualSetpoint();
     } catch (err) {
       console.error("[zenoh] connection failed, retrying in 2s:", err);
       this.scheduleReconnect();
@@ -69,6 +78,27 @@ export class ZenohClient {
     console.log("[zenoh] subscribed to sim_frame (wildcard)");
   }
 
+  private async subscribeManualSetpoint(): Promise<void> {
+    if (!this.session || !this.onManualSetpoint) return;
+    const keyExpr = `${this.realm}/@${KEELSON_VERSION}/*/pubsub/manual_setpoint/engine/0`;
+    const cb = this.onManualSetpoint;
+    await this.session.declareSubscriber(keyExpr, {
+      handler: (sample: Sample) => {
+        try {
+          const text = sample.payload().toString();
+          const sp: ManualSetpoint = JSON.parse(text);
+          // Extract entity_id from key expression
+          const parts = sample.keyexpr().toString().split("/");
+          const eid = parts[2] ?? "";
+          cb(eid, sp);
+        } catch (e) {
+          console.warn("[zenoh] bad manual_setpoint payload:", e);
+        }
+      },
+    });
+    console.log("[zenoh] subscribed to manual_setpoint (wildcard)");
+  }
+
   // --- Per-entity pub/sub control commands ---
 
   async playFor(entityId: string): Promise<void> {
@@ -90,6 +120,20 @@ export class ZenohClient {
     );
   }
 
+  async setModeFor(entityId: string, mode: OperationMode): Promise<void> {
+    await this.session?.put(
+      `${this.prefix(entityId)}/control/set_mode`,
+      JSON.stringify({ mode }),
+    );
+  }
+
+  async manualControlFor(entityId: string, rudderDeg: number, engine: number): Promise<void> {
+    await this.session?.put(
+      `${this.prefix(entityId)}/control/manual`,
+      JSON.stringify({ rudder_deg: rudderDeg, engine }),
+    );
+  }
+
   // --- Backward-compat single-entity methods ---
 
   async play(): Promise<void> { return this.playFor(this.entityId); }
@@ -101,6 +145,28 @@ export class ZenohClient {
 
   private isSample(result: Sample | ReplyError): result is Sample {
     return typeof (result as Sample).keyexpr === "function";
+  }
+
+  async setHomeFor(entityId: string, lat: number, lng: number): Promise<{ ok: boolean; error?: string }> {
+    if (!this.session) return { ok: false, error: "not connected" };
+    const receiver = await this.session.get(
+      `${this.prefix(entityId)}/service/set_home`,
+      { payload: JSON.stringify({ lat, lng }), timeout: QUERY_TIMEOUT },
+    );
+    if (!receiver) return { ok: false, error: "no reply channel" };
+    try {
+      const reply: Reply = await receiver.receive();
+      const result = reply.result();
+      if (this.isSample(result)) {
+        const text = result.payload().toString();
+        return JSON.parse(text);
+      } else {
+        const errPayload = (result as ReplyError).payload().toString();
+        return { ok: false, error: errPayload };
+      }
+    } catch {
+      return { ok: false, error: "query timeout" };
+    }
   }
 
   async loadRouteFor(entityId: string, waypoints: [number, number][]): Promise<{ ok: boolean; error?: string }> {
@@ -134,6 +200,28 @@ export class ZenohClient {
     const receiver = await this.session.get(
       `${this.realm}/@${KEELSON_VERSION}/service/spawn_drone`,
       { payload: JSON.stringify({ lat, lng }), timeout: QUERY_TIMEOUT },
+    );
+    if (!receiver) return { ok: false, error: "no reply channel" };
+    try {
+      const reply: Reply = await receiver.receive();
+      const result = reply.result();
+      if (this.isSample(result)) {
+        const text = result.payload().toString();
+        return JSON.parse(text);
+      } else {
+        const errPayload = (result as ReplyError).payload().toString();
+        return { ok: false, error: errPayload };
+      }
+    } catch {
+      return { ok: false, error: "query timeout" };
+    }
+  }
+
+  async deleteDrone(entityId: string): Promise<{ ok: boolean; error?: string }> {
+    if (!this.session) return { ok: false, error: "not connected" };
+    const receiver = await this.session.get(
+      `${this.realm}/@${KEELSON_VERSION}/service/delete_drone`,
+      { payload: JSON.stringify({ entity_id: entityId }), timeout: QUERY_TIMEOUT },
     );
     if (!receiver) return { ok: false, error: "no reply channel" };
     try {

@@ -160,6 +160,7 @@ def test_nan_fault_on_location_fix(zenoh_router):
     try:
         with start_simulator(cfg) as handle:
             _wait_for_publisher(handle)
+            handle.sim.engine.set_home(_ROUTE[0][0], _ROUTE[0][1])
             _start_playing(client_session)
 
             # Phase 1: Baseline — collect normal location_fix values

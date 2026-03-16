@@ -12,12 +12,17 @@ export interface Waypoint {
 export class MapController {
   readonly map: L.Map;
   waypoints: Waypoint[] = [];
+  private droneRoutes: Map<string, Waypoint[]> = new Map();
   private wpMarkers: L.Marker[] = [];
   private routeLayer: L.Polyline | null = null;
   private droneMarkers: Map<string, L.Marker> = new Map();
   private droneOpacities: Map<string, number> = new Map();
   private isZooming = false;
+  private isProgrammaticMove = false;
+  following = false;
+  private followBtn!: HTMLButtonElement;
   drawModeActive = false;
+  spawnModeActive = false;
   selectedDroneId: string | null = null;
 
   /** External callback for control state refresh */
@@ -28,6 +33,13 @@ export class MapController {
 
   /** External callback when a drone marker is clicked to select it */
   onDroneSelected: ((entityId: string) => void) | null = null;
+
+  /** External callback when a drone marker is dragged to a new position */
+  onDroneDragged: ((entityId: string, lat: number, lng: number) => void) | null = null;
+
+  private droneStates: Map<string, string> = new Map();
+  /** Timestamps until which position updates are frozen (after drag) */
+  private droneFrozenUntil: Map<string, number> = new Map();
 
   constructor() {
     this.map = L.map("map", { zoomAnimation: true }).setView([57.7069, 11.9381], 15);
@@ -47,9 +59,35 @@ export class MapController {
     this.map.on("zoomstart", () => { this.isZooming = true; });
     this.map.on("zoomend", () => { this.isZooming = false; });
 
-    // Spawn click: fires when not in draw mode
+    // Disable follow on user drag (not programmatic pan)
+    this.map.on("dragstart", () => {
+      if (!this.isProgrammaticMove) {
+        this.setFollowing(false);
+      }
+    });
+
+    // Follow button (Leaflet custom control)
+    const FollowControl = L.Control.extend({
+      options: { position: "topright" },
+      onAdd: () => {
+        const btn = L.DomUtil.create("button", "leaflet-follow-btn") as HTMLButtonElement;
+        btn.type = "button";
+        btn.title = "Follow selected drone";
+        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>`;
+        L.DomEvent.disableClickPropagation(btn);
+        btn.addEventListener("click", () => {
+          this.setFollowing(!this.following);
+          if (this.following) this.panToSelectedDrone();
+        });
+        this.followBtn = btn;
+        return btn;
+      },
+    });
+    new FollowControl().addTo(this.map);
+
+    // Spawn click: fires only when spawn mode is active
     this.map.on("click", (e: L.LeafletMouseEvent) => {
-      if (this.drawModeActive) return;
+      if (!this.spawnModeActive) return;
       if (this.onSpawnClick) {
         this.onSpawnClick(e.latlng.lat, e.latlng.lng);
       }
@@ -105,6 +143,23 @@ export class MapController {
     });
   }
 
+  setFollowing(active: boolean): void {
+    this.following = active;
+    if (this.followBtn) {
+      this.followBtn.classList.toggle("active", active);
+    }
+  }
+
+  private panToSelectedDrone(): void {
+    if (!this.selectedDroneId) return;
+    const marker = this.droneMarkers.get(this.selectedDroneId);
+    if (marker) {
+      this.isProgrammaticMove = true;
+      this.map.panTo(marker.getLatLng(), { animate: true, duration: 0.3 });
+      this.map.once("moveend", () => { this.isProgrammaticMove = false; });
+    }
+  }
+
   refreshRoute(): void {
     for (const m of this.wpMarkers) m.remove();
     this.wpMarkers = [];
@@ -123,11 +178,14 @@ export class MapController {
         marker.on("dragend", () => {
           const ll = marker.getLatLng();
           this.waypoints[idx] = { lat: ll.lat, lng: ll.lng };
+          this.saveCurrentRoute();
           this.refreshRoute();
           this.onWaypointsChanged();
         });
         marker.on("contextmenu", () => {
+          if (this.getSimState() !== "stopped") return;
           this.waypoints.splice(idx, 1);
+          this.saveCurrentRoute();
           this.refreshRoute();
           this.onWaypointsChanged();
         });
@@ -154,18 +212,41 @@ export class MapController {
   /** Must be set externally — returns current sim state string */
   getSimState: () => string = () => "stopped";
 
+  /** Sync current waypoints into the per-drone store */
+  private saveCurrentRoute(): void {
+    if (this.selectedDroneId) {
+      this.droneRoutes.set(this.selectedDroneId, [...this.waypoints]);
+    }
+  }
+
   private onMapClick = (e: L.LeafletMouseEvent) => {
     if (!this.drawModeActive || this.getSimState() !== "stopped") return;
     this.waypoints.push({ lat: e.latlng.lat, lng: e.latlng.lng });
+    this.saveCurrentRoute();
     this.refreshRoute();
     this.onWaypointsChanged();
   };
 
+  toggleSpawnMode(): void {
+    this.spawnModeActive = !this.spawnModeActive;
+    // Deactivate draw mode when entering spawn mode
+    if (this.spawnModeActive && this.drawModeActive) {
+      this.drawModeActive = false;
+      this.map.off("click", this.onMapClick);
+      this.updateWaypointDraggability();
+    }
+  }
+
   toggleDrawMode(): void {
     if (this.getSimState() !== "stopped") return;
     this.drawModeActive = !this.drawModeActive;
-    if (this.drawModeActive) this.map.on("click", this.onMapClick);
-    else this.map.off("click", this.onMapClick);
+    if (this.drawModeActive) {
+      // Deactivate spawn mode when entering draw mode
+      this.spawnModeActive = false;
+      this.map.on("click", this.onMapClick);
+    } else {
+      this.map.off("click", this.onMapClick);
+    }
     this.updateWaypointDraggability();
   }
 
@@ -175,28 +256,60 @@ export class MapController {
   }
 
   updateDronePosition(entityId: string, lat: number, lng: number, heading: number, state: string): void {
+    // Ignore frames near null island (0, 0) — backend race on spawn adds noise
+    if (Math.abs(lat) < 0.01 && Math.abs(lng) < 0.01) return;
+
     const latlng = L.latLng(lat, lng);
     const opacity = state === "playing" ? 1.0 : 0.4;
     const isSelected = entityId === this.selectedDroneId;
+    const prevState = this.droneStates.get(entityId);
+    this.droneStates.set(entityId, state);
 
     let marker = this.droneMarkers.get(entityId);
     if (!marker) {
       marker = L.marker(latlng, {
         icon: this.createDroneIcon(opacity, isSelected),
         zIndexOffset: isSelected ? 1000 : 500,
+        draggable: state === "stopped",
       }).addTo(this.map);
       marker.on("click", () => {
         if (this.onDroneSelected) this.onDroneSelected(entityId);
       });
+      marker.on("dragstart", () => {
+        // Freeze position updates while dragging and for 1s after
+        this.droneFrozenUntil.set(entityId, Infinity);
+      });
+      marker.on("dragend", () => {
+        // Keep frozen for 1s so backend frames don't snap it back
+        this.droneFrozenUntil.set(entityId, Date.now() + 1000);
+        const pos = marker!.getLatLng();
+        if (this.onDroneDragged) this.onDroneDragged(entityId, pos.lat, pos.lng);
+      });
       this.droneMarkers.set(entityId, marker);
     }
 
-    marker.setLatLng(latlng);
+    // Don't override position while frozen (during/after drag)
+    const frozenUntil = this.droneFrozenUntil.get(entityId) ?? 0;
+    if (Date.now() >= frozenUntil) {
+      marker.setLatLng(latlng);
+      this.droneFrozenUntil.delete(entityId);
+    }
     this.droneOpacities.set(entityId, opacity);
 
-    // Only pan to follow the selected drone
-    if (isSelected && state === "playing" && !this.isZooming) {
+    // Update draggability when state changes
+    if (prevState !== state) {
+      if (state === "stopped") {
+        marker.dragging!.enable();
+      } else {
+        marker.dragging!.disable();
+      }
+    }
+
+    // Pan to follow the selected drone when following is enabled
+    if (isSelected && this.following && !this.isZooming) {
+      this.isProgrammaticMove = true;
       this.map.panTo(latlng, { animate: true, duration: 0.1 });
+      this.map.once("moveend", () => { this.isProgrammaticMove = false; });
     }
 
     // Heading rotation
@@ -210,7 +323,18 @@ export class MapController {
 
   selectDrone(entityId: string): void {
     const prevId = this.selectedDroneId;
+
+    // Save current waypoints for the previous drone
+    if (prevId) {
+      this.droneRoutes.set(prevId, [...this.waypoints]);
+    }
+
     this.selectedDroneId = entityId;
+
+    // Load waypoints for the newly selected drone
+    this.waypoints = [...(this.droneRoutes.get(entityId) ?? [])];
+    this.refreshRoute();
+    this.onWaypointsChanged();
 
     // Refresh icons for old and new selection
     if (prevId && prevId !== entityId) {
@@ -218,10 +342,13 @@ export class MapController {
     }
     this.refreshMarkerIcon(entityId);
 
-    // Pan to the newly selected drone
+    // Enable following and pan to the newly selected drone
+    this.setFollowing(true);
     const marker = this.droneMarkers.get(entityId);
     if (marker) {
+      this.isProgrammaticMove = true;
       this.map.panTo(marker.getLatLng(), { animate: true, duration: 0.3 });
+      this.map.once("moveend", () => { this.isProgrammaticMove = false; });
     }
   }
 
@@ -252,6 +379,9 @@ export class MapController {
 
   clearWaypoints(): void {
     this.waypoints = [];
+    if (this.selectedDroneId) {
+      this.droneRoutes.set(this.selectedDroneId, []);
+    }
     for (const m of this.wpMarkers) m.remove();
     this.wpMarkers = [];
     if (this.routeLayer) { this.routeLayer.remove(); this.routeLayer = null; }

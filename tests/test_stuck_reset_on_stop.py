@@ -156,6 +156,7 @@ def test_stuck_values_reset_on_stop(zenoh_router):
     try:
         with start_simulator(cfg) as handle:
             _wait_for_publisher(handle)
+            handle.sim.engine.set_home(_NORTH_ROUTE[0][0], _NORTH_ROUTE[0][1])
 
             # --- Phase 1: North route, inject stuck ---
             _load_route(client_session, _NORTH_ROUTE)

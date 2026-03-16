@@ -69,6 +69,10 @@ class FleetManager:
         self._list_queryable = self._session.declare_queryable(list_key, self._on_list)
         logger.info("FleetManager: listening on %s", list_key)
 
+        delete_key = f"{self._realm}/@v0/service/delete_drone"
+        self._delete_queryable = self._session.declare_queryable(delete_key, self._on_delete)
+        logger.info("FleetManager: listening on %s", delete_key)
+
     def _stop(self) -> None:
         with self._lock:
             for entity_id, (handle, exit_stack) in list(self._drones.items()):
@@ -76,6 +80,8 @@ class FleetManager:
                     exit_stack.__exit__(None, None, None)
             self._drones.clear()
 
+        if hasattr(self, '_delete_queryable') and self._delete_queryable is not None:
+            self._delete_queryable.undeclare()
         if hasattr(self, '_list_queryable') and self._list_queryable is not None:
             self._list_queryable.undeclare()
         if self._queryable is not None:
@@ -145,6 +151,49 @@ class FleetManager:
 
         except Exception:
             logger.exception("FleetManager: spawn error")
+            try:
+                query.reply(query.key_expr, json.dumps({
+                    "ok": False, "error": "internal error",
+                }))
+            except Exception:
+                pass
+
+    def _on_delete(self, query: zenoh.Query) -> None:
+        try:
+            payload_bytes = bytes(query.payload) if query.payload is not None else b""
+            if not payload_bytes:
+                query.reply(query.key_expr, json.dumps({
+                    "ok": False, "error": "empty payload",
+                }))
+                return
+
+            msg = json.loads(payload_bytes)
+            entity_id = msg.get("entity_id")
+
+            if not entity_id:
+                query.reply(query.key_expr, json.dumps({
+                    "ok": False, "error": "entity_id is required",
+                }))
+                return
+
+            with self._lock:
+                entry = self._drones.pop(entity_id, None)
+
+            if entry is None:
+                query.reply(query.key_expr, json.dumps({
+                    "ok": False, "error": f"drone '{entity_id}' not found",
+                }))
+                return
+
+            handle, exit_stack = entry
+            if exit_stack is not None:
+                exit_stack.__exit__(None, None, None)
+
+            query.reply(query.key_expr, json.dumps({"ok": True, "entity_id": entity_id}))
+            logger.info("FleetManager: deleted %s", entity_id)
+
+        except Exception:
+            logger.exception("FleetManager: delete error")
             try:
                 query.reply(query.key_expr, json.dumps({
                     "ok": False, "error": "internal error",

@@ -122,6 +122,7 @@ def test_auto_stop_clears_remote_mode(zenoh_router):
     try:
         with start_simulator(cfg) as handle:
             _wait_for_publisher(handle)
+            handle.sim.engine.set_home(_SHORT_ROUTE[0][0], _SHORT_ROUTE[0][1])
 
             # Step 1: Load a very short route and play
             replies = client_session.get(

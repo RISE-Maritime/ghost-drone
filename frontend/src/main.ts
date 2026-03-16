@@ -2,7 +2,7 @@ import { initClock } from "./clock";
 import { initTheme } from "./theme";
 import { MapController } from "./map";
 import { ControlsManager } from "./controls";
-import { onTelemetryFrame } from "./telemetry";
+import { onTelemetryFrame, onManualSetpoint, setOperationMode as setTelemetryMode } from "./telemetry";
 import {
   buildSubjectRows,
   initSettingsModal,
@@ -10,7 +10,7 @@ import {
 } from "./settings";
 import { initFaultPanel, updateFaultPanel } from "./faults";
 import { ZenohClient } from "./zenoh-client";
-import type { SimFrame, SettingsPayload } from "./types";
+import type { SimFrame, SettingsPayload, OperationMode } from "./types";
 
 // --- Parse config from URL params or use defaults ---
 const params = new URLSearchParams(window.location.search);
@@ -23,6 +23,9 @@ const remoteApi = params.get("remote_api") ?? `ws://${wsHost}:10001`;
 
 // --- Selected drone tracking ---
 let selectedDroneId: string = entityId;
+const deletedDrones: Set<string> = new Set();
+let lastTelemetryHeading = 0;
+let lastOperationMode: OperationMode | null = null;
 
 // --- Map ---
 const mapCtrl = new MapController();
@@ -59,10 +62,50 @@ const controls = new ControlsManager({
   onDrawToggle: () => {
     mapCtrl.toggleDrawMode();
     controls.setDrawModeActive(mapCtrl.drawModeActive);
+    controls.setSpawnModeActive(mapCtrl.spawnModeActive);
     mapCtrl.updateWaypointDraggability();
+  },
+  onSpawnToggle: () => {
+    mapCtrl.toggleSpawnMode();
+    controls.setSpawnModeActive(mapCtrl.spawnModeActive);
+    controls.setDrawModeActive(mapCtrl.drawModeActive);
+  },
+  onDeleteDrone: async () => {
+    if (!selectedDroneId) return;
+    const result = await zenoh.deleteDrone(selectedDroneId);
+    if (result.ok) {
+      deletedDrones.add(selectedDroneId);
+      mapCtrl.removeDrone(selectedDroneId);
+      mapCtrl.clearWaypoints();
+      await refreshDroneList();
+      // Select another drone if available
+      const listResult = await zenoh.listDrones();
+      if (listResult.ok && listResult.drones && listResult.drones.length > 0) {
+        selectDrone(listResult.drones[0].entity_id);
+      } else {
+        selectedDroneId = "";
+        mapCtrl.selectedDroneId = null;
+        controls.simState = "stopped";
+        controls.updateControlStates(0);
+      }
+    } else {
+      console.error("[delete]", result.error);
+    }
   },
   onSettingsOpen: () => {
     document.getElementById("settings-overlay")!.style.display = "flex";
+  },
+  onModeToggle: () => {
+    if (!selectedDroneId) return;
+    const newMode: OperationMode = controls.operationMode === "autonomous" ? "manual" : "autonomous";
+    controls.setOperationMode(newMode, lastTelemetryHeading);
+    setTelemetryMode(newMode);
+    zenoh.setModeFor(selectedDroneId, newMode);
+    controls.updateControlStates(mapCtrl.waypoints.length);
+  },
+  onManualControl: (rudderDeg, engine) => {
+    if (!selectedDroneId) return;
+    zenoh.manualControlFor(selectedDroneId, rudderDeg, engine);
   },
 });
 
@@ -75,6 +118,10 @@ function selectDrone(id: string): void {
 
 controls.onDroneSelected = (id) => selectDrone(id);
 mapCtrl.onDroneSelected = (id) => selectDrone(id);
+mapCtrl.onDroneDragged = async (id, lat, lng) => {
+  const result = await zenoh.setHomeFor(id, lat, lng);
+  if (!result.ok) console.error("[set_home]", result.error);
+};
 
 // Wire map -> controls state sync
 mapCtrl.getSimState = () => controls.simState;
@@ -86,8 +133,18 @@ zenoh = new ZenohClient({
   realm,
   entityId,
   remoteApiUrl: remoteApi,
+  onManualSetpoint: (eid, sp) => {
+    if (eid === selectedDroneId) {
+      onManualSetpoint(sp.rudder_deg, sp.engine);
+    }
+  },
   onFrame: (frame: SimFrame) => {
+    // Ignore frames near null island (backend race on spawn adds noise)
+    if (Math.abs(frame.lat) < 0.01 && Math.abs(frame.lng) < 0.01) return;
+
     const eid = frame.entity_id;
+    // Ignore frames from deleted drones (in-flight messages after delete)
+    if (deletedDrones.has(eid)) return;
     mapCtrl.updateDronePosition(
       eid,
       frame.lat,
@@ -98,7 +155,24 @@ zenoh = new ZenohClient({
 
     // Only update sidebar/controls for the selected drone
     if (eid === selectedDroneId) {
+      lastTelemetryHeading = frame.heading;
+      const prevState = controls.simState;
       controls.simState = frame.state;
+      // Only update operation mode on actual transitions to avoid
+      // overwriting manual heading/thrust from keypresses every frame
+      if (frame.operation_mode && frame.operation_mode !== lastOperationMode) {
+        lastOperationMode = frame.operation_mode;
+        controls.setOperationMode(frame.operation_mode, frame.heading);
+        setTelemetryMode(frame.operation_mode);
+      }
+      // Lock/unlock route editing on state transitions
+      if (prevState !== frame.state) {
+        if (frame.state !== "stopped" && mapCtrl.drawModeActive) {
+          mapCtrl.disableDrawMode();
+          controls.setDrawModeActive(false);
+        }
+        mapCtrl.updateWaypointDraggability();
+      }
       controls.updateControlStates(mapCtrl.waypoints.length);
       onTelemetryFrame(frame);
       updateFaultPanel(frame.faults);
@@ -110,6 +184,9 @@ zenoh = new ZenohClient({
 mapCtrl.onSpawnClick = async (lat, lng) => {
   const result = await zenoh.spawnDrone(lat, lng);
   if (result.ok && result.entity_id) {
+    // Exit spawn mode after successful spawn
+    mapCtrl.spawnModeActive = false;
+    controls.setSpawnModeActive(false);
     selectDrone(result.entity_id);
     refreshDroneList();
   } else {
