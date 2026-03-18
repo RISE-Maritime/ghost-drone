@@ -83,10 +83,10 @@ def _list_drones(client):
     return None
 
 
-def test_list_drones_health_mode_idle_when_stopped(zenoh_router):
+def test_list_drones_health_mode_operated_when_spawned(zenoh_router):
     """
-    A stopped drone's health in list_drones should include mode 'idle',
-    consistent with entity_health MODE_IDLE.
+    A newly spawned drone's health in list_drones should include mode 'operated',
+    consistent with entity_health MODE_OPERATED. Drones are always active.
     """
     with FleetManager(zenoh_endpoint=_ROUTER_ENDPOINT, realm=_REALM):
         client = _make_client_session()
@@ -108,8 +108,8 @@ def test_list_drones_health_mode_idle_when_stopped(zenoh_router):
             assert "mode" in health, (
                 f"health summary should include 'mode' field, got keys: {list(health.keys())}"
             )
-            assert health["mode"] == "idle", (
-                f"Stopped drone health mode should be 'idle', got '{health['mode']}'"
+            assert health["mode"] == "operated", (
+                f"Stopped drone health mode should be 'operated', got '{health['mode']}'"
             )
         finally:
             client.close()
@@ -205,8 +205,8 @@ def test_list_drones_health_mode_remote_when_remote_controlled(zenoh_router):
             assert "mode" in health, (
                 f"health summary should include 'mode' field, got keys: {list(health.keys())}"
             )
-            assert health["mode"] == "remote", (
-                f"Remote-controlled drone health mode should be 'remote', got '{health['mode']}'"
+            assert health["mode"] == "directed", (
+                f"Remote-controlled drone health mode should be 'directed', got '{health['mode']}'"
             )
         finally:
             client.close()

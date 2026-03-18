@@ -34,10 +34,11 @@ from ghost_drone.proto.entity_health_pb2 import (
     HEALTH_CRITICAL,
     HEALTH_DEGRADED,
     HEALTH_NOMINAL,
-    MODE_UNKNOWN,
-    MODE_IDLE,
-    MODE_MANUAL,
-    MODE_REMOTE,
+    MODE_MANNED_ON_BOARD,
+    MODE_OPERATED,
+    MODE_DIRECTED,
+    MODE_DELEGATED,
+    MODE_MONITORED,
     MODE_AUTONOMOUS,
 )
 

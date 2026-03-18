@@ -4,9 +4,7 @@ ghost_drone/simulation/roll_pitch.py
 Sinusoidal roll/pitch oscillator for simulated drone telemetry.
 
 RollPitchModel produces roll and pitch angles (degrees) based on elapsed
-simulation time. When the simulation is PLAYING, time advances each tick.
-When PAUSED or STOPPED, elapsed time freezes so the last oscillation point
-is held.
+simulation time. Time always advances — drones are always active.
 
 No cross-package dependencies — stdlib only (math, random).
 """
@@ -15,8 +13,6 @@ from __future__ import annotations
 
 import math
 import random
-
-from ghost_drone.simulation.models import SimState
 
 
 class RollPitchModel:
@@ -38,22 +34,18 @@ class RollPitchModel:
         """Zero elapsed time. Call when the simulation stops."""
         self._elapsed_s = 0.0
 
-    def tick(self, dt: float, state: SimState) -> tuple[float, float]:
+    def tick(self, dt: float) -> tuple[float, float]:
         """Advance the oscillator and return (roll_deg, pitch_deg).
 
-        Elapsed time advances only when state is PLAYING. When PAUSED or
-        STOPPED the oscillator is frozen at the last computed phase, so the
-        returned values remain consistent between ticks.
+        Time always advances — drones are always active from spawn.
 
         Args:
             dt: Time step in seconds.
-            state: Current simulation state.
 
         Returns:
             Tuple of (roll_deg, pitch_deg) both in degrees.
         """
-        if state is SimState.PLAYING:
-            self._elapsed_s += dt
+        self._elapsed_s += dt
 
         roll_deg = (
             self.roll_amplitude_deg

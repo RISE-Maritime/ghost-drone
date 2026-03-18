@@ -1,5 +1,5 @@
 """
-End-to-end test: entity_health reports MODE_REMOTE during remote control.
+End-to-end test: entity_health reports MODE_DIRECTED during remote control.
 
 Verifies SPEC behavior:
 - When playing autonomously, operation mode is AUTONOMOUS.
@@ -25,7 +25,7 @@ from ghost_drone.config import AppConfig
 from ghost_drone.proto.entity_health_pb2 import (
     EntityHealth,
     MODE_AUTONOMOUS,
-    MODE_REMOTE,
+    MODE_DIRECTED,
 )
 from ghost_drone.server import start_simulator
 
@@ -95,7 +95,7 @@ def _start_playing(client_session):
 
 def test_health_mode_remote_during_remote_control(zenoh_router):
     """
-    After sending a move command, entity_health should report MODE_REMOTE.
+    After sending a move command, entity_health should report MODE_DIRECTED.
     Before the move command (autonomous play), it should be MODE_AUTONOMOUS.
 
     SPEC: "A drone can be remote-controlled: movement commands sent via zenoh
@@ -171,12 +171,12 @@ def test_health_mode_remote_during_remote_control(zenoh_router):
             f"got {msg.operation_mode}"
         )
 
-    # Remote phase: operation_mode should be MODE_REMOTE
+    # Remote phase: operation_mode should be MODE_DIRECTED
     assert len(health_remote) >= 1, (
         f"Expected >=1 health messages during remote phase, got {len(health_remote)}"
     )
     for msg in health_remote:
-        assert msg.operation_mode == MODE_REMOTE, (
-            f"Expected MODE_REMOTE ({MODE_REMOTE}) during remote phase, "
+        assert msg.operation_mode == MODE_DIRECTED, (
+            f"Expected MODE_DIRECTED ({MODE_DIRECTED}) during remote phase, "
             f"got {msg.operation_mode}"
         )

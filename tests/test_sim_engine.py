@@ -1,7 +1,7 @@
 """
 Deterministic unit tests for the SimEngine simulation state machine.
 
-Tests verify: state transitions, heading lag convergence, route advancement,
+Tests verify: operation mode transitions, heading lag convergence, route advancement,
 stop/reset behaviour, and the module-level helper functions (_bearing,
 _angle_diff, _haversine_m).
 """
@@ -14,19 +14,20 @@ from ghost_drone.simulation.engine import (
     _angle_diff,
     _haversine_m,
 )
-from ghost_drone.simulation.models import SimState
+from ghost_drone.simulation.models import OperationMode
 
 
 # ---------------------------------------------------------------------------
-# State-transition tests
+# Operation mode transition tests
 # ---------------------------------------------------------------------------
 
 
-def test_load_route_sets_stopped_state():
-    """load_route should always end with engine in STOPPED state."""
+def test_load_route_stores_waypoints():
+    """load_route should store waypoints for later play()."""
     engine = SimEngine()
     engine.load_route([(57.0, 11.0), (57.01, 11.01)])
-    assert engine.state == SimState.STOPPED
+    assert engine.waypoints == [(57.0, 11.0), (57.01, 11.01)]
+    assert engine.operation_mode == OperationMode.OPERATED
 
 
 def test_load_route_too_few_waypoints_raises():
@@ -36,52 +37,68 @@ def test_load_route_too_few_waypoints_raises():
         engine.load_route([(57.0, 11.0)])
 
 
-def test_play_transitions_to_playing():
-    """play() should transition engine from STOPPED to PLAYING."""
+def test_play_transitions_to_autonomous():
+    """play() should switch to AUTONOMOUS mode."""
     engine = SimEngine()
     engine.load_route([(57.0, 11.0), (57.01, 11.01)])
     engine.play()
-    assert engine.state == SimState.PLAYING
+    assert engine.operation_mode == OperationMode.AUTONOMOUS
 
 
-def test_pause_freezes_position():
-    """pause() should freeze drone — subsequent ticks should return PAUSED frames.
-
-    Speed should be exactly zero when paused.
-    """
+def test_stop_stays_in_place():
+    """stop() should NOT teleport — drone stays at its pre-stop position."""
     engine = SimEngine()
     engine.load_route([(57.0, 11.0), (57.01, 11.01)])
-    engine.play()
-
-    # Advance a bit so the drone has moved
-    for _ in range(20):
-        engine.tick(0.05)
-
-    engine.pause()
-
-    frame_a = engine.tick(0.05)
-    frame_b = engine.tick(0.05)
-
-    assert frame_a.state == SimState.PAUSED
-    assert frame_b.state == SimState.PAUSED
-    assert frame_a.speed == 0.0
-    assert frame_b.speed == 0.0
-
-
-def test_stop_resets_to_first_waypoint():
-    """stop() should reset internal position to the first waypoint."""
-    engine = SimEngine()
-    engine.load_route([(57.0, 11.0), (57.01, 11.01)])
+    engine._lat, engine._lng = 57.0, 11.0
+    engine._dynamics.reset(57.0, 11.0, 0.0)
     engine.play()
 
     # Advance drone well into the route
     for _ in range(50):
         engine.tick(0.05)
 
+    pre_stop_lat = engine._lat
+    pre_stop_lng = engine._lng
+
     engine.stop()
 
-    assert engine._lat == pytest.approx(57.0, abs=1e-9)
-    assert engine._lng == pytest.approx(11.0, abs=1e-9)
+    # Drone should stay where it was, NOT teleport to first waypoint
+    assert engine._lat == pytest.approx(pre_stop_lat, abs=1e-9)
+    assert engine._lng == pytest.approx(pre_stop_lng, abs=1e-9)
+
+
+def test_stop_sets_operated_mode():
+    """stop() should switch mode to OPERATED."""
+    engine = SimEngine()
+    engine.load_route([(57.0, 11.0), (57.01, 11.01)])
+    engine._lat, engine._lng = 57.0, 11.0
+    engine._dynamics.reset(57.0, 11.0, 0.0)
+    engine.play()
+
+    assert engine.operation_mode == OperationMode.AUTONOMOUS
+
+    for _ in range(20):
+        engine.tick(0.05)
+
+    engine.stop()
+
+    assert engine.operation_mode == OperationMode.OPERATED
+
+
+def test_route_completion_stays_autonomous():
+    """When a route auto-completes, mode should stay AUTONOMOUS."""
+    engine = SimEngine()
+    # Waypoints ~5m apart — drone will reach acceptance radius quickly
+    engine.load_route([(57.0, 11.0), (57.00005, 11.0)])
+    engine._lat, engine._lng = 57.0, 11.0
+    engine._dynamics.reset(57.0, 11.0, 0.0)
+    engine.play()
+
+    for _ in range(2000):
+        engine.tick(0.05, cruise_speed_mps=2.0)
+
+    assert engine.operation_mode == OperationMode.AUTONOMOUS
+    assert engine._route_complete is True
 
 
 # ---------------------------------------------------------------------------
@@ -107,8 +124,8 @@ def test_heading_lag_converges():
     assert abs(_angle_diff(90.0, engine._heading)) < 10.0
 
 
-def test_route_completes_auto_stops():
-    """A short route should auto-stop when the drone reaches the final waypoint.
+def test_route_completes_auto_stops_motion():
+    """A short route should stop motion when the drone reaches the final waypoint.
 
     Uses a nearby waypoint within acceptance radius reach and enough ticks
     for the dynamics to accelerate and cover the distance.
@@ -124,7 +141,8 @@ def test_route_completes_auto_stops():
     for _ in range(2000):
         engine.tick(0.05, cruise_speed_mps=2.0)
 
-    assert engine.state == SimState.STOPPED
+    assert engine._route_complete is True
+    assert engine._speed == 0.0
 
 
 # ---------------------------------------------------------------------------
@@ -167,7 +185,7 @@ def test_los_converges_on_straight_segment():
 
     for _ in range(1200):
         engine.tick(0.05, cruise_speed_mps=1.5)
-        if engine.state != SimState.PLAYING:
+        if engine._route_complete:
             break
 
     # Should have corrected toward the path (lat closer to 57.0)
@@ -254,7 +272,7 @@ def test_post_turn_heading_dampens():
         frame = engine.tick(dt, cruise_speed_mps=1.5)
         seg_indices.append(engine._seg_idx)
         headings.append(frame.heading)
-        if engine.state != SimState.PLAYING:
+        if engine._route_complete:
             break
 
     # Find where the drone advances past the turn waypoint
@@ -280,3 +298,13 @@ def test_post_turn_heading_dampens():
         f"Post-turn heading oscillation too large: {peak_to_peak:.1f}° peak-to-peak "
         f"(expected < 20°)"
     )
+
+
+def test_drone_active_from_spawn():
+    """A freshly created engine should produce telemetry immediately (always active)."""
+    engine = SimEngine()
+    engine._dynamics.reset(57.0, 11.0, 0.0)
+    engine._lat, engine._lng = 57.0, 11.0
+    frame = engine.tick(0.05)
+    assert frame.to_dict()["state"] == "playing"
+    assert frame.operation_mode == OperationMode.OPERATED

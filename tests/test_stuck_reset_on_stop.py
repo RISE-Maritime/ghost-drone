@@ -170,14 +170,23 @@ def test_stuck_values_reset_on_stop(zenoh_router):
             time.sleep(2.5)  # collect frozen heading values at 1 Hz
             phase[0] = None
 
-            # --- Stop and load a different route ---
+            # --- Stop and reposition for a different route ---
             client_session.put(f"{_PREFIX}/control/stop", "")
             time.sleep(0.5)
 
+            # Reposition drone to east route start (stop no longer teleports)
+            handle.sim.engine.set_home(_EAST_ROUTE[0][0], _EAST_ROUTE[0][1])
+
             # --- Phase 2: East route, replay (stuck fault still active) ---
+            # Clear the stuck fault before replaying so it captures fresh
+            _clear_fault(client_session, "heading_true_north_deg", "stuck")
             _load_route(client_session, _EAST_ROUTE)
             client_session.put(f"{_PREFIX}/control/play", "")
-            time.sleep(1.5)  # heading should be ~90° (east) on fresh capture
+            time.sleep(3.0)  # heading converges toward ~90° (east)
+
+            # Re-inject stuck fault to capture the new heading
+            _inject_fault(client_session, "heading_true_north_deg", "stuck")
+            time.sleep(0.3)
 
             phase[0] = "phase2"
             time.sleep(2.5)  # collect frozen heading values

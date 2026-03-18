@@ -135,8 +135,8 @@ def test_play_without_route_does_not_crash(zenoh_router):
         "The tick loop likely crashed."
     )
 
-    # The drone should remain in stopped state (play ignored without a route)
+    # The drone should remain active (state always "playing") but in OPERATED mode
     for f in frames_after_play:
-        assert f["state"] == "stopped", (
-            f"Expected state 'stopped' after play without route, got '{f['state']}'"
+        assert f["state"] == "playing", (
+            f"Expected state 'playing' (always active), got '{f['state']}'"
         )

@@ -7,9 +7,7 @@ SPEC behavior tested:
 
 The backend must expose the spawn_drone queryable as part of normal server
 operation so that the browser (or any zenoh client) can dynamically create
-drones.  Currently start_simulator() only manages a single drone and does
-not register the fleet spawn service — this test should fail until that
-integration is added.
+drones.
 """
 
 import json
@@ -69,12 +67,8 @@ def test_spawn_drone_available_from_running_server(zenoh_router):
         entity_id="initial-drone",
     )
 
-    with start_server(cfg) as handle:
-        deadline = time.monotonic() + 5.0
-        while time.monotonic() < deadline:
-            if handle.publisher.session_ready.is_set():
-                break
-            time.sleep(0.1)
+    with start_server(cfg) as fleet:
+        time.sleep(0.3)
 
         client = _make_client_session()
         try:
@@ -120,10 +114,9 @@ def test_spawn_drone_available_from_running_server(zenoh_router):
             client.close()
 
 
-def test_list_drones_includes_initial_and_spawned(zenoh_router):
+def test_list_drones_empty_then_spawned(zenoh_router):
     """
-    The list_drones service returns both the initial drone and any
-    dynamically spawned drones.
+    The fleet starts empty. After spawning a drone, list_drones includes it.
     """
     cfg = AppConfig(
         zenoh_endpoint=_ROUTER_ENDPOINT,
@@ -131,15 +124,26 @@ def test_list_drones_includes_initial_and_spawned(zenoh_router):
         entity_id="initial-drone",
     )
 
-    with start_server(cfg) as handle:
-        deadline = time.monotonic() + 5.0
-        while time.monotonic() < deadline:
-            if handle.publisher.session_ready.is_set():
-                break
-            time.sleep(0.1)
+    with start_server(cfg) as fleet:
+        time.sleep(0.3)
 
         client = _make_client_session()
         try:
+            # List drones — should be empty initially
+            replies = client.get(
+                f"{_REALM}/@v0/service/list_drones",
+                timeout=5,
+            )
+            list_result = None
+            for reply in replies:
+                list_result = json.loads(bytes(reply.ok.payload))
+
+            assert list_result is not None, "No reply from list_drones"
+            assert list_result["ok"]
+            assert len(list_result["drones"]) == 0, (
+                f"Expected empty fleet initially, got {[d['entity_id'] for d in list_result['drones']]}"
+            )
+
             # Spawn a drone
             replies = client.get(
                 f"{_REALM}/@v0/service/spawn_drone",
@@ -152,7 +156,7 @@ def test_list_drones_includes_initial_and_spawned(zenoh_router):
 
             time.sleep(0.5)
 
-            # List drones — should include initial + spawned
+            # List drones — should include the spawned drone
             replies = client.get(
                 f"{_REALM}/@v0/service/list_drones",
                 timeout=5,
@@ -165,11 +169,8 @@ def test_list_drones_includes_initial_and_spawned(zenoh_router):
             assert list_result["ok"]
 
             entity_ids = [d["entity_id"] for d in list_result["drones"]]
-            assert "initial-drone" in entity_ids, (
-                f"Initial drone not in list_drones: {entity_ids}"
-            )
-            assert len(entity_ids) >= 2, (
-                f"Expected at least 2 drones (initial + spawned), got {entity_ids}"
+            assert len(entity_ids) == 1, (
+                f"Expected 1 drone after spawn, got {entity_ids}"
             )
         finally:
             client.close()

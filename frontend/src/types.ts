@@ -13,7 +13,7 @@ export type FaultType = "drop" | "stuck" | "nan" | "wrong_rate";
 
 export type FaultState = Record<string, FaultType[]>;
 
-export type OperationMode = "autonomous" | "manual";
+export type OperationMode = "autonomous" | "operated";
 
 export interface SimFrame {
   entity_id: string;
@@ -25,7 +25,7 @@ export interface SimFrame {
   pitch: number;
   rudder_deg?: number;
   thrust_pct?: number;
-  state: "stopped" | "playing" | "paused";
+  state: string;
   operation_mode?: OperationMode;
   health?: HealthSummary;
   faults?: FaultState;

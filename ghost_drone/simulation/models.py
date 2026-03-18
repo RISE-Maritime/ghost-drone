@@ -1,7 +1,7 @@
 """
 Simulation data models for ghost_drone.
 
-Provides TelemetryFrame and SimState for the simulation engine.
+Provides TelemetryFrame and OperationMode for the simulation engine.
 No external dependencies — stdlib only (enum, dataclasses).
 """
 
@@ -11,17 +11,10 @@ import enum
 from dataclasses import dataclass
 
 
-class SimState(enum.Enum):
-    """Drone simulation lifecycle states."""
-    STOPPED = "stopped"   # drone at first waypoint, route editable
-    PLAYING = "playing"   # drone advancing along route
-    PAUSED  = "paused"    # drone frozen mid-route, route locked
-
-
 class OperationMode(enum.Enum):
     """Drone operation mode."""
     AUTONOMOUS = "autonomous"  # follow loaded route via LOS guidance
-    MANUAL     = "manual"      # direct keyboard heading/thrust control
+    OPERATED   = "operated"    # direct keyboard heading/thrust control
 
 
 @dataclass
@@ -34,21 +27,20 @@ class TelemetryFrame:
     lng: float      # degrees WGS-84
     heading: float  # degrees, true north, [0, 360)
     speed: float    # m/s
-    state: SimState # current engine state
     roll: float = 0.0   # degrees (positive = starboard down)
     pitch: float = 0.0  # degrees (positive = bow down)
     rudder_deg: float = 0.0   # rudder angle, degrees (positive = starboard)
     thrust_pct: float = 0.0   # engine thrust, percentage of max [0, 100]
-    operation_mode: OperationMode = OperationMode.AUTONOMOUS
+    operation_mode: OperationMode = OperationMode.OPERATED
 
     def to_dict(self) -> dict:
-        """Return a JSON-serialisable dict (state is the enum .value string)."""
+        """Return a JSON-serialisable dict (state hardcoded for backward compat)."""
         return {
             "lat":     self.lat,
             "lng":     self.lng,
             "heading": self.heading,
             "speed":   self.speed,
-            "state":   self.state.value,
+            "state":   "playing",
             "roll":    self.roll,
             "pitch":   self.pitch,
             "rudder_deg":  self.rudder_deg,

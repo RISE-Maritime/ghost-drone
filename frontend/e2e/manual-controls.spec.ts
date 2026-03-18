@@ -2,7 +2,7 @@
  * E2E tests for manual controls — defines the CORRECT UI behaviour.
  *
  * These tests verify:
- * - Arrow keys only (no WASD) control the drone in manual mode
+ * - Arrow keys only (no WASD) control the drone in operated mode
  * - Left/Right arrows change rudder set value (not heading)
  * - Up/Down arrows change engine set value (not thrust directly)
  * - Setpoint indicators show/hide correctly per mode
@@ -25,7 +25,6 @@ import { test, expect, type Page } from "@playwright/test";
 /** Navigate to the app and wait for it to be ready. */
 async function setup(page: Page): Promise<void> {
   await page.goto("/");
-  await page.waitForSelector("#btn-mode", { state: "attached" });
   await page.waitForSelector("#gauge-heading", { state: "attached" });
 }
 
@@ -40,12 +39,12 @@ async function injectFrame(page: Page, frame: Record<string, unknown>): Promise<
     lng: 11.938,
     heading: 0,
     speed: 0,
-    state: "stopped",
+    state: "playing",
     roll: 0,
     pitch: 0,
     rudder_deg: 0,
     thrust_pct: 0,
-    operation_mode: "autonomous",
+    operation_mode: "operated",
     entity_id: "sim001",
   };
   const merged = { ...defaults, ...frame };
@@ -55,22 +54,6 @@ async function injectFrame(page: Page, frame: Record<string, unknown>): Promise<
       (window as any).__testOnFrame(f);
     }
   }, merged);
-}
-
-/** Switch to manual mode by clicking the mode button. */
-async function enterManualMode(page: Page): Promise<void> {
-  const text = await page.locator("#btn-mode").textContent();
-  if (text?.trim() !== "MANUAL") {
-    await page.click("#btn-mode");
-  }
-}
-
-/** Switch to autonomous mode by clicking the mode button. */
-async function enterAutoMode(page: Page): Promise<void> {
-  const text = await page.locator("#btn-mode").textContent();
-  if (text?.trim() !== "AUTO") {
-    await page.click("#btn-mode");
-  }
 }
 
 /** Collect the values that the onManualControl callback receives. */
@@ -86,43 +69,25 @@ async function captureManualControls(page: Page): Promise<{ calls: any[] }> {
 
 test.describe("Manual controls", () => {
 
-  test("manual mode toggle shows MANUAL and hint", async ({ page }) => {
-    await setup(page);
-    await enterManualMode(page);
-
-    const btnText = await page.locator("#btn-mode").textContent();
-    expect(btnText?.trim()).toBe("MANUAL");
-
-    const hintVisible = await page.locator("#manual-hint").evaluate(
-      (el) => el.classList.contains("visible"),
-    );
-    expect(hintVisible).toBe(true);
-  });
-
   test("ArrowUp increases engine display", async ({ page }) => {
     await setup(page);
-    await enterManualMode(page);
 
+    // Drone starts in operated mode — no toggle needed.
     // Press ArrowUp to increase engine value
     await page.keyboard.press("ArrowUp");
     await page.waitForTimeout(100);
 
-    // The thrust gauge should show a value > 0 after injecting the
-    // resulting sim_frame with the engine effect.
-    // Since we can't get the internal state directly, verify the manual
-    // control callback was invoked — the correct implementation sends
-    // engine increments on ArrowUp.
+    // Verify the manual control callback was invoked
     const { calls } = await captureManualControls(page);
     if (calls.length > 0) {
       const last = calls[calls.length - 1];
-      // Correct: ArrowUp increases engine value (not thrust)
       expect(last.engine ?? last.thrust ?? 0).toBeGreaterThan(0);
     }
 
     // Also inject a frame reflecting the engine effect and check gauge
     await injectFrame(page, {
       state: "playing",
-      operation_mode: "manual",
+      operation_mode: "operated",
       thrust_pct: 10,
       speed: 0.2,
     });
@@ -136,7 +101,6 @@ test.describe("Manual controls", () => {
 
   test("ArrowLeft/Right changes rudder set display", async ({ page }) => {
     await setup(page);
-    await enterManualMode(page);
 
     // Press ArrowRight → should change rudder set value (positive = starboard)
     await page.keyboard.press("ArrowRight");
@@ -153,7 +117,6 @@ test.describe("Manual controls", () => {
 
   test("WASD keys do not affect controls", async ({ page }) => {
     await setup(page);
-    await enterManualMode(page);
 
     // Clear any existing calls
     await page.evaluate(() => {
@@ -177,12 +140,11 @@ test.describe("Manual controls", () => {
 
   test("setpoint indicators visible in manual mode", async ({ page }) => {
     await setup(page);
-    await enterManualMode(page);
 
-    // Inject a playing manual frame to trigger setpoint display
+    // Inject a playing operated frame to trigger setpoint display
     await injectFrame(page, {
       state: "playing",
-      operation_mode: "manual",
+      operation_mode: "operated",
       heading: 45,
       speed: 1.0,
       rudder_deg: 10,
@@ -209,9 +171,8 @@ test.describe("Manual controls", () => {
 
   test("setpoint indicators hidden in autonomous mode", async ({ page }) => {
     await setup(page);
-    await enterAutoMode(page);
 
-    // Inject a playing autonomous frame
+    // Inject an autonomous frame to switch mode
     await injectFrame(page, {
       state: "playing",
       operation_mode: "autonomous",
@@ -279,14 +240,9 @@ test.describe("Manual controls", () => {
 
   test("rudder set needle matches set rudder value", async ({ page }) => {
     await setup(page);
-    await enterManualMode(page);
 
-    // In correct implementation, the set needle shows the directly
-    // commanded rudder angle, not a heading-diff calculation.
-    // We need to trigger the setpoint display with a manual control.
     // Simulate: set rudder_deg = 10 via the manual setpoint callback
     await page.evaluate(() => {
-      // Trigger the onManualSetpoint with rudder_deg-based values
       if (typeof (window as any).__testOnManualSetpoint === "function") {
         (window as any).__testOnManualSetpoint({ rudder_deg: 10, engine: 0.5 });
       }
@@ -295,7 +251,7 @@ test.describe("Manual controls", () => {
     // Also inject a frame so the display is active
     await injectFrame(page, {
       state: "playing",
-      operation_mode: "manual",
+      operation_mode: "operated",
       heading: 90,
       speed: 1.0,
       rudder_deg: 8, // actual may differ slightly from set
@@ -315,11 +271,11 @@ test.describe("Manual controls", () => {
     }
   });
 
-  test("stopped state shows dashes", async ({ page }) => {
+  test("operated mode shows live values not dashes", async ({ page }) => {
     await setup(page);
 
-    // Inject a stopped frame
-    await injectFrame(page, { state: "stopped" });
+    // Inject a frame in operated mode — values should show, not dashes
+    await injectFrame(page, { state: "playing", heading: 45, speed: 1.0, roll: 2.5, pitch: 1.5, rudder_deg: 10, thrust_pct: 50 });
     await page.waitForTimeout(100);
 
     const headingText = await page.locator("#gauge-heading").textContent();
@@ -329,18 +285,17 @@ test.describe("Manual controls", () => {
     const rudderText = await page.locator("#gauge-rudder").textContent();
     const thrustText = await page.locator("#gauge-thrust").textContent();
 
-    // All should show em-dash
-    expect(headingText?.trim()).toBe("\u2014");
-    expect(speedText?.trim()).toBe("\u2014");
-    expect(rollText?.trim()).toBe("\u2014");
-    expect(pitchText?.trim()).toBe("\u2014");
-    expect(rudderText?.trim()).toBe("\u2014");
-    expect(thrustText?.trim()).toBe("\u2014");
+    // All should show actual values, not dashes
+    expect(headingText?.trim()).toBe("45.0");
+    expect(speedText?.trim()).not.toBe("\u2014");
+    expect(rollText?.trim()).toBe("2.50");
+    expect(pitchText?.trim()).toBe("1.50");
+    expect(rudderText?.trim()).toBe("10.0");
+    expect(thrustText?.trim()).toBe("50");
   });
 
   test("actual heading changes gradually with rudder input", async ({ page }) => {
     await setup(page);
-    await enterManualMode(page);
 
     // Simulate: press ArrowRight (sets rudder), then inject frames showing
     // gradual heading change over time — NOT an instant snap.
@@ -354,7 +309,7 @@ test.describe("Manual controls", () => {
     for (const h of headings) {
       await injectFrame(page, {
         state: "playing",
-        operation_mode: "manual",
+        operation_mode: "operated",
         heading: h,
         speed: 0.5,
         rudder_deg: 1,
@@ -385,7 +340,6 @@ test.describe("Manual controls", () => {
 
   test("engine set marker positioned correctly", async ({ page }) => {
     await setup(page);
-    await enterManualMode(page);
 
     // Trigger setpoint display
     await page.evaluate(() => {
@@ -396,7 +350,7 @@ test.describe("Manual controls", () => {
 
     await injectFrame(page, {
       state: "playing",
-      operation_mode: "manual",
+      operation_mode: "operated",
       heading: 0,
       speed: 0.8,
       thrust_pct: 55,
@@ -409,6 +363,15 @@ test.describe("Manual controls", () => {
     );
     // engine=0.6 → setPct = 60 → bottom = "60%"
     expect(markerBottom).toBe("60%");
+  });
+
+  test("manual hint always visible", async ({ page }) => {
+    await setup(page);
+
+    const hintVisible = await page.locator("#manual-hint").evaluate(
+      (el) => el.classList.contains("visible"),
+    );
+    expect(hintVisible).toBe(true);
   });
 
 });

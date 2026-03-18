@@ -25,7 +25,7 @@ from ghost_drone.config import AppConfig
 from ghost_drone.proto.entity_health_pb2 import (
     EntityHealth,
     MODE_AUTONOMOUS,
-    MODE_REMOTE,
+    MODE_DIRECTED,
 )
 from ghost_drone.server import start_simulator
 
@@ -178,5 +178,5 @@ def test_auto_stop_clears_remote_mode(zenoh_router):
     assert last.operation_mode == MODE_AUTONOMOUS, (
         f"After route auto-completion and replay, operation_mode should be "
         f"AUTONOMOUS ({MODE_AUTONOMOUS}), but got {last.operation_mode} "
-        f"(REMOTE={MODE_REMOTE}). Remote heading was not cleared on auto-stop."
+        f"(REMOTE={MODE_DIRECTED}). Remote heading was not cleared on auto-stop."
     )

@@ -33,7 +33,7 @@ const DEFAULT_FRAME: FakeSimFrame = {
   lng: 11.938,
   heading: 0,
   speed: 0,
-  state: "stopped",
+  state: "playing",
   roll: 0,
   pitch: 0,
   rudder_deg: 0,

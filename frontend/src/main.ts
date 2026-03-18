@@ -38,7 +38,7 @@ const controls = new ControlsManager({
   onPlay: async () => {
     if (!selectedDroneId) return;
     if (mapCtrl.waypoints.length < 2) return;
-    if (controls.simState === "stopped") {
+    if (controls.operationMode === "operated") {
       const wps: [number, number][] = mapCtrl.waypoints.map((w) => [
         w.lat,
         w.lng,
@@ -51,11 +51,10 @@ const controls = new ControlsManager({
     }
     await zenoh.playFor(selectedDroneId);
   },
-  onPause: () => { if (selectedDroneId) zenoh.pauseFor(selectedDroneId); },
   onStop: () => { if (selectedDroneId) zenoh.stopFor(selectedDroneId); },
   onSpeedChange: (speed) => { if (selectedDroneId) zenoh.setSpeedFor(selectedDroneId, speed); },
   onClear: () => {
-    if (controls.simState !== "stopped") return;
+    if (controls.operationMode !== "operated") return;
     mapCtrl.clearWaypoints();
     controls.updateControlStates(0);
   },
@@ -85,7 +84,7 @@ const controls = new ControlsManager({
       } else {
         selectedDroneId = "";
         mapCtrl.selectedDroneId = null;
-        controls.simState = "stopped";
+        controls.simState = "playing";
         controls.updateControlStates(0);
       }
     } else {
@@ -94,14 +93,6 @@ const controls = new ControlsManager({
   },
   onSettingsOpen: () => {
     document.getElementById("settings-overlay")!.style.display = "flex";
-  },
-  onModeToggle: () => {
-    if (!selectedDroneId) return;
-    const newMode: OperationMode = controls.operationMode === "autonomous" ? "manual" : "autonomous";
-    controls.setOperationMode(newMode, lastTelemetryHeading);
-    setTelemetryMode(newMode);
-    zenoh.setModeFor(selectedDroneId, newMode);
-    controls.updateControlStates(mapCtrl.waypoints.length);
   },
   onManualControl: (rudderDeg, engine) => {
     if (!selectedDroneId) return;
@@ -124,7 +115,7 @@ mapCtrl.onDroneDragged = async (id, lat, lng) => {
 };
 
 // Wire map -> controls state sync
-mapCtrl.getSimState = () => controls.simState;
+mapCtrl.getOperationMode = () => controls.operationMode;
 mapCtrl.onWaypointsChanged = () =>
   controls.updateControlStates(mapCtrl.waypoints.length);
 
@@ -150,13 +141,12 @@ zenoh = new ZenohClient({
       frame.lat,
       frame.lng,
       frame.heading,
-      frame.state,
+      frame.operation_mode ?? "operated",
     );
 
     // Only update sidebar/controls for the selected drone
     if (eid === selectedDroneId) {
       lastTelemetryHeading = frame.heading;
-      const prevState = controls.simState;
       controls.simState = frame.state;
       // Only update operation mode on actual transitions to avoid
       // overwriting manual heading/thrust from keypresses every frame
@@ -164,10 +154,7 @@ zenoh = new ZenohClient({
         lastOperationMode = frame.operation_mode;
         controls.setOperationMode(frame.operation_mode, frame.heading);
         setTelemetryMode(frame.operation_mode);
-      }
-      // Lock/unlock route editing on state transitions
-      if (prevState !== frame.state) {
-        if (frame.state !== "stopped" && mapCtrl.drawModeActive) {
+        if (frame.operation_mode === "autonomous" && mapCtrl.drawModeActive) {
           mapCtrl.disableDrawMode();
           controls.setDrawModeActive(false);
         }

@@ -12,11 +12,12 @@ enum HealthLevel {
 }
 
 enum OperationMode {
-  MODE_UNKNOWN    = 0;
-  MODE_IDLE       = 1;
-  MODE_MANUAL     = 2;
-  MODE_REMOTE     = 3;
-  MODE_AUTONOMOUS = 4;
+  MODE_MANNED_ON_BOARD = 0;
+  MODE_OPERATED        = 1;
+  MODE_DIRECTED        = 2;
+  MODE_DELEGATED       = 3;
+  MODE_MONITORED       = 4;
+  MODE_AUTONOMOUS      = 5;
 }
 
 message SubsystemHealth {

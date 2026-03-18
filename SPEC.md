@@ -19,9 +19,9 @@ Each behavior is a testable "when X, then Y" statement.
 - When a drone is paused, it holds its current position. When resumed, it continues from where it stopped.
   > **Fully implemented.** `engine.py:121-124` (`pause`) transitions PLAYING→PAUSED; `engine.py:186-196` (`tick`) only advances when PLAYING; `play()` also handles PAUSED→PLAYING resume. Tested in `test_pause_resume.py:95-230` (position spread <0.001 while paused, resumed frame within 50m), `test_sim_engine.py:47-73`.
 - When a drone is stopped, it resets to idle and publishes no telemetry (except entity_health as INACTIVE).
-  > **Fully implemented.** `engine.py:126-130` (`stop`) resets to start; `server.py:268-270` gates `_publish_telemetry` on `PLAYING` only; `server.py:272-275` always publishes health with `HEALTH_INACTIVE`/`MODE_IDLE` when stopped (`server.py:177-180`). Tested in `test_health_states.py:93-154`, `test_e2e_zenoh.py:317-364`.
+  > **Fully implemented.** `engine.py:126-130` (`stop`) resets to start; `server.py:268-270` gates `_publish_telemetry` on `PLAYING` only; `server.py:272-275` always publishes health with `HEALTH_INACTIVE`/`MODE_MANNED_ON_BOARD` when stopped (`server.py:177-180`). Tested in `test_health_states.py:93-154`, `test_e2e_zenoh.py:317-364`.
 - A drone can be remote-controlled: movement commands sent via zenoh override autonomous navigation.
-  > **Fully implemented.** `engine.py:132-138` (`remote_move`) stores override heading; `engine.py:212-222` uses it in `_advance` instead of waypoint bearing; `control.py:55-66` handles `control/move` and `control/cancel_remote`; `server.py:167` reflects `MODE_REMOTE` in health. Tested in `test_remote_control.py:85-172`, `test_cancel_remote.py:93-176`, `test_health_remote_mode.py:96-182`.
+  > **Fully implemented.** `engine.py:132-138` (`remote_move`) stores override heading; `engine.py:212-222` uses it in `_advance` instead of waypoint bearing; `control.py:55-66` handles `control/move` and `control/cancel_remote`; `server.py:167` reflects `MODE_DIRECTED` in health. Tested in `test_remote_control.py:85-172`, `test_cancel_remote.py:93-176`, `test_health_remote_mode.py:96-182`.
 - Routes require at least 2 waypoints; loading fewer is rejected with an error.
   > **Fully implemented.** `engine.py:107-108` raises `ValueError` for `< 2` waypoints; `control.py:98-104` catches and replies `{"ok": false, "error": ...}`; frontend guards at `controls.ts:44` and `main.ts:32`. Tested in `test_sim_engine.py:32-36`, `test_load_route_null_waypoints.py:64-107`, `test_load_route_validation.py:66-101`.
 
@@ -47,7 +47,7 @@ Each behavior is a testable "when X, then Y" statement.
 - Each drone publishes `entity_health` at a steady rate regardless of its state.
   > **Fully implemented.** `server.py:272-275` calls `_publish_health` unconditionally in the tick loop; rate is `HEALTH_RATE_HZ = 1.0` (`server.py:128`). Tested in `test_health_states.py:93-154` (messages received while stopped), `test_health_paused.py:92-172` (while paused).
 - When idle/stopped, health level is INACTIVE and operation mode is IDLE.
-  > **Fully implemented.** `server.py:177-180` sets `HEALTH_INACTIVE`/`MODE_IDLE` and all subsystems to INACTIVE when not playing. Tested in `test_health_states.py:142-154`, `test_sim_frame_health.py:263-305`.
+  > **Fully implemented.** `server.py:177-180` sets `HEALTH_INACTIVE`/`MODE_MANNED_ON_BOARD` and all subsystems to INACTIVE when not playing. Tested in `test_health_states.py:142-154`, `test_sim_frame_health.py:263-305`.
 - When playing autonomously, health level is NOMINAL and operation mode is AUTONOMOUS.
   > **Fully implemented.** `server.py:166-176` computes worst-level from subsystems (all NOMINAL when no faults) and sets `MODE_AUTONOMOUS` when not remote. Tested in `test_health_states.py:212-224`, `test_health_paused.py:160-172`.
 - When a fault is active, the affected subsystem's health reflects it (DEGRADED or CRITICAL).

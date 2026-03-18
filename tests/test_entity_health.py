@@ -13,10 +13,11 @@ from ghost_drone.proto.entity_health_pb2 import (
     HEALTH_NOMINAL,
     HEALTH_UNKNOWN,
     MODE_AUTONOMOUS,
-    MODE_IDLE,
-    MODE_MANUAL,
-    MODE_REMOTE,
-    MODE_UNKNOWN,
+    MODE_DELEGATED,
+    MODE_DIRECTED,
+    MODE_MANNED_ON_BOARD,
+    MODE_MONITORED,
+    MODE_OPERATED,
 )
 from ghost_drone.zenoh_bridge.telemetry import encode_entity_health
 
@@ -79,17 +80,17 @@ def test_encode_decode_round_trip_degraded():
 
 
 def test_encode_decode_round_trip_inactive():
-    payload = encode_entity_health(HEALTH_INACTIVE, 1.0, MODE_IDLE, "", [], [])
+    payload = encode_entity_health(HEALTH_INACTIVE, 1.0, MODE_MANNED_ON_BOARD, "", [], [])
     msg = _decode(payload)
 
     assert msg.level == HEALTH_INACTIVE
-    assert msg.operation_mode == MODE_IDLE
+    assert msg.operation_mode == MODE_MANNED_ON_BOARD
     assert len(msg.subsystems) == 0
     assert len(msg.telemetry_expectations) == 0
 
 
 def test_timestamp_is_set():
-    payload = encode_entity_health(HEALTH_NOMINAL, 1.0, MODE_IDLE, "", [], [])
+    payload = encode_entity_health(HEALTH_NOMINAL, 1.0, MODE_MANNED_ON_BOARD, "", [], [])
     msg = _decode(payload)
 
     assert msg.timestamp.seconds > 0
@@ -104,11 +105,12 @@ def test_health_levels_have_expected_values():
 
 
 def test_operation_modes_have_expected_values():
-    assert MODE_UNKNOWN == 0
-    assert MODE_IDLE == 1
-    assert MODE_MANUAL == 2
-    assert MODE_REMOTE == 3
-    assert MODE_AUTONOMOUS == 4
+    assert MODE_MANNED_ON_BOARD == 0
+    assert MODE_OPERATED == 1
+    assert MODE_DIRECTED == 2
+    assert MODE_DELEGATED == 3
+    assert MODE_MONITORED == 4
+    assert MODE_AUTONOMOUS == 5
 
 
 def test_telemetry_expectations_round_trip():
@@ -130,17 +132,17 @@ def test_telemetry_expectations_round_trip():
 
 
 def test_rate_hz_on_health_message():
-    payload = encode_entity_health(HEALTH_NOMINAL, 0.5, MODE_IDLE, "", [], [])
+    payload = encode_entity_health(HEALTH_NOMINAL, 0.5, MODE_MANNED_ON_BOARD, "", [], [])
     msg = _decode(payload)
 
     assert msg.rate_hz == 0.5
 
 
-def test_remote_mode_with_operator():
+def test_directed_mode_with_operator():
     payload = encode_entity_health(
-        HEALTH_NOMINAL, 1.0, MODE_REMOTE, "roc/operator-1", [], [],
+        HEALTH_NOMINAL, 1.0, MODE_DIRECTED, "roc/operator-1", [], [],
     )
     msg = _decode(payload)
 
-    assert msg.operation_mode == MODE_REMOTE
+    assert msg.operation_mode == MODE_DIRECTED
     assert msg.operator == "roc/operator-1"

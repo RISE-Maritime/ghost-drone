@@ -82,9 +82,10 @@ def _list_drones(client):
     return None
 
 
-def test_list_drones_health_inactive_when_stopped(zenoh_router):
+def test_list_drones_health_nominal_when_spawned(zenoh_router):
     """
-    A newly spawned (stopped) drone reports health 'inactive' in list_drones.
+    A newly spawned drone reports health 'nominal' in list_drones.
+    Drones are always active from spawn.
     """
     with FleetManager(zenoh_endpoint=_ROUTER_ENDPOINT, realm=_REALM):
         client = _make_client_session()
@@ -108,12 +109,12 @@ def test_list_drones_health_inactive_when_stopped(zenoh_router):
             assert isinstance(health, dict), (
                 f"health should be a dict, got {type(health).__name__}: {health!r}"
             )
-            assert health["level"] == "inactive", (
-                f"Stopped drone health level should be 'inactive', got '{health['level']}'"
+            assert health["level"] == "nominal", (
+                f"Spawned drone health level should be 'nominal', got '{health['level']}'"
             )
             for sub in health["subsystems"]:
-                assert sub["level"] == "inactive", (
-                    f"Subsystem {sub['name']} should be 'inactive' when stopped, "
+                assert sub["level"] == "nominal", (
+                    f"Subsystem {sub['name']} should be 'nominal' when spawned, "
                     f"got '{sub['level']}'"
                 )
         finally:

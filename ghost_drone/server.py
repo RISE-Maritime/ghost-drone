@@ -23,7 +23,7 @@ import time
 from ghost_drone.config import AppConfig
 from ghost_drone.sim_state import SimGlobals
 from ghost_drone.simulation.engine import TICK_HZ
-from ghost_drone.simulation.models import OperationMode, SimState
+from ghost_drone.simulation.models import OperationMode
 from ghost_drone.zenoh_bridge.control import register_control_handlers
 from ghost_drone.zenoh_bridge.publisher import ZenohPublisher
 from ghost_drone.zenoh_bridge.telemetry import (
@@ -32,8 +32,9 @@ from ghost_drone.zenoh_bridge.telemetry import (
     HEALTH_INACTIVE,
     HEALTH_NOMINAL,
     MODE_AUTONOMOUS,
-    MODE_IDLE,
-    MODE_REMOTE,
+    MODE_DIRECTED,
+    MODE_MANNED_ON_BOARD,
+    MODE_OPERATED,
     MPS_TO_KNOTS,
     encode_entity_health,
     encode_location_fix,
@@ -157,27 +158,28 @@ def _publish_health(
     publisher: ZenohPublisher,
     cfg: AppConfig,
     sim: SimGlobals,
-    is_playing: bool,
 ) -> None:
-    """Publish an EntityHealth message at a throttled rate."""
+    """Publish an EntityHealth message at a throttled rate.
+
+    Always active — drones are always active from spawn.
+    """
     if not sim.throttle.should_publish(HEALTH_SUBJECT, HEALTH_RATE_HZ):
         return
 
-    if is_playing:
-        operation_mode = MODE_REMOTE if sim.engine.is_remote else MODE_AUTONOMOUS
-        subsystems = []
-        worst_level = HEALTH_NOMINAL
-        for name, subject in _SUBSYSTEM_SUBJECT_MAP.items():
-            sub_level, detail = _subsystem_health(sim, subject)
-            subsystems.append((name, sub_level, detail))
-            # Lower enum value = worse health (CRITICAL=2 < DEGRADED=3 < NOMINAL=4)
-            if sub_level < worst_level:
-                worst_level = sub_level
-        level = worst_level
+    if sim.engine.operation_mode == OperationMode.OPERATED:
+        operation_mode = MODE_OPERATED
+    elif sim.engine.is_remote:
+        operation_mode = MODE_DIRECTED
     else:
-        level = HEALTH_INACTIVE
-        operation_mode = MODE_IDLE
-        subsystems = [(name, HEALTH_INACTIVE, "") for name in _SUBSYSTEM_SUBJECT_MAP]
+        operation_mode = MODE_AUTONOMOUS
+    subsystems = []
+    worst_level = HEALTH_NOMINAL
+    for name, subject in _SUBSYSTEM_SUBJECT_MAP.items():
+        sub_level, detail = _subsystem_health(sim, subject)
+        subsystems.append((name, sub_level, detail))
+        if sub_level < worst_level:
+            worst_level = sub_level
+    level = worst_level
 
     telemetry_expectations = [
         (subject, sc.source_id, sc.rate_hz)
@@ -202,35 +204,36 @@ _HEALTH_LEVEL_NAMES = {
 
 
 _MODE_NAMES = {
-    MODE_IDLE: "idle",
+    MODE_MANNED_ON_BOARD: "manned_on_board",
+    MODE_OPERATED: "operated",
+    MODE_DIRECTED: "directed",
     MODE_AUTONOMOUS: "autonomous",
-    MODE_REMOTE: "remote",
 }
 
 
-def _compute_health_summary(sim: SimGlobals, is_playing: bool) -> dict:
-    """Return a health summary dict suitable for inclusion in sim_frame JSON."""
-    if is_playing:
-        operation_mode = MODE_REMOTE if sim.engine.is_remote else MODE_AUTONOMOUS
-        subsystems = []
-        worst_level = HEALTH_NOMINAL
-        for name, subject in _SUBSYSTEM_SUBJECT_MAP.items():
-            sub_level, detail = _subsystem_health(sim, subject)
-            subsystems.append({
-                "name": name,
-                "level": _HEALTH_LEVEL_NAMES.get(sub_level, "unknown"),
-                "detail": detail,
-            })
-            if sub_level < worst_level:
-                worst_level = sub_level
-        level = worst_level
+def _compute_health_summary(sim: SimGlobals) -> dict:
+    """Return a health summary dict suitable for inclusion in sim_frame JSON.
+
+    Always active — drones are always active from spawn.
+    """
+    if sim.engine.operation_mode == OperationMode.OPERATED:
+        operation_mode = MODE_OPERATED
+    elif sim.engine.is_remote:
+        operation_mode = MODE_DIRECTED
     else:
-        level = HEALTH_INACTIVE
-        operation_mode = MODE_IDLE
-        subsystems = [
-            {"name": name, "level": "inactive", "detail": ""}
-            for name in _SUBSYSTEM_SUBJECT_MAP
-        ]
+        operation_mode = MODE_AUTONOMOUS
+    subsystems = []
+    worst_level = HEALTH_NOMINAL
+    for name, subject in _SUBSYSTEM_SUBJECT_MAP.items():
+        sub_level, detail = _subsystem_health(sim, subject)
+        subsystems.append({
+            "name": name,
+            "level": _HEALTH_LEVEL_NAMES.get(sub_level, "unknown"),
+            "detail": detail,
+        })
+        if sub_level < worst_level:
+            worst_level = sub_level
+    level = worst_level
 
     return {
         "level": _HEALTH_LEVEL_NAMES.get(level, "unknown"),
@@ -261,43 +264,37 @@ def _tick_loop(
 ) -> None:
     """Daemon thread body: advance simulation at TICK_HZ, publish frames."""
     dt = 1.0 / TICK_HZ
-    prev_state = None
+    prev_mode = None
     stuck_values: dict = {}
 
     while not stop_event.is_set():
         frame = sim.engine.tick(dt, cruise_speed_mps=sim.cruise_speed_mps)
         roll, pitch = frame.roll, frame.pitch
 
-        # Reset throttle and stuck values on STOPPED transition
-        if frame.state == SimState.STOPPED and prev_state != SimState.STOPPED:
+        # Reset throttle and stuck values on operation_mode change
+        current_mode = frame.operation_mode
+        if current_mode != prev_mode and prev_mode is not None:
             sim.throttle.reset()
             stuck_values.clear()
-        prev_state = frame.state
+        prev_mode = current_mode
 
-        # Publish keelson telemetry only when PLAYING
-        if frame.state == SimState.PLAYING:
-            _publish_telemetry(publisher, cfg, frame, roll, pitch, sim, stuck_values)
+        # Always publish keelson telemetry — drones are always active
+        _publish_telemetry(publisher, cfg, frame, roll, pitch, sim, stuck_values)
 
-        # Health is always published (so subscribers know inactive vs nominal).
-        # PAUSED is still mid-mission, so report active health (not INACTIVE).
-        is_active = frame.state != SimState.STOPPED
-        _publish_health(publisher, cfg, sim, is_active)
+        # Health is always published
+        _publish_health(publisher, cfg, sim)
 
         # Always publish sim_frame for the browser UI
         frame_dict = frame.to_dict()
         frame_dict["entity_id"] = cfg.entity_id
         frame_dict["roll"] = roll
         frame_dict["pitch"] = pitch
-        frame_dict["health"] = _compute_health_summary(sim, is_active)
+        frame_dict["health"] = _compute_health_summary(sim)
         frame_dict["faults"] = sim.faults.all_faults()
         _publish_sim_frame(publisher, cfg, frame_dict)
 
-        # Publish manual setpoint separately so the frontend can show
-        # commanded values without them being overwritten by actuals.
-        if (
-            frame.state == SimState.PLAYING
-            and sim.engine.operation_mode == OperationMode.MANUAL
-        ):
+        # Publish manual setpoint when in OPERATED mode
+        if sim.engine.operation_mode == OperationMode.OPERATED:
             setpoint = json.dumps({
                 "rudder_deg": sim.engine._manual_rudder,
                 "engine": sim.engine._manual_engine,
@@ -367,26 +364,23 @@ def start_simulator(cfg: AppConfig):
 
 @contextlib.contextmanager
 def start_server(cfg: AppConfig):
-    """Start the simulator with fleet management (spawn/list drones).
+    """Start the fleet manager (spawn/list/delete drones).
 
-    Yields a SimHandle for the initial drone.  The FleetManager runs
-    alongside, exposing spawn_drone and list_drones queryables at the
-    realm level.  The initial drone is registered with the fleet so
-    that list_drones includes it.
+    Yields the FleetManager. No initial drone is created — the fleet
+    starts empty and drones are spawned dynamically via the spawn_drone
+    queryable.
     """
     from ghost_drone.fleet import FleetManager  # noqa: PLC0415
 
-    with start_simulator(cfg) as handle:
-        fleet = FleetManager(
-            zenoh_endpoint=cfg.zenoh_endpoint,
-            realm=cfg.keelson_realm,
-        )
-        fleet._start()
-        fleet.register_drone(cfg.entity_id, handle)
-        try:
-            yield handle
-        finally:
-            fleet._stop()
+    fleet = FleetManager(
+        zenoh_endpoint=cfg.zenoh_endpoint,
+        realm=cfg.keelson_realm,
+    )
+    fleet._start()
+    try:
+        yield fleet
+    finally:
+        fleet._stop()
 
 
 # ---------------------------------------------------------------------------
@@ -403,7 +397,7 @@ def run(cfg: AppConfig) -> None:
     signal.signal(signal.SIGINT, _on_signal)
     signal.signal(signal.SIGTERM, _on_signal)
 
-    with start_server(cfg) as handle:
+    with start_server(cfg) as fleet:
         print("Simulator running. Press Ctrl+C to stop.")
         stop.wait()
 

@@ -3,7 +3,7 @@ End-to-end test: cancel remote control returns drone to autonomous navigation.
 
 Verifies that after activating remote control via control/move, sending
 control/cancel_remote returns the drone to autonomous mode — entity_health
-operation_mode switches from MODE_REMOTE back to MODE_AUTONOMOUS.
+operation_mode switches from MODE_DIRECTED back to MODE_AUTONOMOUS.
 
 SPEC: "A drone can be remote-controlled: movement commands sent via zenoh
        override autonomous navigation."
@@ -22,7 +22,7 @@ from ghost_drone.config import AppConfig
 from ghost_drone.proto.entity_health_pb2 import (
     EntityHealth,
     MODE_AUTONOMOUS,
-    MODE_REMOTE,
+    MODE_DIRECTED,
 )
 from ghost_drone.server import start_simulator
 
@@ -94,7 +94,7 @@ def test_cancel_remote_restores_autonomous_mode(zenoh_router):
     """
     After activating remote control, sending control/cancel_remote should
     return the drone to autonomous navigation. Entity_health operation_mode
-    should switch from MODE_REMOTE back to MODE_AUTONOMOUS.
+    should switch from MODE_DIRECTED back to MODE_AUTONOMOUS.
     """
     cfg = AppConfig(
         zenoh_endpoint=_ROUTER_ENDPOINT,
@@ -155,13 +155,13 @@ def test_cancel_remote_restores_autonomous_mode(zenoh_router):
 
     # --- Assertions ---
 
-    # During remote phase: operation_mode should be MODE_REMOTE
+    # During remote phase: operation_mode should be MODE_DIRECTED
     assert len(health_remote) >= 1, (
         f"Expected >=1 health messages during remote phase, got {len(health_remote)}"
     )
     for msg in health_remote:
-        assert msg.operation_mode == MODE_REMOTE, (
-            f"Expected MODE_REMOTE ({MODE_REMOTE}) during remote phase, "
+        assert msg.operation_mode == MODE_DIRECTED, (
+            f"Expected MODE_DIRECTED ({MODE_DIRECTED}) during remote phase, "
             f"got {msg.operation_mode}"
         )
 

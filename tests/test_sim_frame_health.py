@@ -260,9 +260,10 @@ def test_sim_frame_health_reflects_faults(zenoh_router):
         assert heading_sub["level"] == "nominal", f"Expected nominal after clear, got {heading_sub['level']}"
 
 
-def test_sim_frame_health_inactive_when_stopped(zenoh_router):
+def test_sim_frame_health_nominal_when_operated(zenoh_router):
     """
-    When stopped, sim_frame health level should be 'inactive'.
+    When in OPERATED mode (no route), sim_frame health level should be 'nominal'.
+    Drones are always active from spawn.
     """
     cfg = AppConfig(
         zenoh_endpoint=_ROUTER_ENDPOINT,
@@ -290,16 +291,16 @@ def test_sim_frame_health_inactive_when_stopped(zenoh_router):
     try:
         with start_simulator(cfg) as handle:
             _wait_for_publisher(handle)
-            # Stay stopped, just collect frames
+            # Don't load route or play — drone is active from spawn
             time.sleep(1.0)
     finally:
         subscriber.undeclare()
         client_session.close()
 
-    stopped_frames = [f for f in frames if f.get("state") == "stopped"]
-    assert len(stopped_frames) >= 5, f"Expected >=5 stopped frames, got {len(stopped_frames)}"
+    active_frames = [f for f in frames if f.get("state") == "playing"]
+    assert len(active_frames) >= 5, f"Expected >=5 active frames, got {len(active_frames)}"
 
-    for f in stopped_frames[:5]:
-        assert "health" in f, f"sim_frame missing 'health' when stopped: {f.keys()}"
-        assert f["health"]["level"] == "inactive", \
-            f"Expected inactive health when stopped, got {f['health']['level']}"
+    for f in active_frames[:5]:
+        assert "health" in f, f"sim_frame missing 'health': {f.keys()}"
+        assert f["health"]["level"] == "nominal", \
+            f"Expected nominal health (always active), got {f['health']['level']}"

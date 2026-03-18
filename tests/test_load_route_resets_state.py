@@ -1,14 +1,8 @@
 """
-End-to-end test: loading a route resets the drone to STOPPED state.
+End-to-end test: loading a route stores waypoints for the next play().
 
-Verifies SPEC behavior:
-- "When a route is loaded and autonomous mode is enabled, the drone moves to
-   the start of the route and follows it."
-
-Loading a route should always reset the drone to STOPPED, regardless of the
-current state.  The user must explicitly call play() to begin following the
-new route.  This test checks the case where a new route is loaded while the
-drone is already PLAYING — the drone should transition to STOPPED.
+Drones are always active — load_route no longer changes state.
+The user must explicitly call play() to begin following the new route.
 """
 
 import json
@@ -67,14 +61,11 @@ def _wait_for_publisher(handle, timeout=5.0):
     raise RuntimeError("Publisher session not ready within timeout")
 
 
-def test_load_route_while_playing_resets_to_stopped(zenoh_router):
+def test_load_route_stores_waypoints(zenoh_router):
     """
-    Loading a new route while the drone is PLAYING should transition the
-    drone back to STOPPED.  The user must send play() again to follow the
-    new route.
-
-    SPEC: "When a route is loaded and autonomous mode is enabled, the drone
-           moves to the start of the route and follows it."
+    Loading a route should store waypoints. The drone stays active
+    (state always "playing") and the user must call play() to follow
+    the new route.
     """
     cfg = AppConfig(
         zenoh_endpoint=_ROUTER_ENDPOINT,
@@ -103,27 +94,28 @@ def test_load_route_while_playing_resets_to_stopped(zenoh_router):
         with start_simulator(cfg) as handle:
             _wait_for_publisher(handle)
 
-            # Load route A and play
+            # Load route A — drone stays active
             replies = client_session.get(
                 f"{_PREFIX}/service/load_route",
                 payload=json.dumps({"waypoints": _ROUTE_A}).encode(),
                 timeout=5,
             )
             for reply in replies:
-                pass
-            client_session.put(f"{_PREFIX}/control/play", "")
-            time.sleep(1.0)
+                result = json.loads(bytes(reply.ok.payload))
+                assert result["ok"], f"load_route A failed: {result}"
 
-            # Verify we are PLAYING
-            with lock:
-                playing_frames = [f for f in frames if f.get("state") == "playing"]
-            assert len(playing_frames) >= 5, (
-                f"Expected drone to be playing, got {len(playing_frames)} playing frames"
-            )
+            time.sleep(0.5)
 
-            # Now load route B while still playing
+            # Verify drone is still active (state = "playing")
             with lock:
-                frames.clear()
+                recent = list(frames)
+            assert len(recent) > 0, "No sim_frames received"
+            for f in recent[-3:]:
+                assert f.get("state") == "playing", (
+                    f"Expected state 'playing', got '{f.get('state')}'"
+                )
+
+            # Load route B — should succeed and store new waypoints
             replies = client_session.get(
                 f"{_PREFIX}/service/load_route",
                 payload=json.dumps({"waypoints": _ROUTE_B}).encode(),
@@ -133,17 +125,9 @@ def test_load_route_while_playing_resets_to_stopped(zenoh_router):
                 result = json.loads(bytes(reply.ok.payload))
                 assert result["ok"], f"load_route B failed: {result}"
 
-            # Wait for sim_frame to reflect the new state
-            time.sleep(0.5)
-
-            # After loading a new route, the drone should be STOPPED
-            with lock:
-                recent = list(frames)
-            stopped_frames = [f for f in recent if f.get("state") == "stopped"]
-            assert len(stopped_frames) > 0, (
-                f"Expected drone to be stopped after loading new route, "
-                f"but got states: {[f.get('state') for f in recent[-5:]]}"
-            )
+            # Verify the engine has the new waypoints
+            wps = handle.sim.engine.waypoints
+            assert len(wps) >= 2, "Expected waypoints to be stored"
 
             client_session.put(f"{_PREFIX}/control/stop", "")
             time.sleep(0.2)

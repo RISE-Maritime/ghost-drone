@@ -2,7 +2,6 @@ import type { OperationMode } from "./types";
 
 export interface ControlCallbacks {
   onPlay: () => void;
-  onPause: () => void;
   onStop: () => void;
   onSpeedChange: (speed: number) => void;
   onClear: () => void;
@@ -10,28 +9,24 @@ export interface ControlCallbacks {
   onSpawnToggle: () => void;
   onDeleteDrone: () => void;
   onSettingsOpen: () => void;
-  onModeToggle: () => void;
   onManualControl: (rudderDeg: number, engine: number) => void;
 }
 
 export class ControlsManager {
   private btnDraw = document.getElementById("btn-draw") as HTMLButtonElement;
   private btnPlay = document.getElementById("btn-play") as HTMLButtonElement;
-  private btnPause = document.getElementById("btn-pause") as HTMLButtonElement;
   private btnStop = document.getElementById("btn-stop") as HTMLButtonElement;
   private btnClear = document.getElementById("btn-clear") as HTMLButtonElement;
   private speedInput = document.getElementById("speed-input") as HTMLInputElement;
   private btnSpawn = document.getElementById("btn-spawn") as HTMLButtonElement;
   private btnDeleteDrone = document.getElementById("btn-delete-drone") as HTMLButtonElement;
   private btnSettings = document.getElementById("btn-settings") as HTMLButtonElement;
-  private btnMode = document.getElementById("btn-mode") as HTMLButtonElement;
-  private manualHint = document.getElementById("manual-hint")!;
   private simStatusBadge = document.getElementById("sim-status-badge")!;
   private simStatusText = document.getElementById("sim-status-text")!;
   private droneSelect = document.getElementById("drone-select") as HTMLSelectElement;
 
-  simState: string = "stopped";
-  operationMode: OperationMode = "autonomous";
+  simState: string = "playing";
+  operationMode: OperationMode = "operated";
   selectedDroneId: string | null = null;
   private drawModeActive = false;
   private spawnModeActive = false;
@@ -44,21 +39,19 @@ export class ControlsManager {
 
   constructor(private callbacks: ControlCallbacks) {
     this.btnPlay.addEventListener("click", () => callbacks.onPlay());
-    this.btnPause.addEventListener("click", () => callbacks.onPause());
     this.btnStop.addEventListener("click", () => callbacks.onStop());
     this.btnClear.addEventListener("click", () => callbacks.onClear());
     this.btnDraw.addEventListener("click", () => callbacks.onDrawToggle());
     this.btnSpawn.addEventListener("click", () => callbacks.onSpawnToggle());
     this.btnDeleteDrone.addEventListener("click", () => callbacks.onDeleteDrone());
     this.btnSettings.addEventListener("click", () => callbacks.onSettingsOpen());
-    this.btnMode.addEventListener("click", () => callbacks.onModeToggle());
     this.speedInput.addEventListener("change", () => {
       callbacks.onSpeedChange(parseFloat(this.speedInput.value));
     });
 
     // Keyboard controls for manual mode — arrow keys only
     window.addEventListener("keydown", (e) => {
-      if (this.operationMode !== "manual") return;
+      if (this.operationMode !== "operated") return;
       // Ignore if focus is in an input/select/textarea
       const tag = (e.target as HTMLElement).tagName;
       if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
@@ -73,7 +66,7 @@ export class ControlsManager {
     });
 
     window.addEventListener("keyup", (e) => {
-      if (this.operationMode !== "manual") return;
+      if (this.operationMode !== "operated") return;
       const key = e.key;
       if (this.keysDown.has(key)) {
         this.keysDown.delete(key);
@@ -112,20 +105,13 @@ export class ControlsManager {
   }
 
   setOperationMode(mode: OperationMode, _currentHeading?: number): void {
-    const wasManual = this.operationMode === "manual";
+    const wasManual = this.operationMode === "operated";
     this.operationMode = mode;
-    if (mode === "manual") {
+    if (mode === "operated") {
       if (!wasManual) {
         this.manualRudder = 0;
         this.manualEngine = 0;
       }
-      this.btnMode.textContent = "MANUAL";
-      this.btnMode.classList.add("manual");
-      this.manualHint.classList.add("visible");
-    } else {
-      this.btnMode.textContent = "AUTO";
-      this.btnMode.classList.remove("manual");
-      this.manualHint.classList.remove("visible");
     }
   }
 
@@ -146,13 +132,20 @@ export class ControlsManager {
     }
   }
 
-  updateDroneList(drones: { entity_id: string; state: string }[]): void {
+  updateDroneList(drones: { entity_id: string; state: string; operation_mode?: string }[]): void {
     const currentValue = this.droneSelect.value;
     this.droneSelect.innerHTML = "";
+    if (drones.length === 0) {
+      const opt = document.createElement("option");
+      opt.value = "";
+      opt.textContent = "No drones";
+      this.droneSelect.appendChild(opt);
+      return;
+    }
     for (const d of drones) {
       const opt = document.createElement("option");
       opt.value = d.entity_id;
-      opt.textContent = `${d.entity_id} (${d.state})`;
+      opt.textContent = `${d.entity_id} (${d.operation_mode ?? d.state})`;
       this.droneSelect.appendChild(opt);
     }
     // Restore selection if still in list
@@ -169,31 +162,16 @@ export class ControlsManager {
   }
 
   updateControlStates(waypointCount: number): void {
-    const isManual = this.operationMode === "manual";
-    const canEdit = this.simState === "stopped" && !isManual;
-    const canPlay = !isManual && ((canEdit && waypointCount >= 2) || this.simState === "paused");
+    const canEdit = this.operationMode === "operated";
+    const canPlay = canEdit && waypointCount >= 2;
 
     this.btnPlay.disabled = !canPlay;
-    this.btnPause.disabled = isManual || this.simState !== "playing";
-    this.btnStop.disabled = isManual || this.simState === "stopped";
+    this.btnStop.disabled = this.operationMode !== "autonomous";
     this.btnClear.disabled = !canEdit;
-    this.btnDraw.disabled = !canEdit || isManual;
-
-    if (!canEdit && this.drawModeActive) {
-      this.drawModeActive = false;
-      this.btnDraw.classList.remove("active");
-    }
+    this.btnDraw.disabled = !canEdit;
 
     // Status badge
-    if (this.simState === "playing") {
-      this.simStatusBadge.classList.add("visible");
-      this.simStatusBadge.classList.remove("paused");
-      this.simStatusText.textContent = "Running";
-    } else if (this.simState === "paused") {
-      this.simStatusBadge.classList.add("visible", "paused");
-      this.simStatusText.textContent = "Paused";
-    } else {
-      this.simStatusBadge.classList.remove("visible", "paused");
-    }
+    this.simStatusBadge.classList.add("visible");
+    this.simStatusText.textContent = this.operationMode === "autonomous" ? "Autonomous" : "Operated";
   }
 }

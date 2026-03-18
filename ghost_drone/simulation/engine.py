@@ -13,7 +13,7 @@ from __future__ import annotations
 import math
 
 from .dynamics import USVDynamics
-from .models import OperationMode, SimState, TelemetryFrame
+from .models import OperationMode, TelemetryFrame
 
 # ---------------------------------------------------------------------------
 # Module-level constants
@@ -186,7 +186,6 @@ class SimEngine:
     """
 
     def __init__(self) -> None:
-        self._state: SimState = SimState.STOPPED
         self._waypoints: list[tuple[float, float]] = []  # active navigation waypoints
         self._route_waypoints: list[tuple[float, float]] = []  # original route
         self._lat: float = 0.0
@@ -196,13 +195,15 @@ class SimEngine:
         self._seg_idx: int = 0               # index of current segment start waypoint
         self._remote_heading: float | None = None  # remote heading override
         self._dynamics = USVDynamics()
+        self._dynamics.reset(0, 0, 0)
         self._roll: float = 0.0
         self._pitch: float = 0.0
         self._rudder_deg: float = 0.0
         self._thrust_pct: float = 0.0
-        self._operation_mode: OperationMode = OperationMode.AUTONOMOUS
-        self._manual_rudder: float = 0.0     # commanded rudder angle in MANUAL mode, degrees [-35, +35]
-        self._manual_engine: float = 0.0     # commanded engine power in MANUAL mode, [0, 1]
+        self._operation_mode: OperationMode = OperationMode.OPERATED
+        self._manual_rudder: float = 0.0     # commanded rudder angle in OPERATED mode, degrees [-35, +35]
+        self._manual_engine: float = 0.0     # commanded engine power in OPERATED mode, [0, 1]
+        self._route_complete: bool = False
 
     # ------------------------------------------------------------------
     # Public route / lifecycle API
@@ -225,46 +226,49 @@ class SimEngine:
             raise ValueError("Route requires at least 2 waypoints")
         self._route_waypoints = list(waypoints)
         self._waypoints = list(waypoints)
-        self._state = SimState.STOPPED
+        self._route_complete = False
         self._seg_idx = 0
         self._speed = 0.0
         self._remote_heading = None
 
     def play(self) -> None:
-        """Transition STOPPED -> PLAYING or PAUSED -> PLAYING.
+        """Switch to AUTONOMOUS mode and start following the loaded route.
 
-        When transitioning from STOPPED, prepends the drone's current
-        position as waypoint 0 if it is not already near the route start,
-        so the existing LOS guidance navigates the drone to the route
-        before following it.
+        Prepends the drone's current position as waypoint 0 if it is not
+        already near the route start, so the existing LOS guidance navigates
+        the drone to the route before following it.
 
-        No-op if already PLAYING or if no route is loaded.
+        No-op if no route is loaded.
         """
-        if self._state in (SimState.STOPPED, SimState.PAUSED) and self._waypoints:
-            if self._state == SimState.STOPPED:
-                self._waypoints = list(self._route_waypoints)
-                first_wp = self._waypoints[0]
-                dist = _haversine_m(
-                    self._lat, self._lng, first_wp[0], first_wp[1],
-                )
-                if dist > WP_ACCEPT_RADIUS_M:
-                    self._waypoints.insert(0, (self._lat, self._lng))
-                self._seg_idx = 0
-                # Keep current heading — LOS guidance will steer toward the route
-                self._dynamics.reset(self._lat, self._lng, self._heading)
-            self._state = SimState.PLAYING
-
-    def pause(self) -> None:
-        """Transition PLAYING -> PAUSED. No-op otherwise."""
-        if self._state == SimState.PLAYING:
-            self._state = SimState.PAUSED
+        if not self._waypoints:
+            return
+        self._waypoints = list(self._route_waypoints)
+        first_wp = self._waypoints[0]
+        dist = _haversine_m(
+            self._lat, self._lng, first_wp[0], first_wp[1],
+        )
+        if dist > WP_ACCEPT_RADIUS_M:
+            self._waypoints.insert(0, (self._lat, self._lng))
+        self._seg_idx = 0
+        self._route_complete = False
+        # Keep current heading — LOS guidance will steer toward the route
+        self._dynamics.reset(self._lat, self._lng, self._heading)
+        self._operation_mode = OperationMode.AUTONOMOUS
+        self._manual_rudder = 0.0
+        self._manual_engine = 0.0
 
     def stop(self) -> None:
-        """Transition any state -> STOPPED and reset drone to first waypoint."""
-        self._state = SimState.STOPPED
+        """Switch to OPERATED mode, zero motion, stay in place."""
         self._remote_heading = None
+        self._operation_mode = OperationMode.OPERATED
+        self._manual_rudder = 0.0
+        self._manual_engine = 0.0
+        self._speed = 0.0
+        self._roll = 0.0
+        self._pitch = 0.0
+        self._rudder_deg = 0.0
+        self._thrust_pct = 0.0
         self._waypoints = list(self._route_waypoints)
-        self._reset_to_start()
 
     def remote_move(self, heading_deg: float) -> None:
         """Override autonomous heading with a remote command.
@@ -279,17 +283,17 @@ class SimEngine:
         self._remote_heading = None
 
     def set_mode(self, mode: OperationMode) -> None:
-        """Switch between AUTONOMOUS and MANUAL operation modes.
+        """Switch between AUTONOMOUS and OPERATED operation modes.
 
-        Switching to MANUAL while PLAYING in autonomous mode stops
+        Switching to OPERATED while PLAYING in autonomous mode stops
         autonomous playback (pauses) so the user takes over.
-        Switching to AUTONOMOUS clears manual commands.
+        Switching to AUTONOMOUS clears operated-mode commands.
         """
         if mode == self._operation_mode:
             return
         self._operation_mode = mode
-        if mode == OperationMode.MANUAL:
-            # Reset manual controls to neutral
+        if mode == OperationMode.OPERATED:
+            # Reset operated-mode controls to neutral
             self._manual_rudder = 0.0
             self._manual_engine = 0.0
             self._remote_heading = None
@@ -299,34 +303,31 @@ class SimEngine:
             self._manual_engine = 0.0
 
     def manual_control(self, rudder_deg: float, engine: float) -> None:
-        """Set manual rudder angle and engine power. Only effective in MANUAL mode.
+        """Set manual rudder angle and engine power. Only effective in OPERATED mode.
 
         Args:
             rudder_deg: Rudder angle in degrees, clamped to [-35, +35].
             engine: Engine power fraction, clamped to [0, 1].
         """
-        if self._operation_mode != OperationMode.MANUAL:
+        if self._operation_mode != OperationMode.OPERATED:
             return
         self._manual_rudder = max(-35.0, min(35.0, rudder_deg))
         self._manual_engine = max(0.0, min(1.0, engine))
-        # Auto-play if stopped/paused so manual input moves the drone
-        if self._state in (SimState.STOPPED, SimState.PAUSED):
-            self._state = SimState.PLAYING
-            self._dynamics.reset(self._lat, self._lng, self._heading)
 
     def set_home(self, lat: float, lng: float) -> None:
-        """Set the drone's home position while STOPPED.
+        """Set the drone's home position while in OPERATED mode.
 
-        This allows repositioning a drone before playing. Clears any
-        previously loaded route so the drone can be re-routed from the
-        new location. No-op if state is not STOPPED.
+        This allows repositioning a drone when not autonomously navigating.
+        Clears any previously loaded route so the drone can be re-routed
+        from the new location. No-op if mode is not OPERATED.
         """
-        if self._state == SimState.STOPPED:
+        if self._operation_mode == OperationMode.OPERATED:
             self._lat = lat
             self._lng = lng
             self._waypoints = []
             self._route_waypoints = []
             self._seg_idx = 0
+            self._dynamics.reset(lat, lng, self._heading)
 
     @property
     def is_remote(self) -> bool:
@@ -365,20 +366,18 @@ class SimEngine:
     def tick(self, dt: float, cruise_speed_mps: float = 1.5) -> TelemetryFrame:
         """Advance simulation by *dt* seconds and return a TelemetryFrame.
 
-        - STOPPED/PAUSED: returns current position with zero speed (no movement).
-        - PLAYING: advances drone using 3-DOF dynamics.
+        Always advances — drones are active from spawn.
+        In OPERATED mode with zero input, dynamics naturally produce no movement.
+        When route is complete and AUTONOMOUS, hold position.
         """
-        if self._state == SimState.PLAYING:
+        if not (self._route_complete and self._operation_mode == OperationMode.AUTONOMOUS):
             self._advance(dt, cruise_speed_mps)
-
-        effective_speed = self._speed if self._state == SimState.PLAYING else 0.0
 
         return TelemetryFrame(
             lat=self._lat,
             lng=self._lng,
             heading=self._heading % 360,
-            speed=max(0.0, effective_speed),
-            state=self._state,
+            speed=max(0.0, self._speed),
             roll=self._roll,
             pitch=self._pitch,
             rudder_deg=self._rudder_deg,
@@ -394,8 +393,8 @@ class SimEngine:
         transitions.
         """
         # --- Determine control inputs and step dynamics ---
-        if self._operation_mode == OperationMode.MANUAL:
-            # Bypass PI/PD controllers — apply rudder and engine directly
+        if self._operation_mode == OperationMode.OPERATED or not self._waypoints:
+            # Operated mode (or no waypoints): apply rudder and engine directly
             out = self._dynamics.step_manual(
                 dt, self._manual_rudder, self._manual_engine,
             )
@@ -428,8 +427,8 @@ class SimEngine:
         self._thrust_pct = out.thrust_pct
 
         # --- Waypoint tracking (acceptance radius) ---
-        if self._operation_mode == OperationMode.MANUAL:
-            return  # No waypoint tracking in manual mode
+        if self._operation_mode == OperationMode.OPERATED or not self._waypoints:
+            return  # No waypoint tracking in operated mode or without waypoints
         if self._remote_heading is None:
             next_wp_idx = min(self._seg_idx + 1, len(self._waypoints) - 1)
             dist = _haversine_m(
@@ -440,9 +439,9 @@ class SimEngine:
             if dist < WP_ACCEPT_RADIUS_M:
                 self._seg_idx += 1
                 if self._seg_idx >= len(self._waypoints) - 1:
-                    # Route complete — stop at final waypoint
+                    # Route complete — hold position at final waypoint, stay AUTONOMOUS
                     self._lat, self._lng = self._waypoints[-1]
-                    self._state = SimState.STOPPED
+                    self._route_complete = True
                     self._remote_heading = None
                     self._seg_idx = len(self._waypoints) - 2  # clamp
                     self._speed = 0.0
@@ -450,15 +449,12 @@ class SimEngine:
                     self._pitch = 0.0
                     self._rudder_deg = 0.0
                     self._thrust_pct = 0.0
+                    self._manual_rudder = 0.0
+                    self._manual_engine = 0.0
 
     # ------------------------------------------------------------------
     # Properties
     # ------------------------------------------------------------------
-
-    @property
-    def state(self) -> SimState:
-        """Current simulation state."""
-        return self._state
 
     @property
     def operation_mode(self) -> OperationMode:

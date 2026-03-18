@@ -37,10 +37,6 @@ def register_control_handlers(
         logger.debug("control/play received")
         sim.engine.play()
 
-    def on_pause(sample: zenoh.Sample) -> None:
-        logger.debug("control/pause received")
-        sim.engine.pause()
-
     def on_stop(sample: zenoh.Sample) -> None:
         logger.debug("control/stop received")
         sim.engine.stop()
@@ -67,7 +63,6 @@ def register_control_handlers(
         sim.engine.cancel_remote()
 
     declared.append(session.declare_subscriber(f"{prefix}/control/play", on_play))
-    declared.append(session.declare_subscriber(f"{prefix}/control/pause", on_pause))
     declared.append(session.declare_subscriber(f"{prefix}/control/stop", on_stop))
     declared.append(session.declare_subscriber(f"{prefix}/control/set_speed", on_set_speed))
     declared.append(session.declare_subscriber(f"{prefix}/control/move", on_move))

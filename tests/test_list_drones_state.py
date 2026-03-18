@@ -82,9 +82,9 @@ def _list_drones(client):
     return None
 
 
-def test_list_drones_includes_state_stopped(zenoh_router):
+def test_list_drones_includes_state_playing(zenoh_router):
     """
-    A newly spawned drone appears in list_drones with state 'stopped'.
+    A newly spawned drone appears in list_drones with state 'playing' — always active.
     """
     with FleetManager(zenoh_endpoint=_ROUTER_ENDPOINT, realm=_REALM) as fleet:
         client = _make_client_session()
@@ -104,8 +104,8 @@ def test_list_drones_includes_state_stopped(zenoh_router):
 
             drone = by_id[entity_id]
             assert "state" in drone, "list_drones response must include 'state' field"
-            assert drone["state"] == "stopped", (
-                f"Newly spawned drone should be 'stopped', got '{drone['state']}'"
+            assert drone["state"] == "playing", (
+                f"Drone should always be 'playing', got '{drone['state']}'"
             )
         finally:
             client.close()

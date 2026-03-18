@@ -48,11 +48,17 @@ function updateHealthDisplay(health: HealthSummary | undefined): void {
     healthLevelEl.textContent = "\u2014";
     healthLevelEl.removeAttribute("data-level");
     healthSubsystemsEl.innerHTML = "";
+    const healthPanel = document.getElementById("health-panel");
+    if (healthPanel) healthPanel.removeAttribute("data-health");
     return;
   }
 
   healthLevelEl.textContent = health.level.toUpperCase();
   healthLevelEl.setAttribute("data-level", health.level);
+
+  // Update health panel border glow to reflect overall state
+  const healthPanel = document.getElementById("health-panel");
+  if (healthPanel) healthPanel.setAttribute("data-health", health.level);
 
   const rows = health.subsystems.map((sub) => {
     const detail = sub.detail ? ` (${sub.detail})` : "";
@@ -66,7 +72,7 @@ function updateHealthDisplay(health: HealthSummary | undefined): void {
 
 export function setOperationMode(mode: string): void {
   currentOperationMode = mode;
-  if (mode !== "manual") {
+  if (mode !== "operated") {
     clearSetpointIndicators();
   }
 }
@@ -91,7 +97,7 @@ function clearSetpointIndicators(): void {
 }
 
 function updateSetpointIndicators(): void {
-  if (currentOperationMode !== "manual" || setpointRudder === null || setpointEngine === null) {
+  if (currentOperationMode !== "operated" || setpointRudder === null || setpointEngine === null) {
     clearSetpointIndicators();
     return;
   }
@@ -119,52 +125,37 @@ function updateSetpointIndicators(): void {
 export function onTelemetryFrame(frame: SimFrame): void {
   updateHealthDisplay(frame.health);
 
-  if (frame.state === "stopped") {
-    for (const k of Object.keys(history)) history[k] = [];
-    for (const k of Object.keys(gaugeEls) as (keyof typeof gaugeEls)[]) {
-      gaugeEls[k].textContent = "\u2014";
-    }
-    gaugeRudder.textContent = "\u2014";
-    gaugeThrust.textContent = "\u2014";
-    rudderNeedle.setAttribute("transform", "rotate(0, 60, 60)");
-    thrustBarFill.style.height = "0%";
-    clearSetpointIndicators();
-    return;
+  lastActualHeading = frame.heading;
+
+  const values: Record<string, number> = {
+    heading: frame.heading,
+    speed: frame.speed * 1.94384,
+    roll: frame.roll,
+    pitch: frame.pitch,
+  };
+  for (const key of Object.keys(history)) {
+    history[key].push(values[key]);
+    if (history[key].length > HISTORY_SAMPLES) history[key].shift();
   }
+  gaugeEls.heading.textContent = frame.heading.toFixed(1);
+  gaugeEls.speed.textContent = (frame.speed * 1.94384).toFixed(2);
+  gaugeEls.roll.textContent = frame.roll.toFixed(2);
+  gaugeEls.pitch.textContent = frame.pitch.toFixed(2);
 
-  if (frame.state === "playing") {
-    lastActualHeading = frame.heading;
+  // Conning display — always shows actual values
+  const rudder = frame.rudder_deg ?? 0;
+  const thrust = frame.thrust_pct ?? 0;
+  gaugeRudder.textContent = rudder.toFixed(1);
+  gaugeThrust.textContent = thrust.toFixed(0);
+  // Rudder needle: map [-35, +35] degrees to arc rotation.
+  const clampedRudder = Math.max(-35, Math.min(35, rudder));
+  const needleAngle = (clampedRudder / 35) * 90;
+  rudderNeedle.setAttribute("transform", `rotate(${needleAngle}, 60, 60)`);
+  // Thrust bar
+  const clampedThrust = Math.max(0, Math.min(100, thrust));
+  thrustBarFill.style.height = `${clampedThrust}%`;
 
-    const values: Record<string, number> = {
-      heading: frame.heading,
-      speed: frame.speed * 1.94384,
-      roll: frame.roll,
-      pitch: frame.pitch,
-    };
-    for (const key of Object.keys(history)) {
-      history[key].push(values[key]);
-      if (history[key].length > HISTORY_SAMPLES) history[key].shift();
-    }
-    gaugeEls.heading.textContent = frame.heading.toFixed(1);
-    gaugeEls.speed.textContent = (frame.speed * 1.94384).toFixed(2);
-    gaugeEls.roll.textContent = frame.roll.toFixed(2);
-    gaugeEls.pitch.textContent = frame.pitch.toFixed(2);
-
-    // Conning display — always shows actual values
-    const rudder = frame.rudder_deg ?? 0;
-    const thrust = frame.thrust_pct ?? 0;
-    gaugeRudder.textContent = rudder.toFixed(1);
-    gaugeThrust.textContent = thrust.toFixed(0);
-    // Rudder needle: map [-35, +35] degrees to arc rotation.
-    const clampedRudder = Math.max(-35, Math.min(35, rudder));
-    const needleAngle = (clampedRudder / 35) * 90;
-    rudderNeedle.setAttribute("transform", `rotate(${needleAngle}, 60, 60)`);
-    // Thrust bar
-    const clampedThrust = Math.max(0, Math.min(100, thrust));
-    thrustBarFill.style.height = `${clampedThrust}%`;
-
-    updateSetpointIndicators();
-  }
+  updateSetpointIndicators();
 
   const sparkColor = cssVar("--instrument-enhanced-primary-color") || "#5a84bf";
   for (const key of Object.keys(svgEls) as (keyof typeof svgEls)[]) {

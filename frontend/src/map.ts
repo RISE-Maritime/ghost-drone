@@ -166,7 +166,7 @@ export class MapController {
     if (this.routeLayer) { this.routeLayer.remove(); this.routeLayer = null; }
     if (this.waypoints.length === 0) return;
 
-    const isDraggable = this.drawModeActive && this.getSimState() === "stopped";
+    const isDraggable = this.drawModeActive;
     for (let i = 0; i < this.waypoints.length; i++) {
       const wp = this.waypoints[i];
       const marker = L.marker([wp.lat, wp.lng], {
@@ -183,7 +183,6 @@ export class MapController {
           this.onWaypointsChanged();
         });
         marker.on("contextmenu", () => {
-          if (this.getSimState() !== "stopped") return;
           this.waypoints.splice(idx, 1);
           this.saveCurrentRoute();
           this.refreshRoute();
@@ -202,15 +201,15 @@ export class MapController {
   }
 
   updateWaypointDraggability(): void {
-    const isDraggable = this.drawModeActive && this.getSimState() === "stopped";
+    const isDraggable = this.drawModeActive;
     for (const m of this.wpMarkers) {
       if (isDraggable) m.dragging!.enable();
       else m.dragging!.disable();
     }
   }
 
-  /** Must be set externally — returns current sim state string */
-  getSimState: () => string = () => "stopped";
+  /** Must be set externally — returns current operation mode string */
+  getOperationMode: () => string = () => "operated";
 
   /** Sync current waypoints into the per-drone store */
   private saveCurrentRoute(): void {
@@ -220,7 +219,7 @@ export class MapController {
   }
 
   private onMapClick = (e: L.LeafletMouseEvent) => {
-    if (!this.drawModeActive || this.getSimState() !== "stopped") return;
+    if (!this.drawModeActive) return;
     this.waypoints.push({ lat: e.latlng.lat, lng: e.latlng.lng });
     this.saveCurrentRoute();
     this.refreshRoute();
@@ -238,7 +237,6 @@ export class MapController {
   }
 
   toggleDrawMode(): void {
-    if (this.getSimState() !== "stopped") return;
     this.drawModeActive = !this.drawModeActive;
     if (this.drawModeActive) {
       // Deactivate spawn mode when entering draw mode
@@ -255,22 +253,22 @@ export class MapController {
     this.map.off("click", this.onMapClick);
   }
 
-  updateDronePosition(entityId: string, lat: number, lng: number, heading: number, state: string): void {
+  updateDronePosition(entityId: string, lat: number, lng: number, heading: number, operationMode: string): void {
     // Ignore frames near null island (0, 0) — backend race on spawn adds noise
     if (Math.abs(lat) < 0.01 && Math.abs(lng) < 0.01) return;
 
     const latlng = L.latLng(lat, lng);
-    const opacity = state === "playing" ? 1.0 : 0.4;
+    const opacity = 1.0;
     const isSelected = entityId === this.selectedDroneId;
-    const prevState = this.droneStates.get(entityId);
-    this.droneStates.set(entityId, state);
+    const prevMode = this.droneStates.get(entityId);
+    this.droneStates.set(entityId, operationMode);
 
     let marker = this.droneMarkers.get(entityId);
     if (!marker) {
       marker = L.marker(latlng, {
         icon: this.createDroneIcon(opacity, isSelected),
         zIndexOffset: isSelected ? 1000 : 500,
-        draggable: state === "stopped",
+        draggable: operationMode === "operated",
       }).addTo(this.map);
       marker.on("click", () => {
         if (this.onDroneSelected) this.onDroneSelected(entityId);
@@ -296,9 +294,9 @@ export class MapController {
     }
     this.droneOpacities.set(entityId, opacity);
 
-    // Update draggability when state changes
-    if (prevState !== state) {
-      if (state === "stopped") {
+    // Update draggability when operation mode changes
+    if (prevMode !== operationMode) {
+      if (operationMode === "operated") {
         marker.dragging!.enable();
       } else {
         marker.dragging!.disable();

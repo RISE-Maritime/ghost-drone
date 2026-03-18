@@ -109,8 +109,8 @@ def test_spawn_drone_creates_new_entity(zenoh_router):
                 assert abs(last["lng"] - spawn_lng) < 0.01, (
                     f"Drone lng {last['lng']} too far from spawn {spawn_lng}"
                 )
-                assert last["state"] == "stopped", (
-                    f"Newly spawned drone should be stopped, got {last['state']}"
+                assert last["state"] == "playing", (
+                    f"Newly spawned drone should be active (playing), got {last['state']}"
                 )
         finally:
             client.close()

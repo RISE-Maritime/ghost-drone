@@ -74,7 +74,7 @@ def _wait_for_publisher(handle, timeout=5.0):
 
 
 def _set_manual_mode(client, prefix=_PREFIX):
-    client.put(f"{prefix}/control/set_mode", json.dumps({"mode": "manual"}).encode())
+    client.put(f"{prefix}/control/set_mode", json.dumps({"mode": "operated"}).encode())
 
 
 def _set_autonomous_mode(client, prefix=_PREFIX):
@@ -176,14 +176,14 @@ class TestManualControl:
                 frames = _collect_sim_frames(client, 2.0)
                 assert len(frames) > 0, "No sim_frames received"
                 for f in frames:
-                    assert f["operation_mode"] == "manual", (
-                        f"Expected operation_mode 'manual', got '{f['operation_mode']}'"
+                    assert f["operation_mode"] == "operated", (
+                        f"Expected operation_mode 'operated', got '{f['operation_mode']}'"
                     )
             finally:
                 client.close()
 
-    def test_manual_control_auto_plays_from_stopped(self, zenoh_router):
-        """Sending manual control while stopped should auto-play."""
+    def test_manual_control_works_immediately(self, zenoh_router):
+        """Manual control should work immediately — drones are always active."""
         with _start_sim(zenoh_router) as handle:
             _wait_for_publisher(handle)
             handle.sim.engine.set_home(57.706, 11.938)
@@ -195,11 +195,11 @@ class TestManualControl:
                 time.sleep(1.0)
                 frames = _collect_sim_frames(client, 2.0)
                 assert len(frames) > 0, "No sim_frames received"
-                playing_frames = [f for f in frames if f["state"] == "playing"]
-                assert len(playing_frames) > 0, (
-                    "Expected state 'playing' after manual control, "
-                    f"got states: {[f['state'] for f in frames]}"
-                )
+                # All frames should be "playing" — always active
+                for f in frames:
+                    assert f["state"] == "playing", (
+                        f"Expected state 'playing', got '{f['state']}'"
+                    )
             finally:
                 client.close()
 
@@ -287,20 +287,23 @@ class TestManualControl:
                 client.close()
 
     def test_manual_control_ignored_in_autonomous(self, zenoh_router):
-        """Sending manual control without switching to manual mode → stays stopped."""
+        """Sending manual control in autonomous mode has no effect on motion."""
         with _start_sim(zenoh_router) as handle:
             _wait_for_publisher(handle)
             handle.sim.engine.set_home(57.706, 11.938)
             client = _make_client_session()
             try:
-                # Don't switch to manual mode — stay autonomous
+                # Switch to autonomous mode
+                _set_autonomous_mode(client)
+                time.sleep(0.3)
                 _send_manual(client, rudder_deg=10, engine=0.5)
                 time.sleep(1.5)
                 frames = _collect_sim_frames(client, 2.0)
-                # Should either get no frames or all stopped
+                # All frames should still report state "playing" (always active)
+                # but manual control should have no effect
                 for f in frames:
-                    assert f["state"] == "stopped", (
-                        f"Manual control in autonomous mode should not play; "
+                    assert f["state"] == "playing", (
+                        f"Drone should always report state 'playing', "
                         f"got state '{f['state']}'"
                     )
             finally:

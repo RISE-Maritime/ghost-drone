@@ -105,6 +105,11 @@ def test_all_five_subjects_published_and_decode(zenoh_router):
             _wait_for_publisher(handle)
             handle.sim.engine.set_home(_ROUTE[0][0], _ROUTE[0][1])
 
+            # Clear any early messages captured before set_home
+            time.sleep(0.2)
+            with received_lock:
+                received.clear()
+
             # Load route via queryable (GET with payload)
             replies = client_session.get(
                 f"{_PREFIX}/service/load_route",
@@ -315,9 +320,10 @@ def test_load_route_validates_waypoints(zenoh_router):
         client_session.close()
 
 
-def test_no_messages_published_when_stopped(zenoh_router):
+def test_telemetry_always_published(zenoh_router):
     """
-    Asserts that no keelson zenoh messages are published while stopped.
+    Asserts that keelson telemetry messages are always published — drones
+    are always active from spawn.
     """
     cfg = AppConfig(
         zenoh_endpoint=_ROUTER_ENDPOINT,
@@ -332,8 +338,6 @@ def test_no_messages_published_when_stopped(zenoh_router):
 
     def on_sample(_sample):
         nonlocal keelson_count
-        # Only count keelson telemetry subjects, not sim_frame or entity_health.
-        # SPEC: "While stopped, no keelson telemetry is published (entity_health excepted)."
         key = str(_sample.key_expr)
         if "sim_frame" not in key and "entity_health" not in key:
             with lock:
@@ -345,21 +349,12 @@ def test_no_messages_published_when_stopped(zenoh_router):
         with start_simulator(cfg) as handle:
             _wait_for_publisher(handle)
 
-            # Load route but do NOT play — stay in STOPPED state.
-            replies = client_session.get(
-                f"{_PREFIX}/service/load_route",
-                payload=json.dumps({"waypoints": _ROUTE}).encode(),
-                timeout=5,
-            )
-            for reply in replies:
-                pass  # consume
-
-            # Wait 1.5 seconds (longer than the 1 Hz publish interval).
-            time.sleep(1.5)
+            # Don't load route or play — drone is still active from spawn
+            time.sleep(2.5)
     finally:
         subscriber.undeclare()
         client_session.close()
 
     assert (
-        keelson_count == 0
-    ), f"Expected 0 keelson messages while stopped, got {keelson_count}"
+        keelson_count > 0
+    ), f"Expected telemetry messages (always active), got {keelson_count}"

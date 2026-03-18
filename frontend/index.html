@@ -25,34 +25,50 @@
     :root,
     [data-obc-theme="dusk"] {
       --container-overlay-color:          rgba(0, 0, 0, 0.72);
-      --instrument-enhanced-primary-color: rgb(90, 132, 191);   /* = --data-categorical-01 */
+      --instrument-enhanced-primary-color: rgb(90, 132, 191);
+      --instrument-enhanced-glow:         rgba(90, 132, 191, 0.12);
       --instrument-port-primary-color:    rgb(165, 90, 106);
       --instrument-starboard-primary-color: rgb(0, 128, 95);
       --shadow-overlay: 0 8px 32px rgba(0, 0, 0, 0.72);
+      --gauge-inset-shadow:               inset 0 1px 3px rgba(0, 0, 0, 0.35);
+      --sidebar-bg:                       rgba(0, 0, 0, 0.18);
+      --bar-separator-glow:               rgba(90, 132, 191, 0.08);
     }
 
     [data-obc-theme="night"] {
       --container-overlay-color:          rgba(0, 0, 0, 0.90);
       --instrument-enhanced-primary-color: rgb(200, 148, 0);
+      --instrument-enhanced-glow:         rgba(200, 148, 0, 0.10);
       --instrument-port-primary-color:    rgb(120, 40, 52);
       --instrument-starboard-primary-color: rgb(0, 82, 58);
       --shadow-overlay: 0 8px 32px rgba(0, 0, 0, 0.90);
+      --gauge-inset-shadow:               inset 0 1px 3px rgba(0, 0, 0, 0.50);
+      --sidebar-bg:                       rgba(0, 0, 0, 0.25);
+      --bar-separator-glow:               rgba(200, 148, 0, 0.06);
     }
 
     [data-obc-theme="day"] {
       --container-overlay-color:          rgba(80, 80, 90, 0.50);
       --instrument-enhanced-primary-color: rgb(0, 56, 158);
+      --instrument-enhanced-glow:         rgba(0, 56, 158, 0.08);
       --instrument-port-primary-color:    rgb(165, 90, 106);
       --instrument-starboard-primary-color: rgb(0, 128, 95);
       --shadow-overlay: 0 8px 32px rgba(0, 0, 0, 0.38);
+      --gauge-inset-shadow:               inset 0 1px 2px rgba(0, 0, 0, 0.10);
+      --sidebar-bg:                       rgba(0, 0, 0, 0.03);
+      --bar-separator-glow:               rgba(0, 56, 158, 0.05);
     }
 
     [data-obc-theme="bright"] {
       --container-overlay-color:          rgba(60, 62, 70, 0.45);
       --instrument-enhanced-primary-color: rgb(0, 46, 148);
+      --instrument-enhanced-glow:         rgba(0, 46, 148, 0.06);
       --instrument-port-primary-color:    rgb(165, 90, 106);
       --instrument-starboard-primary-color: rgb(0, 128, 95);
       --shadow-overlay: 0 8px 32px rgba(0, 0, 0, 0.32);
+      --gauge-inset-shadow:               inset 0 1px 2px rgba(0, 0, 0, 0.08);
+      --sidebar-bg:                       rgba(0, 0, 0, 0.02);
+      --bar-separator-glow:               rgba(0, 46, 148, 0.04);
     }
 
     /* =====================================================================
@@ -69,6 +85,17 @@
       color: var(--element-active-color);
     }
 
+    /* Custom scrollbar for sidebar */
+    #telemetry-sidebar::-webkit-scrollbar { width: 4px; }
+    #telemetry-sidebar::-webkit-scrollbar-track { background: transparent; }
+    #telemetry-sidebar::-webkit-scrollbar-thumb {
+      background: var(--border-outline-color);
+      border-radius: 2px;
+    }
+    #telemetry-sidebar::-webkit-scrollbar-thumb:hover {
+      background: var(--element-inactive-color);
+    }
+
     /* =====================================================================
        App shell
        ===================================================================== */
@@ -83,7 +110,7 @@
        Top bar
        ===================================================================== */
     #top-bar {
-      height: 52px;
+      height: 48px;
       background: var(--container-global-color);
       border-bottom: 1px solid var(--border-outline-color);
       display: flex;
@@ -101,27 +128,29 @@
     }
 
     #app-title {
-      font-size: 15px;
-      font-weight: 600;
+      font-size: 14px;
+      font-weight: 700;
       color: var(--element-active-color);
-      letter-spacing: 0.02em;
+      letter-spacing: 0.04em;
       user-select: none;
+      text-transform: uppercase;
     }
 
     #app-subtitle {
-      font-size: 11px;
+      font-size: 10px;
       color: var(--element-inactive-color);
-      letter-spacing: 0.03em;
+      letter-spacing: 0.05em;
       user-select: none;
+      text-transform: uppercase;
     }
 
     #top-bar-clock {
       font-size: 13px;
-      font-weight: 500;
+      font-weight: 600;
       color: var(--element-neutral-color);
-      letter-spacing: 0.04em;
+      letter-spacing: 0.06em;
       font-variant-numeric: tabular-nums;
-      min-width: 52px;
+      min-width: 56px;
     }
 
     #top-bar-spacer { flex: 1; }
@@ -129,20 +158,23 @@
     #top-bar-right {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
 
-    /* Theme selector — OB normal button style */
+    /* Theme selector */
     #theme-select {
       background: var(--normal-enabled-background-color);
       color: var(--on-normal-active-color);
       border: 1px solid var(--normal-enabled-border-color, var(--border-outline-color));
       border-radius: 4px;
-      padding: 5px 8px;
-      font-size: 12px;
+      padding: 4px 8px;
+      font-size: 11px;
       font-family: 'Noto Sans', sans-serif;
+      font-weight: 500;
       cursor: pointer;
       outline: none;
+      letter-spacing: 0.03em;
+      transition: border-color 0.15s, background 0.15s;
     }
 
     #theme-select:hover { background: var(--normal-hover-background-color); }
@@ -170,7 +202,7 @@
       align-items: center;
       justify-content: center;
       color: var(--element-inactive-color);
-      transition: background 0.15s, color 0.15s;
+      transition: background 0.15s, color 0.15s, box-shadow 0.15s;
     }
 
     .leaflet-follow-btn:hover {
@@ -182,6 +214,7 @@
       background: var(--instrument-enhanced-primary-color);
       color: var(--container-global-color);
       border-color: var(--instrument-enhanced-primary-color);
+      box-shadow: 0 0 8px var(--instrument-enhanced-glow);
     }
 
     .leaflet-follow-btn.active:hover {
@@ -194,38 +227,48 @@
     #sim-status-badge {
       display: none;
       align-items: center;
-      gap: 5px;
-      font-size: 11px;
+      gap: 6px;
+      font-size: 10px;
       font-weight: 700;
       color: var(--alert-running-color);
-      letter-spacing: 0.06em;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      padding: 0 12px 0 4px;
+      padding: 3px 10px 3px 8px;
+      border-radius: 10px;
+      background: rgba(0, 200, 120, 0.08);
+      border: 1px solid rgba(0, 200, 120, 0.15);
+      transition: color 0.3s, background 0.3s, border-color 0.3s;
     }
 
     #sim-status-badge.visible { display: flex; }
-    #sim-status-badge.paused  { color: var(--alert-caution-color); }
+
+    #sim-status-badge.paused {
+      color: var(--alert-caution-color);
+      background: rgba(233, 195, 0, 0.08);
+      border-color: rgba(233, 195, 0, 0.15);
+    }
 
     #sim-status-dot {
-      width: 7px;
-      height: 7px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
       background: currentColor;
       animation: statusPulse 1.4s ease-in-out infinite;
+      flex-shrink: 0;
     }
 
     #sim-status-badge.paused #sim-status-dot { animation: none; }
 
     @keyframes statusPulse {
       0%, 100% { opacity: 1; }
-      50%       { opacity: 0.3; }
+      50%       { opacity: 0.25; }
     }
 
     /* =====================================================================
        Telemetry sidebar
        ===================================================================== */
     #telemetry-sidebar {
-      width: 220px;
+      width: 236px;
       background: var(--container-section-color);
       border-left: 1px solid var(--border-outline-color);
       overflow-y: auto;
@@ -237,67 +280,84 @@
     }
 
     .sidebar-header {
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border-divider-color);
-      margin-bottom: 2px;
+      padding: 0 2px 6px;
+      margin-bottom: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .sidebar-label {
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 700;
       color: var(--element-inactive-color);
       text-transform: uppercase;
-      letter-spacing: 0.10em;
+      letter-spacing: 0.12em;
+    }
+
+    .sidebar-header::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border-divider-color);
     }
 
     /* Instrument-style gauge block */
     .gauge-block {
       background: var(--container-background-color);
       border: 1px solid var(--border-outline-color);
-      border-radius: 4px;
+      border-radius: 5px;
       padding: 8px 10px 6px;
+      box-shadow: var(--gauge-inset-shadow);
+      transition: border-color 0.2s;
     }
 
     .gauge-tag {
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 700;
       color: var(--element-inactive-color);
       text-transform: uppercase;
-      letter-spacing: 0.09em;
-      margin-bottom: 1px;
+      letter-spacing: 0.10em;
+      margin-bottom: 2px;
     }
 
     .gauge-row {
       display: flex;
       align-items: baseline;
-      gap: 4px;
-      margin-bottom: 5px;
+      gap: 3px;
+      margin-bottom: 4px;
     }
 
     .gauge-value {
       color: var(--instrument-enhanced-primary-color);
       font-size: 22px;
-      font-weight: 600;
+      font-weight: 700;
       font-family: 'Noto Sans', sans-serif;
       line-height: 1.1;
-      letter-spacing: -0.01em;
+      letter-spacing: -0.02em;
       min-width: 60px;
+      font-variant-numeric: tabular-nums;
     }
 
     .gauge-unit {
       color: var(--element-inactive-color);
-      font-size: 11px;
-      font-weight: 500;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
     }
 
-    .sparkline-svg { display: block; width: 100%; }
+    .sparkline-svg {
+      display: block;
+      width: 100%;
+      opacity: 0.85;
+    }
 
     /* Conning display */
-    .conning-block { padding: 8px 6px 6px; }
+    .conning-block { padding: 10px 6px 6px; }
 
     .conning-row {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       justify-content: center;
     }
 
@@ -320,7 +380,7 @@
       display: flex;
       align-items: baseline;
       gap: 2px;
-      margin-top: 2px;
+      margin-top: 3px;
     }
 
     .conning-val {
@@ -338,11 +398,12 @@
     .gauge-set-row.visible { display: flex; }
 
     .gauge-set-label {
-      font-size: 9px;
+      font-size: 8px;
       font-weight: 700;
       color: var(--alert-caution-color);
       letter-spacing: 0.06em;
       margin-right: 2px;
+      text-transform: uppercase;
     }
 
     .gauge-set-val {
@@ -366,6 +427,7 @@
       color: var(--alert-caution-color);
       letter-spacing: 0.06em;
       margin-right: 2px;
+      text-transform: uppercase;
     }
 
     .conning-set-val {
@@ -390,6 +452,7 @@
       border-radius: 3px;
       position: relative;
       overflow: hidden;
+      box-shadow: var(--gauge-inset-shadow);
     }
 
     .thrust-bar-fill {
@@ -423,6 +486,7 @@
       color: var(--element-inactive-color);
       line-height: 1;
       padding: 1px 0;
+      font-variant-numeric: tabular-nums;
     }
 
     /* Health panel */
@@ -434,10 +498,11 @@
     }
 
     .health-level {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.06em;
+      transition: color 0.3s;
     }
 
     .health-level[data-level="nominal"]  { color: var(--alert-running-color); }
@@ -446,11 +511,16 @@
     .health-level[data-level="inactive"] { color: var(--element-inactive-color); }
     .health-level[data-level="unknown"]  { color: var(--element-inactive-color); }
 
+    /* Subtle border glow on health gauge block matching health state */
+    #health-panel[data-health="nominal"]  { border-color: rgba(0, 200, 120, 0.25); }
+    #health-panel[data-health="degraded"] { border-color: rgba(233, 195, 0, 0.30); }
+    #health-panel[data-health="critical"] { border-color: rgba(220, 53, 69, 0.35); }
+
     .health-sub-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 3px 0;
+      padding: 4px 0;
       border-top: 1px solid var(--border-divider-color);
     }
 
@@ -462,9 +532,10 @@
 
     .health-sub-level {
       font-size: 10px;
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.04em;
+      transition: color 0.3s;
     }
 
     .health-sub-level[data-level="nominal"]  { color: var(--alert-running-color); }
@@ -481,12 +552,12 @@
 
     .fault-table th {
       color: var(--element-inactive-color);
-      font-size: 9px;
-      font-weight: 600;
+      font-size: 8px;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
       text-align: center;
-      padding: 0 2px 4px;
+      padding: 0 2px 5px;
       border-bottom: 1px solid var(--border-divider-color);
     }
 
@@ -507,21 +578,27 @@
       border: 1px solid var(--normal-enabled-border-color, var(--border-outline-color));
       border-radius: 3px;
       padding: 2px 4px;
-      font-size: 9px;
+      font-size: 8px;
       font-family: 'Noto Sans', sans-serif;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       outline: none;
-      min-width: 32px;
-      transition: background 0.1s ease, color 0.1s ease;
+      min-width: 30px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
-    .fault-toggle:hover { background: var(--normal-hover-background-color); }
+    .fault-toggle:hover {
+      background: var(--normal-hover-background-color);
+      border-color: var(--element-inactive-color);
+    }
 
     .fault-toggle.active {
       background: var(--alert-alarm-color);
       color: var(--container-global-color);
       border-color: var(--alert-alarm-color);
+      box-shadow: 0 0 6px rgba(220, 53, 69, 0.3);
     }
 
     .fault-toggle.active:hover { opacity: 0.85; }
@@ -530,58 +607,67 @@
        Bottom control bar
        ===================================================================== */
     #bottom-bar {
-      height: 52px;
+      height: 48px;
       background: var(--container-section-color);
       border-top: 1px solid var(--border-outline-color);
       display: flex;
       align-items: center;
-      gap: 4px;
-      padding: 0 12px;
+      gap: 5px;
+      padding: 0 14px;
       flex-shrink: 0;
     }
 
     .bar-divider {
       width: 1px;
-      height: 28px;
+      height: 24px;
       background: var(--border-divider-color);
       flex-shrink: 0;
-      margin: 0 4px;
+      margin: 0 5px;
     }
 
     .bar-spacer { flex: 1; }
 
-    /* Native buttons styled with OB CSS variables — reliable event handling,
-       no shadow DOM, identical visual result to obc-button */
+    /* Native buttons styled with OB CSS variables */
     .ctrl-btn {
       background: var(--normal-enabled-background-color);
       color: var(--on-normal-active-color);
       border: 1px solid var(--normal-enabled-border-color, var(--border-outline-color));
       border-radius: 4px;
-      padding: 6px 12px;
+      padding: 5px 11px;
       cursor: pointer;
-      font-size: 12px;
+      font-size: 11px;
       font-family: 'Noto Sans', sans-serif;
-      font-weight: 500;
+      font-weight: 600;
       line-height: 1;
       white-space: nowrap;
       outline: none;
-      transition: background 0.08s ease;
+      letter-spacing: 0.02em;
+      transition: background 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
     }
 
     .ctrl-btn:disabled {
-      opacity: 0.32;
+      opacity: 0.28;
       cursor: not-allowed;
     }
 
-    .ctrl-btn:not(:disabled):hover   { background: var(--normal-hover-background-color); }
-    .ctrl-btn:not(:disabled):active  { background: var(--normal-pressed-background-color); }
-    .ctrl-btn:focus-visible          { outline: 2px solid var(--border-focus-color); outline-offset: 1px; }
+    .ctrl-btn:not(:disabled):hover {
+      background: var(--normal-hover-background-color);
+    }
+    .ctrl-btn:not(:disabled):active {
+      background: var(--normal-pressed-background-color);
+      transform: translateY(0.5px);
+    }
+    .ctrl-btn:focus-visible {
+      outline: 2px solid var(--border-focus-color);
+      outline-offset: 1px;
+    }
 
     /* variant="check" active state */
     .ctrl-btn.active {
       background: var(--selected-enabled-background-color);
       color: var(--on-selected-active-color);
       border-color: var(--selected-enabled-background-color);
+      box-shadow: 0 0 6px var(--instrument-enhanced-glow);
     }
     .ctrl-btn.active:not(:disabled):hover {
       background: var(--selected-hover-background-color);
@@ -604,13 +690,6 @@
     .ctrl-btn.flat:not(:disabled):hover  { background: var(--flat-hover-background-color); }
     .ctrl-btn.flat:not(:disabled):active { background: var(--flat-pressed-background-color); }
 
-    /* Mode toggle button */
-    .ctrl-btn#btn-mode.manual {
-      background: var(--alert-caution-color);
-      color: var(--container-global-color);
-      border-color: var(--alert-caution-color);
-    }
-
     /* Manual control hint (shown in bottom bar) */
     #manual-hint {
       display: none;
@@ -627,21 +706,25 @@
       align-items: center;
       gap: 6px;
       color: var(--element-neutral-color);
-      font-size: 12px;
+      font-size: 11px;
+      font-weight: 500;
       white-space: nowrap;
     }
 
     #speed-input {
-      width: 58px;
+      width: 56px;
       background: var(--normal-enabled-background-color);
       color: var(--on-normal-active-color);
       border: 1px solid var(--normal-enabled-border-color, var(--border-outline-color));
       border-radius: 4px;
-      padding: 4px 6px;
-      font-size: 12px;
+      padding: 3px 6px;
+      font-size: 11px;
       font-family: 'Noto Sans', sans-serif;
+      font-weight: 600;
       text-align: right;
       outline: none;
+      font-variant-numeric: tabular-nums;
+      transition: border-color 0.15s;
     }
 
     #speed-input:focus { border-color: var(--border-focus-color); }
@@ -654,6 +737,8 @@
       position: fixed;
       inset: 0;
       background: var(--container-overlay-color);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
       z-index: 9999;
       align-items: center;
       justify-content: center;
@@ -662,31 +747,37 @@
     #settings-modal {
       background: var(--container-background-color);
       border: 1px solid var(--border-outline-color);
-      border-radius: 8px;
-      padding: 20px;
+      border-radius: 10px;
+      padding: 22px;
       width: 440px;
       max-height: 80vh;
       overflow-y: auto;
       box-shadow: var(--shadow-overlay);
+      animation: modalIn 0.2s ease-out;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(8px) scale(0.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     .modal-title {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
       color: var(--element-active-color);
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.08em;
       padding-bottom: 12px;
       margin-bottom: 16px;
       border-bottom: 1px solid var(--border-divider-color);
     }
 
     .modal-section-title {
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 700;
       color: var(--element-inactive-color);
       text-transform: uppercase;
-      letter-spacing: 0.09em;
+      letter-spacing: 0.10em;
       margin-bottom: 8px;
       margin-top: 16px;
     }
@@ -701,10 +792,10 @@
 
     .settings-table th {
       color: var(--element-inactive-color);
-      font-size: 10px;
-      font-weight: 600;
+      font-size: 9px;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.07em;
+      letter-spacing: 0.08em;
       text-align: left;
       padding: 0 4px 6px;
       border-bottom: 1px solid var(--border-divider-color);
@@ -723,11 +814,13 @@
       background: var(--normal-enabled-background-color);
       color: var(--on-normal-active-color);
       border: 1px solid var(--normal-enabled-border-color, var(--border-outline-color));
-      border-radius: 3px;
-      padding: 3px 5px;
-      font-size: 12px;
+      border-radius: 4px;
+      padding: 4px 6px;
+      font-size: 11px;
       font-family: 'Noto Sans', sans-serif;
+      font-weight: 500;
       outline: none;
+      transition: border-color 0.15s;
     }
 
     .settings-input:focus { border-color: var(--border-focus-color); }
@@ -756,6 +849,7 @@
       font-weight: 600;
       min-width: 34px;
       text-align: right;
+      font-variant-numeric: tabular-nums;
     }
 
     .modal-footer {
@@ -986,16 +1080,11 @@
 
       <div class="bar-divider"></div>
 
-      <button class="ctrl-btn" id="btn-mode" title="Toggle Autonomous / Manual mode">AUTO</button>
-
-      <div class="bar-divider"></div>
-
       <button class="ctrl-btn" id="btn-draw">Draw Route</button>
 
       <div class="bar-divider"></div>
 
       <button class="ctrl-btn raised" id="btn-play">&#9654; Play</button>
-      <button class="ctrl-btn" id="btn-pause">&#9646;&#9646; Pause</button>
       <button class="ctrl-btn" id="btn-stop">&#9632; Stop</button>
 
       <div class="bar-divider"></div>
@@ -1005,7 +1094,7 @@
         <input id="speed-input" type="number" value="1.5" min="0.1" max="3.0" step="0.1">
       </label>
 
-      <span id="manual-hint">&uarr;&darr;: engine &middot; &larr;&rarr;: rudder</span>
+      <span id="manual-hint" class="visible">&uarr;&darr;: engine &middot; &larr;&rarr;: rudder</span>
 
       <div class="bar-spacer"></div>
 
