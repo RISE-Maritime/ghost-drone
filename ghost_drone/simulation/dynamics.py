@@ -338,6 +338,103 @@ class USVDynamics:
             thrust_pct=engine * 100.0,
         )
 
+    def step_brake(
+        self,
+        dt: float,
+        rudder_deg: float = 0.0,
+    ) -> DynamicsOutput:
+        """Advance dynamics with reverse thrust to brake the vessel.
+
+        Applies proportional reverse thrust to decelerate. Once speed is
+        near zero, clamps surge velocity to zero.
+
+        Args:
+            dt: Time step in seconds.
+            rudder_deg: Rudder angle in degrees, clamped to [-35, +35].
+
+        Returns:
+            A DynamicsOutput with the new state.
+        """
+        p = self.p
+
+        # --- Direct rudder (rate-limited) ---
+        delta_cmd = math.radians(max(-35.0, min(35.0, rudder_deg)))
+        max_change = p.delta_rate_max * dt
+        delta_diff = delta_cmd - self._delta
+        delta_diff = max(-max_change, min(max_change, delta_diff))
+        self._delta += delta_diff
+        delta = self._delta
+
+        # --- Reverse thrust proportional to forward speed ---
+        if self.u > 0.01:
+            thrust = -min(1.0, self.u / 1.0) * p.T_max
+        else:
+            self.u = 0.0
+            thrust = 0.0
+
+        # --- Equations of motion (same as step_manual) ---
+        u_dot = (
+            p.X_u * self.u
+            + p.X_uu * self.u * abs(self.u)
+            + thrust
+        ) / (p.mass + p.X_udot)
+
+        v_dot = (
+            p.Y_v * self.v
+            + p.Y_vv * self.v * abs(self.v)
+            + p.Y_r * self.r
+        ) / (p.mass + p.Y_vdot)
+
+        r_dot = (
+            p.N_r * self.r
+            + p.N_rr * self.r * abs(self.r)
+            + p.N_v * self.v
+            + p.N_delta * delta
+        ) / (p.Iz + p.N_rdot)
+
+        # --- Euler integration ---
+        self.u += u_dot * dt
+        self.v += v_dot * dt
+        self.r += r_dot * dt
+        self.psi += self.r * dt
+
+        self.psi = self.psi % (2 * math.pi)
+
+        # --- Kinematic update (world frame) ---
+        cos_psi = math.cos(self.psi)
+        sin_psi = math.sin(self.psi)
+        v_north = self.u * cos_psi - self.v * sin_psi
+        v_east = self.u * sin_psi + self.v * cos_psi
+
+        self.lat += math.degrees(v_north * dt / _R_EARTH)
+        cos_lat = math.cos(math.radians(self.lat)) or 1e-9
+        self.lng += math.degrees(v_east * dt / (_R_EARTH * cos_lat))
+
+        # --- Roll / pitch from dynamics ---
+        raw_roll = -p.K_roll * self.u * self.r
+        raw_pitch = -p.K_pitch * u_dot
+        roll_deg = raw_roll + random.gauss(0, p.roll_noise_sigma_deg)
+        pitch_deg = raw_pitch + random.gauss(0, p.pitch_noise_sigma_deg)
+
+        self._prev_u_dot = u_dot
+
+        speed = math.sqrt(self.u ** 2 + self.v ** 2)
+        heading_deg = math.degrees(self.psi) % 360
+
+        return DynamicsOutput(
+            lat=self.lat,
+            lng=self.lng,
+            heading_deg=heading_deg,
+            speed_mps=speed,
+            roll_deg=roll_deg,
+            pitch_deg=pitch_deg,
+            u=self.u,
+            v=self.v,
+            r=self.r,
+            rudder_deg=math.degrees(self._delta),
+            thrust_pct=-abs(thrust) / p.T_max * 100.0 if thrust != 0 else 0.0,
+        )
+
     # ------------------------------------------------------------------
     # Internal controllers
     # ------------------------------------------------------------------

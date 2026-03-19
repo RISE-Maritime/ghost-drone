@@ -267,6 +267,16 @@
       font-variant-numeric: tabular-nums;
     }
 
+    .keyexpr-cell {
+      font-family: monospace;
+      font-size: 10px;
+      color: var(--element-inactive-color);
+      max-width: 320px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     .rate-ok     { color: #0b0; }
     .rate-warn   { color: #da0; }
     .rate-bad    { color: #d33; }
@@ -365,7 +375,7 @@
       .cards-row { grid-template-columns: 1fr; }
     }
   </style>
-  <script type="module" crossorigin src="/assets/monitor-CA-BnKy6.js"></script>
+  <script type="module" crossorigin src="/assets/monitor-Bj6fB5ln.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/config-B9ykmmDk.js">
 </head>
 <body>
@@ -427,6 +437,7 @@
             <thead>
               <tr>
                 <th>Subject</th>
+                <th>Key Expression</th>
                 <th>Expected (Hz)</th>
                 <th>Actual (Hz)</th>
                 <th>Deviation</th>

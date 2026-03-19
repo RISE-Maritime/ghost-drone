@@ -13,7 +13,7 @@ from __future__ import annotations
 import math
 
 from .dynamics import USVDynamics
-from .models import OperationMode, TelemetryFrame
+from .models import GeofenceAction, OperationMode, TelemetryFrame
 
 # ---------------------------------------------------------------------------
 # Module-level constants
@@ -168,6 +168,31 @@ def _turn_speed(
     return min_speed + (cruise_speed - min_speed) * blend
 
 
+def _point_in_polygon(
+    lat: float, lng: float, polygon: list[tuple[float, float]],
+) -> bool:
+    """Ray-casting algorithm to test if a point is inside a polygon.
+
+    Args:
+        lat: Latitude of the test point.
+        lng: Longitude of the test point.
+        polygon: List of (lat, lng) vertices defining the polygon.
+
+    Returns:
+        True if the point is inside the polygon.
+    """
+    n = len(polygon)
+    inside = False
+    j = n - 1
+    for i in range(n):
+        yi, xi = polygon[i]
+        yj, xj = polygon[j]
+        if ((yi > lat) != (yj > lat)) and (lng < (xj - xi) * (lat - yi) / (yj - yi) + xi):
+            inside = not inside
+        j = i
+    return inside
+
+
 # ---------------------------------------------------------------------------
 # SimEngine
 # ---------------------------------------------------------------------------
@@ -204,6 +229,9 @@ class SimEngine:
         self._manual_rudder: float = 0.0     # commanded rudder angle in OPERATED mode, degrees [-35, +35]
         self._manual_engine: float = 0.0     # commanded engine power in OPERATED mode, [0, 1]
         self._route_complete: bool = False
+        self._geofence_polygon: list[tuple[float, float]] | None = None
+        self._geofence_action: GeofenceAction = GeofenceAction.COAST
+        self._geofence_active: bool = False  # True = breach enforcement in progress
 
     # ------------------------------------------------------------------
     # Public route / lifecycle API
@@ -329,6 +357,26 @@ class SimEngine:
             self._seg_idx = 0
             self._dynamics.reset(lat, lng, self._heading)
 
+    def set_geofence(
+        self,
+        polygon: list[tuple[float, float]],
+        action: GeofenceAction,
+    ) -> None:
+        """Set the geofence polygon and breach action."""
+        self._geofence_polygon = list(polygon)
+        self._geofence_action = action
+        self._geofence_active = False
+
+    def clear_geofence(self) -> None:
+        """Remove the geofence."""
+        self._geofence_polygon = None
+        self._geofence_active = False
+
+    @property
+    def geofence_breached(self) -> bool:
+        """True when geofence breach enforcement is in progress."""
+        return self._geofence_active
+
     @property
     def is_remote(self) -> bool:
         """True when a remote heading override is active."""
@@ -383,6 +431,7 @@ class SimEngine:
             rudder_deg=self._rudder_deg,
             thrust_pct=self._thrust_pct,
             operation_mode=self._operation_mode,
+            geofence_breached=self._geofence_active,
         )
 
     def _advance(self, dt: float, cruise_speed_mps: float) -> None:
@@ -392,6 +441,32 @@ class SimEngine:
         correction, turn-anticipation speed control, and smooth waypoint
         transitions.
         """
+        # --- Geofence enforcement ---
+        if self._geofence_polygon is not None and not self._geofence_active:
+            if not _point_in_polygon(self._lat, self._lng, self._geofence_polygon):
+                self._geofence_active = True
+
+        if self._geofence_active:
+            if self._geofence_action == GeofenceAction.BRAKE:
+                out = self._dynamics.step_brake(dt, 0.0)
+            else:
+                out = self._dynamics.step_manual(dt, 0.0, 0.0)
+            self._lat = out.lat
+            self._lng = out.lng
+            self._heading = out.heading_deg
+            self._speed = out.speed_mps
+            self._roll = out.roll_deg
+            self._pitch = out.pitch_deg
+            self._rudder_deg = out.rudder_deg
+            self._thrust_pct = out.thrust_pct
+            if self._speed < 0.01:
+                self._speed = 0.0
+                self._operation_mode = OperationMode.OPERATED
+                self._geofence_active = False
+                self._manual_rudder = 0.0
+                self._manual_engine = 0.0
+            return
+
         # --- Determine control inputs and step dynamics ---
         if self._operation_mode == OperationMode.OPERATED or not self._waypoints:
             # Operated mode (or no waypoints): apply rudder and engine directly

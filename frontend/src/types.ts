@@ -29,6 +29,7 @@ export interface SimFrame {
   operation_mode?: OperationMode;
   health?: HealthSummary;
   faults?: FaultState;
+  geofence_breached?: boolean;
 }
 
 export interface SettingsPayload {

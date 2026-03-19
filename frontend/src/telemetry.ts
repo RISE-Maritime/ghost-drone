@@ -134,7 +134,8 @@ export function onTelemetryFrame(frame: SimFrame): void {
     pitch: frame.pitch,
   };
   for (const key of Object.keys(history)) {
-    history[key].push(values[key]);
+    const v = values[key];
+    history[key].push(Number.isFinite(v) ? v : 0);
     if (history[key].length > HISTORY_SAMPLES) history[key].shift();
   }
   gaugeEls.heading.textContent = frame.heading.toFixed(1);

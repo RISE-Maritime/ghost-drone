@@ -14,7 +14,7 @@ import zenoh
 
 from ghost_drone.config import AppConfig
 from ghost_drone.sim_state import FAULT_TYPES, SimGlobals
-from ghost_drone.simulation.models import OperationMode
+from ghost_drone.simulation.models import GeofenceAction, OperationMode
 
 logger = logging.getLogger(__name__)
 
@@ -232,6 +232,50 @@ def register_control_handlers(
             logger.exception("set_home: handler error")
 
     declared.append(session.declare_queryable(f"{prefix}/service/set_home", on_set_home))
+
+    # --- Queryable: set_geofence ---
+
+    def on_set_geofence(query: zenoh.Query) -> None:
+        try:
+            payload_bytes = bytes(query.payload) if query.payload is not None else b""
+            if not payload_bytes:
+                sim.engine.clear_geofence()
+                query.reply(query.key_expr, json.dumps({"ok": True, "cleared": True}))
+                logger.info("set_geofence: cleared")
+                return
+
+            msg = json.loads(payload_bytes)
+            raw_polygon = msg.get("polygon")
+            if not isinstance(raw_polygon, list) or len(raw_polygon) < 3:
+                query.reply(query.key_expr, json.dumps({
+                    "ok": False, "error": "polygon must be a list with >= 3 points",
+                }))
+                return
+
+            try:
+                polygon = [(float(p[0]), float(p[1])) for p in raw_polygon]
+            except (TypeError, ValueError, IndexError) as e:
+                query.reply(query.key_expr, json.dumps({
+                    "ok": False, "error": f"invalid polygon coordinates: {e}",
+                }))
+                return
+
+            action_str = msg.get("action", "coast")
+            try:
+                action = GeofenceAction(action_str)
+            except ValueError:
+                query.reply(query.key_expr, json.dumps({
+                    "ok": False, "error": f"invalid action: {action_str!r}, must be 'coast' or 'brake'",
+                }))
+                return
+
+            sim.engine.set_geofence(polygon, action)
+            query.reply(query.key_expr, json.dumps({"ok": True}))
+            logger.info("set_geofence: accepted %d-point polygon, action=%s", len(polygon), action.value)
+        except Exception:
+            logger.exception("set_geofence: handler error")
+
+    declared.append(session.declare_queryable(f"{prefix}/service/set_geofence", on_set_geofence))
 
     logger.info("Registered control handlers on prefix %s", prefix)
     return declared

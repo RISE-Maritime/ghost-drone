@@ -10,6 +10,10 @@ export interface ControlCallbacks {
   onDeleteDrone: () => void;
   onSettingsOpen: () => void;
   onManualControl: (rudderDeg: number, engine: number) => void;
+  onRouteSet: () => void;
+  onGeofenceToggle: () => void;
+  onGeofenceSet: () => void;
+  onGeofenceClear: () => void;
 }
 
 export class ControlsManager {
@@ -21,6 +25,11 @@ export class ControlsManager {
   private btnSpawn = document.getElementById("btn-spawn") as HTMLButtonElement;
   private btnDeleteDrone = document.getElementById("btn-delete-drone") as HTMLButtonElement;
   private btnSettings = document.getElementById("btn-settings") as HTMLButtonElement;
+  private btnRouteSet = document.getElementById("btn-route-set") as HTMLButtonElement;
+  private btnGeofence = document.getElementById("btn-geofence") as HTMLButtonElement;
+  private btnGeofenceSet = document.getElementById("btn-geofence-set") as HTMLButtonElement;
+  private btnGeofenceClear = document.getElementById("btn-geofence-clear") as HTMLButtonElement;
+  private geofenceAction = document.getElementById("geofence-action") as HTMLSelectElement;
   private simStatusBadge = document.getElementById("sim-status-badge")!;
   private simStatusText = document.getElementById("sim-status-text")!;
   private droneSelect = document.getElementById("drone-select") as HTMLSelectElement;
@@ -30,6 +39,8 @@ export class ControlsManager {
   selectedDroneId: string | null = null;
   private drawModeActive = false;
   private spawnModeActive = false;
+  private geofenceModeActive = false;
+  private routeSetForDrone: Set<string> = new Set();
   private manualRudder = 0;
   private manualEngine = 0;
   private keysDown = new Set<string>();
@@ -45,6 +56,10 @@ export class ControlsManager {
     this.btnSpawn.addEventListener("click", () => callbacks.onSpawnToggle());
     this.btnDeleteDrone.addEventListener("click", () => callbacks.onDeleteDrone());
     this.btnSettings.addEventListener("click", () => callbacks.onSettingsOpen());
+    this.btnRouteSet.addEventListener("click", () => callbacks.onRouteSet());
+    this.btnGeofence.addEventListener("click", () => callbacks.onGeofenceToggle());
+    this.btnGeofenceSet.addEventListener("click", () => callbacks.onGeofenceSet());
+    this.btnGeofenceClear.addEventListener("click", () => callbacks.onGeofenceClear());
     this.speedInput.addEventListener("change", () => {
       callbacks.onSpeedChange(parseFloat(this.speedInput.value));
     });
@@ -130,6 +145,50 @@ export class ControlsManager {
       this.drawModeActive = false;
       this.btnDraw.classList.remove("active");
     }
+    if (active && this.geofenceModeActive) {
+      this.geofenceModeActive = false;
+      this.btnGeofence.classList.remove("active");
+    }
+  }
+
+  setGeofenceModeActive(active: boolean): void {
+    this.geofenceModeActive = active;
+    this.btnGeofence.classList.toggle("active", active);
+    // Mutual exclusion with draw and spawn
+    if (active) {
+      this.setDrawModeActive(false);
+      this.setSpawnModeActive(false);
+    }
+  }
+
+  getGeofenceAction(): "coast" | "brake" {
+    return this.geofenceAction.value as "coast" | "brake";
+  }
+
+  /** Briefly replace a button's text with a checkmark to confirm success. */
+  flashConfirm(btn: HTMLButtonElement): void {
+    const original = btn.textContent;
+    btn.textContent = "\u2713";
+    btn.classList.add("active");
+    setTimeout(() => {
+      btn.textContent = original;
+      btn.classList.remove("active");
+    }, 800);
+  }
+
+  flashRouteSetConfirm(): void { this.flashConfirm(this.btnRouteSet); }
+  flashGeofenceSetConfirm(): void { this.flashConfirm(this.btnGeofenceSet); }
+
+  markRouteSet(entityId: string): void {
+    this.routeSetForDrone.add(entityId);
+  }
+
+  clearRouteSet(entityId: string): void {
+    this.routeSetForDrone.delete(entityId);
+  }
+
+  get isRouteSet(): boolean {
+    return !!this.selectedDroneId && this.routeSetForDrone.has(this.selectedDroneId);
   }
 
   updateDroneList(drones: { entity_id: string; state: string; operation_mode?: string }[]): void {
@@ -163,12 +222,20 @@ export class ControlsManager {
 
   updateControlStates(waypointCount: number): void {
     const canEdit = this.operationMode === "operated";
-    const canPlay = canEdit && waypointCount >= 2;
+    const canPlay = canEdit && this.isRouteSet;
 
     this.btnPlay.disabled = !canPlay;
+    this.btnPlay.title = !canPlay && canEdit
+      ? "Draw a route and press Set first"
+      : "";
     this.btnStop.disabled = this.operationMode !== "autonomous";
     this.btnClear.disabled = !canEdit;
     this.btnDraw.disabled = !canEdit;
+    this.btnRouteSet.disabled = !canEdit;
+    this.btnGeofence.disabled = !canEdit;
+    this.btnGeofenceSet.disabled = !canEdit;
+    this.btnGeofenceClear.disabled = !canEdit;
+    this.geofenceAction.disabled = !canEdit;
 
     // Status badge
     this.simStatusBadge.classList.add("visible");

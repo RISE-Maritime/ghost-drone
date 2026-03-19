@@ -23,10 +23,20 @@ export class MapController {
   private followBtn!: HTMLButtonElement;
   drawModeActive = false;
   spawnModeActive = false;
+  geofenceModeActive = false;
   selectedDroneId: string | null = null;
+
+  // Geofence state
+  geofenceVertices: Waypoint[] = [];
+  private droneGeofences: Map<string, Waypoint[]> = new Map();
+  private geofenceMarkers: L.Marker[] = [];
+  private geofenceLayer: L.Polygon | null = null;
 
   /** External callback for control state refresh */
   onWaypointsChanged: () => void = () => {};
+
+  /** External callback when geofence vertices change */
+  onGeofenceChanged: () => void = () => {};
 
   /** External callback for spawn-on-click */
   onSpawnClick: ((lat: number, lng: number) => void) | null = null;
@@ -211,6 +221,144 @@ export class MapController {
   /** Must be set externally — returns current operation mode string */
   getOperationMode: () => string = () => "operated";
 
+  // --- Geofence ---
+
+  private onGeofenceClick = (e: L.LeafletMouseEvent) => {
+    if (!this.geofenceModeActive) return;
+    this.geofenceVertices.push({ lat: e.latlng.lat, lng: e.latlng.lng });
+    this.saveCurrentGeofence();
+    this.refreshGeofence();
+    this.onGeofenceChanged();
+  };
+
+  toggleGeofenceMode(): void {
+    this.geofenceModeActive = !this.geofenceModeActive;
+    if (this.geofenceModeActive) {
+      // Deactivate draw and spawn modes
+      if (this.drawModeActive) {
+        this.drawModeActive = false;
+        this.map.off("click", this.onMapClick);
+        this.updateWaypointDraggability();
+      }
+      this.spawnModeActive = false;
+      this.map.on("click", this.onGeofenceClick);
+    } else {
+      this.map.off("click", this.onGeofenceClick);
+    }
+    this.refreshGeofence();
+  }
+
+  disableGeofenceMode(): void {
+    this.geofenceModeActive = false;
+    this.map.off("click", this.onGeofenceClick);
+  }
+
+  refreshGeofence(): void {
+    for (const m of this.geofenceMarkers) m.remove();
+    this.geofenceMarkers = [];
+    if (this.geofenceLayer) { this.geofenceLayer.remove(); this.geofenceLayer = null; }
+    if (this.geofenceVertices.length === 0) return;
+
+    const alarmColor = cssVar("--alert-alarm-color") || "rgb(220,53,69)";
+    const isDraggable = this.geofenceModeActive;
+
+    for (let i = 0; i < this.geofenceVertices.length; i++) {
+      const v = this.geofenceVertices[i];
+      const marker = L.marker([v.lat, v.lng], {
+        icon: this.createGeofenceIcon(i + 1),
+        draggable: isDraggable,
+      }).addTo(this.map);
+
+      ((idx: number) => {
+        marker.on("dragend", () => {
+          const ll = marker.getLatLng();
+          this.geofenceVertices[idx] = { lat: ll.lat, lng: ll.lng };
+          this.saveCurrentGeofence();
+          this.refreshGeofence();
+          this.onGeofenceChanged();
+        });
+        marker.on("contextmenu", () => {
+          this.geofenceVertices.splice(idx, 1);
+          this.saveCurrentGeofence();
+          this.refreshGeofence();
+          this.onGeofenceChanged();
+        });
+      })(i);
+
+      this.geofenceMarkers.push(marker);
+    }
+
+    if (this.geofenceVertices.length >= 3) {
+      this.geofenceLayer = L.polygon(
+        this.geofenceVertices.map(v => [v.lat, v.lng] as L.LatLngTuple),
+        {
+          color: alarmColor,
+          weight: 2,
+          dashArray: "6, 4",
+          fillColor: alarmColor,
+          fillOpacity: 0.08,
+        },
+      ).addTo(this.map);
+    }
+  }
+
+  private createGeofenceIcon(number: number): L.DivIcon {
+    const bg = cssVar("--alert-alarm-color") || "rgb(220,53,69)";
+    const text = "#fff";
+    const ring = cssVar("--container-section-color") || "#121212";
+    return L.divIcon({
+      className: "",
+      html: `<div style="
+        width:20px;height:20px;border-radius:50%;
+        background:${bg};color:${text};
+        font-weight:700;font-size:9px;
+        font-family:'Noto Sans',sans-serif;
+        display:flex;align-items:center;justify-content:center;
+        border:2px solid ${ring};
+        box-shadow:0 1px 4px rgba(0,0,0,.55)">${number}</div>`,
+      iconSize: [20, 20],
+      iconAnchor: [10, 10],
+    });
+  }
+
+  clearGeofence(): void {
+    this.geofenceVertices = [];
+    if (this.selectedDroneId) {
+      this.droneGeofences.set(this.selectedDroneId, []);
+    }
+    for (const m of this.geofenceMarkers) m.remove();
+    this.geofenceMarkers = [];
+    if (this.geofenceLayer) { this.geofenceLayer.remove(); this.geofenceLayer = null; }
+  }
+
+  setGeofenceBreached(breached: boolean): void {
+    if (!this.geofenceLayer) return;
+    const alarmColor = cssVar("--alert-alarm-color") || "rgb(220,53,69)";
+    if (breached) {
+      this.geofenceLayer.setStyle({
+        dashArray: undefined,
+        weight: 3,
+        fillOpacity: 0.18,
+        color: alarmColor,
+        fillColor: alarmColor,
+      });
+    } else {
+      this.geofenceLayer.setStyle({
+        dashArray: "6, 4",
+        weight: 2,
+        fillOpacity: 0.08,
+        color: alarmColor,
+        fillColor: alarmColor,
+      });
+    }
+  }
+
+  private saveCurrentGeofence(): void {
+    if (this.selectedDroneId) {
+      this.droneGeofences.set(this.selectedDroneId, [...this.geofenceVertices]);
+    }
+  }
+
   /** Sync current waypoints into the per-drone store */
   private saveCurrentRoute(): void {
     if (this.selectedDroneId) {
@@ -322,9 +470,10 @@ export class MapController {
   selectDrone(entityId: string): void {
     const prevId = this.selectedDroneId;
 
-    // Save current waypoints for the previous drone
+    // Save current waypoints and geofence for the previous drone
     if (prevId) {
       this.droneRoutes.set(prevId, [...this.waypoints]);
+      this.droneGeofences.set(prevId, [...this.geofenceVertices]);
     }
 
     this.selectedDroneId = entityId;
@@ -333,6 +482,11 @@ export class MapController {
     this.waypoints = [...(this.droneRoutes.get(entityId) ?? [])];
     this.refreshRoute();
     this.onWaypointsChanged();
+
+    // Load geofence for the newly selected drone
+    this.geofenceVertices = [...(this.droneGeofences.get(entityId) ?? [])];
+    this.refreshGeofence();
+    this.onGeofenceChanged();
 
     // Refresh icons for old and new selection
     if (prevId && prevId !== entityId) {

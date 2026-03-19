@@ -17,6 +17,12 @@ class OperationMode(enum.Enum):
     OPERATED   = "operated"    # direct keyboard heading/thrust control
 
 
+class GeofenceAction(enum.Enum):
+    """Action to take when a drone breaches the geofence boundary."""
+    COAST = "coast"
+    BRAKE = "brake"
+
+
 @dataclass
 class TelemetryFrame:
     """A single telemetry snapshot from the simulation engine.
@@ -32,6 +38,7 @@ class TelemetryFrame:
     rudder_deg: float = 0.0   # rudder angle, degrees (positive = starboard)
     thrust_pct: float = 0.0   # engine thrust, percentage of max [0, 100]
     operation_mode: OperationMode = OperationMode.OPERATED
+    geofence_breached: bool = False
 
     def to_dict(self) -> dict:
         """Return a JSON-serialisable dict (state hardcoded for backward compat)."""
@@ -46,4 +53,5 @@ class TelemetryFrame:
             "rudder_deg":  self.rudder_deg,
             "thrust_pct":  self.thrust_pct,
             "operation_mode": self.operation_mode.value,
+            "geofence_breached": self.geofence_breached,
         }

@@ -5,8 +5,8 @@
 # Use 127.0.0.1 when running outside a devcontainer
 # zenoh_endpoint = "tcp/127.0.0.1:7447"
 zenoh_endpoint = "tcp/host.docker.internal:7447"
-keelson_realm = "ghost-drone"
-entity_id = "sim001"
+keelson_realm = "rise"
+entity_id = "ghost-drone"
 
 # The zenoh-bridge-remote-api must be running alongside zenohd.
 # Default WebSocket endpoint: ws://localhost:10001

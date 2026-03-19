@@ -208,6 +208,7 @@ interface DroneState {
   lastHealth: HealthMessage | null;
   receivedTimestamps: Record<string, number[]>; // subject → receive times (ms)
   actualRates: Record<string, number>;          // subject → measured Hz
+  lastKeyExprs: Record<string, string>;         // subject → last seen key expression
   healthLog: { time: Date; msg: HealthMessage }[];
 }
 
@@ -237,6 +238,7 @@ function ensureDrone(entityId: string): DroneState {
       lastHealth: null,
       receivedTimestamps: {},
       actualRates: {},
+      lastKeyExprs: {},
       healthLog: [],
     });
     refreshTabs();
@@ -275,10 +277,11 @@ async function subscribeTelemetry(): Promise<void> {
     const keyExpr = `${realm}/@${KEELSON_VERSION}/*/pubsub/${subject}/**`;
     await session.declareSubscriber(keyExpr, {
       handler: (sample: Sample) => {
-        const parts = sample.keyexpr().toString().split("/");
+        const ke = sample.keyexpr().toString();
+        const parts = ke.split("/");
         const entityId = parts[2] ?? "";
         if (!entityId) return;
-        recordTelemetryHit(entityId, subject);
+        recordTelemetryHit(entityId, subject, ke);
       },
     });
   }
@@ -289,12 +292,13 @@ async function subscribeHealth(): Promise<void> {
   const keyExpr = `${realm}/@${KEELSON_VERSION}/*/pubsub/entity_health/**`;
   await session.declareSubscriber(keyExpr, {
     handler: (sample: Sample) => {
-      const parts = sample.keyexpr().toString().split("/");
+      const ke = sample.keyexpr().toString();
+      const parts = ke.split("/");
       const entityId = parts[2] ?? "";
       if (!entityId) return;
 
       // Count for rate measurement
-      recordTelemetryHit(entityId, "entity_health");
+      recordTelemetryHit(entityId, "entity_health", ke);
 
       // Decode protobuf
       const raw = sample.payload().toBytes();
@@ -308,13 +312,17 @@ async function subscribeHealth(): Promise<void> {
 
 const RATE_WINDOW_MS = 5000;
 
-function recordTelemetryHit(entityId: string, subject: string): void {
+function recordTelemetryHit(entityId: string, subject: string, keyExpr?: string): void {
   const drone = ensureDrone(entityId);
   const now = performance.now();
   if (!drone.receivedTimestamps[subject]) {
     drone.receivedTimestamps[subject] = [];
   }
   drone.receivedTimestamps[subject].push(now);
+
+  if (keyExpr) {
+    drone.lastKeyExprs[subject] = keyExpr;
+  }
 
   const cutoff = now - RATE_WINDOW_MS;
   const stamps = drone.receivedTimestamps[subject];
@@ -493,8 +501,11 @@ function renderRateTable(): void {
       barColor = "#0b0";
     }
 
+    const keyExpr = drone.lastKeyExprs[subject] ?? "--";
+
     html += `<tr>
       <td>${subject}</td>
+      <td class="keyexpr-cell" title="${keyExpr}">${keyExpr}</td>
       <td class="rate-cell">${expectedStr}</td>
       <td class="rate-cell ${rateClass}">${actualStr}</td>
       <td class="deviation-cell ${devClass}">${devStr}</td>

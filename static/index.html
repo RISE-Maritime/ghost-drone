@@ -861,7 +861,7 @@
       border-top: 1px solid var(--border-divider-color);
     }
   </style>
-  <script type="module" crossorigin src="/assets/main-rBgYE028.js"></script>
+  <script type="module" crossorigin src="/assets/main-BMCW8-fI.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/config-B9ykmmDk.js">
   <link rel="stylesheet" crossorigin href="/assets/main-BDwZpBkf.css">
 </head>
@@ -1083,7 +1083,19 @@
 
       <div class="bar-divider"></div>
 
-      <button class="ctrl-btn" id="btn-draw">Draw Route</button>
+      <button class="ctrl-btn" id="btn-draw">Route</button>
+      <button class="ctrl-btn" id="btn-route-set">Set</button>
+      <button class="ctrl-btn flat" id="btn-clear">&times;</button>
+
+      <div class="bar-divider"></div>
+
+      <button class="ctrl-btn" id="btn-geofence">Geofence</button>
+      <button class="ctrl-btn" id="btn-geofence-set">Set</button>
+      <button class="ctrl-btn flat" id="btn-geofence-clear">&times;</button>
+      <select class="ctrl-btn" id="geofence-action">
+        <option value="coast">Coast</option>
+        <option value="brake">Brake</option>
+      </select>
 
       <div class="bar-divider"></div>
 
@@ -1102,7 +1114,6 @@
       <div class="bar-spacer"></div>
 
       <button class="ctrl-btn flat" id="btn-settings">&#9881; Settings</button>
-      <button class="ctrl-btn flat" id="btn-clear">Clear</button>
     </div>
   </div>
 

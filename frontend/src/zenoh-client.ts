@@ -195,6 +195,50 @@ export class ZenohClient {
     return this.loadRouteFor(this.entityId, waypoints);
   }
 
+  async setGeofenceFor(entityId: string, polygon: [number, number][], action: "coast" | "brake"): Promise<{ ok: boolean; error?: string }> {
+    if (!this.session) return { ok: false, error: "not connected" };
+    const receiver = await this.session.get(
+      `${this.prefix(entityId)}/service/set_geofence`,
+      { payload: JSON.stringify({ polygon, action }), timeout: QUERY_TIMEOUT },
+    );
+    if (!receiver) return { ok: false, error: "no reply channel" };
+    try {
+      const reply: Reply = await receiver.receive();
+      const result = reply.result();
+      if (this.isSample(result)) {
+        const text = result.payload().toString();
+        return JSON.parse(text);
+      } else {
+        const errPayload = (result as ReplyError).payload().toString();
+        return { ok: false, error: errPayload };
+      }
+    } catch {
+      return { ok: false, error: "query timeout" };
+    }
+  }
+
+  async clearGeofenceFor(entityId: string): Promise<{ ok: boolean; error?: string }> {
+    if (!this.session) return { ok: false, error: "not connected" };
+    const receiver = await this.session.get(
+      `${this.prefix(entityId)}/service/set_geofence`,
+      { timeout: QUERY_TIMEOUT },
+    );
+    if (!receiver) return { ok: false, error: "no reply channel" };
+    try {
+      const reply: Reply = await receiver.receive();
+      const result = reply.result();
+      if (this.isSample(result)) {
+        const text = result.payload().toString();
+        return JSON.parse(text);
+      } else {
+        const errPayload = (result as ReplyError).payload().toString();
+        return { ok: false, error: errPayload };
+      }
+    } catch {
+      return { ok: false, error: "query timeout" };
+    }
+  }
+
   async spawnDrone(lat: number, lng: number): Promise<{ ok: boolean; entity_id?: string; error?: string }> {
     if (!this.session) return { ok: false, error: "not connected" };
     const receiver = await this.session.get(

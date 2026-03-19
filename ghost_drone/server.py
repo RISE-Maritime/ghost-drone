@@ -291,6 +291,7 @@ def _tick_loop(
         frame_dict["pitch"] = pitch
         frame_dict["health"] = _compute_health_summary(sim)
         frame_dict["faults"] = sim.faults.all_faults()
+        frame_dict["geofence_breached"] = sim.engine.geofence_breached
         _publish_sim_frame(publisher, cfg, frame_dict)
 
         # Publish manual setpoint when in OPERATED mode

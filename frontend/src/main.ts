@@ -37,25 +37,18 @@ let zenoh: ZenohClient;
 const controls = new ControlsManager({
   onPlay: async () => {
     if (!selectedDroneId) return;
-    if (mapCtrl.waypoints.length < 2) return;
-    if (controls.operationMode === "operated") {
-      const wps: [number, number][] = mapCtrl.waypoints.map((w) => [
-        w.lat,
-        w.lng,
-      ]);
-      const result = await zenoh.loadRouteFor(selectedDroneId, wps);
-      if (!result.ok) {
-        console.error("[loadRoute]", result.error);
-        return;
-      }
-    }
     await zenoh.playFor(selectedDroneId);
   },
-  onStop: () => { if (selectedDroneId) zenoh.stopFor(selectedDroneId); },
+  onStop: () => {
+    if (!selectedDroneId) return;
+    zenoh.stopFor(selectedDroneId);
+    controls.clearRouteSet(selectedDroneId);
+  },
   onSpeedChange: (speed) => { if (selectedDroneId) zenoh.setSpeedFor(selectedDroneId, speed); },
   onClear: () => {
     if (controls.operationMode !== "operated") return;
     mapCtrl.clearWaypoints();
+    if (selectedDroneId) controls.clearRouteSet(selectedDroneId);
     controls.updateControlStates(0);
   },
   onDrawToggle: () => {
@@ -74,6 +67,7 @@ const controls = new ControlsManager({
     const result = await zenoh.deleteDrone(selectedDroneId);
     if (result.ok) {
       deletedDrones.add(selectedDroneId);
+      controls.clearRouteSet(selectedDroneId);
       mapCtrl.removeDrone(selectedDroneId);
       mapCtrl.clearWaypoints();
       await refreshDroneList();
@@ -97,6 +91,51 @@ const controls = new ControlsManager({
   onManualControl: (rudderDeg, engine) => {
     if (!selectedDroneId) return;
     zenoh.manualControlFor(selectedDroneId, rudderDeg, engine);
+  },
+  onRouteSet: async () => {
+    if (!selectedDroneId) return;
+    if (mapCtrl.waypoints.length < 2) return;
+    const wps: [number, number][] = mapCtrl.waypoints.map(w => [w.lat, w.lng]);
+    const result = await zenoh.loadRouteFor(selectedDroneId, wps);
+    if (!result.ok) {
+      console.error("[loadRoute]", result.error);
+      return;
+    }
+    controls.markRouteSet(selectedDroneId);
+    controls.flashRouteSetConfirm();
+    if (mapCtrl.drawModeActive) {
+      mapCtrl.toggleDrawMode();
+      controls.setDrawModeActive(false);
+    }
+    controls.updateControlStates(mapCtrl.waypoints.length);
+  },
+  onGeofenceToggle: () => {
+    mapCtrl.toggleGeofenceMode();
+    controls.setGeofenceModeActive(mapCtrl.geofenceModeActive);
+    controls.setSpawnModeActive(mapCtrl.spawnModeActive);
+    controls.setDrawModeActive(mapCtrl.drawModeActive);
+  },
+  onGeofenceSet: async () => {
+    if (!selectedDroneId) return;
+    if (mapCtrl.geofenceVertices.length < 3) return;
+    const polygon: [number, number][] = mapCtrl.geofenceVertices.map(v => [v.lat, v.lng]);
+    const action = controls.getGeofenceAction();
+    const result = await zenoh.setGeofenceFor(selectedDroneId, polygon, action);
+    if (!result.ok) {
+      console.error("[setGeofence]", result.error);
+      return;
+    }
+    controls.flashGeofenceSetConfirm();
+    if (mapCtrl.geofenceModeActive) {
+      mapCtrl.toggleGeofenceMode();
+      controls.setGeofenceModeActive(false);
+    }
+  },
+  onGeofenceClear: async () => {
+    if (!selectedDroneId) return;
+    const result = await zenoh.clearGeofenceFor(selectedDroneId);
+    if (!result.ok) console.error("[clearGeofence]", result.error);
+    mapCtrl.clearGeofence();
   },
 });
 
@@ -158,11 +197,16 @@ zenoh = new ZenohClient({
           mapCtrl.disableDrawMode();
           controls.setDrawModeActive(false);
         }
+        if (frame.operation_mode === "autonomous" && mapCtrl.geofenceModeActive) {
+          mapCtrl.disableGeofenceMode();
+          controls.setGeofenceModeActive(false);
+        }
         mapCtrl.updateWaypointDraggability();
       }
       controls.updateControlStates(mapCtrl.waypoints.length);
       onTelemetryFrame(frame);
       updateFaultPanel(frame.faults);
+      mapCtrl.setGeofenceBreached(frame.geofence_breached ?? false);
     }
   },
 });
