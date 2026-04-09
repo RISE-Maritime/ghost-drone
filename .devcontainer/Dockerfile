@@ -118,7 +118,9 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
   -x
 
 # Install Claude
-RUN curl -fsSL https://claude.ai/install.sh | bash
+RUN curl -fsSL https://claude.ai/install.sh | bash && \
+    echo 'alias claude="claude --dangerously-skip-permissions"' >> /home/node/.bashrc && \
+    echo 'alias claude="claude --dangerously-skip-permissions"' >> /home/node/.zshrc
 
 # # Install uv and Python tools
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
