@@ -1,81 +1,87 @@
 # ghost-drone
 
-Simulated surface water drone that follows a user-drawn route on a browser-based map and publishes keelson-compatible telemetry to a zenoh network. Used for testing keelson consumers and stakeholder demos without physical hardware.
+Simulated drone companion computer in a Docker container. Runs an [ArduPilot SITL](https://ardupilot.org/dev/docs/sitl-simulator-software-in-the-loop.html) flight controller and bridges its telemetry into a [Zenoh](https://zenoh.io) network via [Keelson](https://github.com/RISE-Maritime/keelson) connectors.
 
 ## Prerequisites
 
-- Python 3.11+
-- [uv](https://docs.astral.sh/uv/)
-- Node.js 18+ (for building the frontend)
-- A running zenoh router (default: `tcp/127.0.0.1:7447`)
-- [zenoh-bridge-remote-api](https://github.com/eclipse-zenoh/zenoh-plugin-webserver) running alongside zenohd (provides browser-to-zenoh WebSocket bridge, default: `ws://localhost:10001`)
+- Docker with Compose
+- A Zenoh router reachable from the host (default: `tcp/localhost:7447`)
 
-## Setup
+## Quick start
 
 ```bash
-# Install Python dependencies
-uv sync
+# Build the image (first build compiles .proto files and downloads SITL binaries — takes a few minutes)
+docker compose build
 
-# Install frontend dependencies and build
-cd frontend && npm install && npm run build && cd ..
-
-# Copy and edit the config file
-cp ghost_drone.toml.example ghost_drone.toml
+# Run a motorboat simulation
+VEHICLE_TYPE=motorboat docker compose up
 ```
 
-Edit `ghost_drone.toml`:
+The container connects to the Zenoh router on the host and starts publishing telemetry under the configured realm and entity ID.
 
-```toml
-zenoh_endpoint = "tcp/host.docker.internal:7447"  # your zenoh router address
-keelson_realm = "ghost-drone"           # realm name
-entity_id = "sim001"                    # unique drone identity
-```
+## Configuration
 
-## Run
+All options are set via environment variables — either in a `.env` file or passed directly.
 
-1. Start zenohd and zenoh-bridge-remote-api (default port 10001)
-2. Start the simulator:
+| Variable | Default | Description |
+|---|---|---|
+| `VEHICLE_TYPE` | `rover` | Vehicle to simulate (see table below) |
+| `ZENOH_CONNECT` | `tcp/localhost:7447` | Zenoh router endpoint |
+| `REALM` | `rise` | Keelson realm |
+| `ENTITY_ID` | `drone-01` | Keelson entity ID for this drone |
+| `SOURCE_ID` | `sitl` | Keelson source ID |
+| `SITL_HOME` | `57.7089,11.9746,0,270` | SITL start position: `lat,lon,alt,heading` |
+| `MAVLINK_URL` | `tcp:localhost:5760` | pymavlink connection string to SITL |
+
+### Supported vehicle types
+
+| `VEHICLE_TYPE` | ArduPilot binary | SITL frame |
+|---|---|---|
+| `rover` | ardurover | rover |
+| `motorboat` / `boat` | ardurover | motorboat |
+| `sailboat` | ardurover | sailboat |
+| `copter` | arducopter | + (quadcopter) |
+| `plane` | arduplane | plane |
+| `sub` | ardusub | vectored |
+
+### Example: run two drones at once
 
 ```bash
-# Terminal 1: Start the simulator
-uv run ghost-drone
-
-# Terminal 2: Serve the frontend
-cd frontend && npm run build
-cd ../static && python3 -m http.server 8000
+VEHICLE_TYPE=motorboat ENTITY_ID=boat-01 MAVLINK_URL=tcp:localhost:5760 docker compose up -d
+VEHICLE_TYPE=copter    ENTITY_ID=uav-01  MAVLINK_URL=tcp:localhost:5770 docker compose up -d
 ```
 
-The simulator connects to zenoh and publishes telemetry — it has no built-in web server. Serve the frontend separately using any static file server.
+## Optional connectors
 
-The frontend connects to the zenoh-bridge-remote-api at `ws://localhost:10001` by default. Override via URL parameters:
+Two connectors start automatically when their config file is present.
 
+### keelson-connector-platform
+
+Publishes static platform geometry (hull dimensions, sensor positions).
+
+Create `ghost-drone/config/<VEHICLE_TYPE>/platform.json` — see [`keelson/connectors/platform/example-config.json`](https://github.com/RISE-Maritime/keelson/blob/main/connectors/platform/example-config.json) for the schema.
+
+### keelson-connector-entity-health
+
+Monitors Zenoh publication rates and reports entity health.
+
+Create `ghost-drone/config/<VEHICLE_TYPE>/entity_health.json` — see [`keelson/connectors/entity_health/example-config.json`](https://github.com/RISE-Maritime/keelson/blob/main/connectors/entity_health/example-config.json) for the schema.
+
+## Pinning the Keelson version
+
+The Dockerfile clones Keelson from `main` by default. To pin to a specific release or commit:
+
+```bash
+docker compose build --build-arg KEELSON_REF=v0.5.3
 ```
-http://localhost:8000?remote_api=ws://otherhost:10001&realm=my-realm&entity_id=drone42
-```
-
-## Architecture
-
-All frontend-backend communication uses zenoh via the zenoh-bridge-remote-api:
-
-- **Pub/Sub** for streaming data: sim frames (20 Hz), play/pause/stop/set_speed controls
-- **Queryable/Get** for request-response: load_route (with waypoint validation), settings (GET returns current values, body updates them)
-- **Keelson subjects** published when PLAYING: `location_fix`, `heading_true_north_deg`, `speed_over_ground_knots`, `roll_deg`, `pitch_deg`
 
 ## Development
 
-```bash
-# Python
-uv sync --all-extras
-uv run pytest
+This repo includes a VS Code devcontainer. The devcontainer runs with `--network=host` so it shares the host's network stack — the same Zenoh router the drone container connects to is visible from inside the devcontainer at `localhost`.
 
-# Frontend (dev server with hot reload)
-cd frontend && npm run dev
-```
-
-### Frontend build
-
-The frontend is a Vite+TypeScript project in `frontend/` that builds to `static/`. After making changes:
+The devcontainer also mounts the Docker socket, so you can build and run the `ghost-drone` container from the terminal inside VS Code:
 
 ```bash
-cd frontend && npm run build
+docker compose build
+docker compose up
 ```

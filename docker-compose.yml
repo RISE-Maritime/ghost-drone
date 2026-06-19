@@ -1,0 +1,17 @@
+services:
+  ghost-drone:
+    build:
+      context: ghost-drone/
+    image: ghost-drone
+    network_mode: host
+    environment:
+      VEHICLE_TYPE: ${VEHICLE_TYPE:-rover}
+      ZENOH_CONNECT: ${ZENOH_CONNECT:-tcp/localhost:7447}
+      SITL_HOME: ${SITL_HOME:-57.7089,11.9746,0,270}
+      REALM: ${REALM:-rise}
+      ENTITY_ID: ${ENTITY_ID:-drone-01}
+      SOURCE_ID: ${SOURCE_ID:-sitl}
+      MAVLINK_URL: ${MAVLINK_URL:-tcp:localhost:5760}
+      TARGET_SYSTEM: ${TARGET_SYSTEM:-1}
+    stdin_open: true
+    tty: true
