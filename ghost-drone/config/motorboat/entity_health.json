@@ -1,0 +1,152 @@
+{
+  "publish_rate_hz": 1.0,
+  "sources": [
+    {
+      "name": "mavlink",
+      "subjects": [
+        {
+          "name": "location_fix",
+          "inactive_after_s": 5.0,
+          "publication_rate_hz": [
+            { "level": "NOMINAL", "min": 0.6, "max": 2.0 },
+            { "level": "DEGRADED", "min": 0.1, "max": 5.0 }
+          ],
+          "publication_rate_default_level": "CRITICAL",
+          "content_rules": [
+            {
+              "field": "latitude",
+              "bands": [{ "level": "NOMINAL", "min": -90, "max": 90 }],
+              "default_level": "CRITICAL"
+            },
+            {
+              "field": "longitude",
+              "bands": [{ "level": "NOMINAL", "min": -180, "max": 180 }],
+              "default_level": "CRITICAL"
+            }
+          ]
+        },
+        {
+          "name": "location_fix_quality",
+          "inactive_after_s": 5.0,
+          "publication_rate_hz": [
+            { "level": "NOMINAL", "min": 0.6, "max": 2.0 },
+            { "level": "DEGRADED", "min": 0.1, "max": 5.0 }
+          ],
+          "publication_rate_default_level": "CRITICAL",
+          "content_rules": [
+            {
+              "field": "fix_type",
+              "bands": [
+                { "level": "NOMINAL", "equals": ["FIX_3D"] },
+                { "level": "DEGRADED", "equals": ["FIX_2D", "GPS_DR"] },
+                {
+                  "level": "CRITICAL",
+                  "equals": ["UNKNOWN", "INVALID", "FIX_NO", "TIME_ONLY", "DR_ONLY"]
+                }
+              ],
+              "default_level": "CRITICAL"
+            }
+          ]
+        },
+        {
+          "name": "heading_true_north_deg",
+          "inactive_after_s": 5.0,
+          "publication_rate_hz": [
+            { "level": "NOMINAL", "min": 0.6, "max": 2.0 },
+            { "level": "DEGRADED", "min": 0.1, "max": 5.0 }
+          ],
+          "publication_rate_default_level": "CRITICAL",
+          "content_rules": [
+            {
+              "field": "value",
+              "bands": [{ "level": "NOMINAL", "min": 0, "max": 360 }],
+              "default_level": "CRITICAL"
+            }
+          ]
+        },
+        {
+          "name": "course_over_ground_deg",
+          "inactive_after_s": 5.0,
+          "publication_rate_hz": [
+            { "level": "NOMINAL", "min": 0.6, "max": 2.0 },
+            { "level": "DEGRADED", "min": 0.1, "max": 5.0 }
+          ],
+          "publication_rate_default_level": "CRITICAL",
+          "content_rules": [
+            {
+              "field": "value",
+              "bands": [{ "level": "NOMINAL", "min": 0, "max": 360 }],
+              "default_level": "CRITICAL"
+            }
+          ]
+        },
+        {
+          "name": "speed_over_ground_knots",
+          "inactive_after_s": 5.0,
+          "publication_rate_hz": [
+            { "level": "NOMINAL", "min": 0.6, "max": 2.0 },
+            { "level": "DEGRADED", "min": 0.1, "max": 5.0 }
+          ],
+          "publication_rate_default_level": "CRITICAL",
+          "content_rules": [
+            {
+              "field": "value",
+              "bands": [
+                { "level": "NOMINAL", "min": 0, "max": 15 },
+                { "level": "DEGRADED", "min": -0.5, "max": 50 }
+              ],
+              "default_level": "CRITICAL"
+            }
+          ]
+        },
+        {
+          "name": "vehicle_mode",
+          "inactive_after_s": 5.0,
+          "publication_rate_hz": [
+            { "level": "NOMINAL", "min": 0.6, "max": 2.0 },
+            { "level": "DEGRADED", "min": 0.1, "max": 5.0 }
+          ],
+          "publication_rate_default_level": "CRITICAL"
+        },
+        {
+          "name": "vehicle_armed",
+          "inactive_after_s": 5.0,
+          "publication_rate_hz": [
+            { "level": "NOMINAL", "min": 0.6, "max": 2.0 },
+            { "level": "DEGRADED", "min": 0.1, "max": 5.0 }
+          ],
+          "publication_rate_default_level": "CRITICAL"
+        },
+        {
+          "name": "vehicle_state",
+          "inactive_after_s": 5.0,
+          "publication_rate_hz": [
+            { "level": "NOMINAL", "min": 0.6, "max": 2.0 },
+            { "level": "DEGRADED", "min": 0.1, "max": 5.0 }
+          ],
+          "publication_rate_default_level": "CRITICAL",
+          "content_rules": [
+            {
+              "field": "state",
+              "bands": [
+                { "level": "NOMINAL", "equals": ["STATE_ACTIVE", "STATE_STANDBY"] },
+                { "level": "DEGRADED", "equals": ["STATE_BOOTING", "STATE_CALIBRATING"] },
+                {
+                  "level": "CRITICAL",
+                  "equals": [
+                    "STATE_UNKNOWN",
+                    "STATE_CRITICAL",
+                    "STATE_EMERGENCY",
+                    "STATE_SHUTDOWN",
+                    "STATE_TERMINATED"
+                  ]
+                }
+              ],
+              "default_level": "CRITICAL"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

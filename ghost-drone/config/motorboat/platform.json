@@ -1,0 +1,53 @@
+{
+  "platform_type": "vessel",
+  "name": "Ghost Drone (SITL)",
+  "description": "Simulated ArduPilot motorboat running in SITL. Development and testing only; not a real platform. Identity and dimensions match the drone_sim_01 entry in Crowsnest's platform registry.",
+  "length_over_all_m": 4.0,
+  "breadth_over_all_m": 1.5,
+  "mmsi_number": 0,
+  "imo_number": 0,
+  "call_sign": "SITL",
+  "operational_limits": {
+    "max_speed_knots": 10.0,
+    "max_wind_speed_mps": 0.0,
+    "max_wave_height_m": 0.0,
+    "max_range_m": 0.0,
+    "endurance_hours": 0.0
+  },
+  "ccrp_m": { "x": 0.0, "y": 0.0, "z": 0.0 },
+  "vessel_outlines": {
+    "complex_max": {
+      "description": "Hull envelope for the 4.0 x 1.5 m motorboat, relative to the CCRP amidships",
+      "coordinates_m": [
+        [2.0, 0.0],
+        [1.65, 0.5],
+        [1.1, 0.75],
+        [-1.8, 0.75],
+        [-2.0, 0.5],
+        [-2.0, -0.5],
+        [-1.8, -0.75],
+        [1.1, -0.75],
+        [1.65, -0.5],
+        [2.0, 0.0]
+      ]
+    }
+  },
+  "frame_transforms": [
+    {
+      "parent_frame_id": "drone-sim-01-frame-ccrp",
+      "child_frame_id": "drone-sim-01-frame-gnss",
+      "sensor_type": "gnss",
+      "sensor_description": "Simulated GNSS. SITL models no antenna lever arm, so this is co-located with the body origin: the published location_fix IS the body origin, not an offset antenna.",
+      "translation_m": { "x": 0.0, "y": 0.0, "z": 0.0 },
+      "rotation_deg": { "yaw": 0.0, "pitch": 0.0, "roll": 0.0 }
+    },
+    {
+      "parent_frame_id": "drone-sim-01-frame-ccrp",
+      "child_frame_id": "drone-sim-01-frame-imu",
+      "sensor_type": "imu",
+      "sensor_description": "Simulated IMU, co-located with the body origin. Attitude and rate subjects are reported in the body frame with no mounting offset.",
+      "translation_m": { "x": 0.0, "y": 0.0, "z": 0.0 },
+      "rotation_deg": { "yaw": 0.0, "pitch": 0.0, "roll": 0.0 }
+    }
+  ]
+}

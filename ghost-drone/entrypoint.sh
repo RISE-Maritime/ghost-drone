@@ -156,10 +156,14 @@ fi
 # keelson-connector-entity-health
 # Monitors zenoh publication rates and reports entity health
 # Requires a config JSON — see /config/<VEHICLE_TYPE>/entity_health.json
+# Deliberately NOT ${SOURCE_ID}: publishing health under the same source as the
+# telemetry it monitors makes both connectors declare the identical liveliness
+# token, so "is the health connector itself alive?" becomes unanswerable.
+# Crowsnest resolves the health source by discovery, so the panel is unaffected.
 if [ -f "/config/${VEHICLE_TYPE}/entity_health.json" ]; then
     python3 /app/keelson/connectors/entity_health/bin/entity_health2keelson.py \
         "${KEELSON_COMMON[@]}" \
-        --source-id "${SOURCE_ID}" \
+        --source-id health \
         --config "/config/${VEHICLE_TYPE}/entity_health.json" &
     HEALTH_PID=$!
     track "${HEALTH_PID}" "entity_health2keelson"
