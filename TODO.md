@@ -6,15 +6,13 @@ Single source of truth for **pending** work, as a checklist. Completed items are
 
 The order to work in. Everything below this section is real but genuinely deferred.
 
-1. **Fix the `KEELSON_REF` pin and add a build-time import assertion** → [Reproducibility & supply chain](#reproducibility--supply-chain). The README is wrong today — `v0.5.3` cannot clone, and the corrected `0.5.3` predates the protos `sim_control.py` imports. Anyone following the documented pin gets a failed build or a silently crippled container. One doc line plus one `RUN`.
+1. **`sim_control` initial state and ack matching** → [sim_control correctness](#sim_control-correctness). Publishing `STOPPED` while the vessel is underway puts wrong data on the wire, and ack matching means failed commands report success. Correctness of published data is the product.
 
-2. **`sim_control` initial state and ack matching** → [sim_control correctness](#sim_control-correctness). Publishing `STOPPED` while the vessel is underway puts wrong data on the wire, and ack matching means failed commands report success. Correctness of published data is the product.
+2. **`config/motorboat/entity_health.json`, then `platform.json`** → [Vehicle coverage](#vehicle-coverage). The cheapest visible payoff: `entity_health` already decodes in Crowsnest and would light up its health panel with no UI work. `platform.json` is additionally a prerequisite for the sensor work, since bino publishes no transforms. A malformed config makes the connector `sys.exit(1)`, which the supervisor now surfaces as a container exit rather than swallowing.
 
-3. **`config/motorboat/entity_health.json`, then `platform.json`** → [Vehicle coverage](#vehicle-coverage). The cheapest visible payoff: `entity_health` already decodes in Crowsnest and would light up its health panel with no UI work. `platform.json` is additionally a prerequisite for the sensor work, since bino publishes no transforms. A malformed config makes the connector `sys.exit(1)`, which the supervisor now surfaces as a container exit rather than swallowing.
+3. **CI that builds on PR** → [CI & testing](#ci--testing). The Dockerfile now asserts its own imports and connector entry points, but nothing runs that assertion before merge — a change that breaks the keelson pin is only caught by whoever next builds locally. One workflow file turns an existing check into an enforced one.
 
-4. **CI on PR with the import smoke test** → [CI & testing](#ci--testing). Catches item 1's entire class of failure at build time rather than at boot. One workflow file.
-
-5. **The `boat` alias and the missing `sailboat` frame class** → [Vehicle coverage](#vehicle-coverage). Small mapping bugs that leave two of the six documented vehicle types quietly wrong.
+4. **The `boat` alias and the missing `sailboat` frame class** → [Vehicle coverage](#vehicle-coverage). Small mapping bugs that leave two of the six documented vehicle types quietly wrong.
 
 ## sim_control correctness
 
@@ -38,25 +36,15 @@ The order to work in. Everything below this section is real but genuinely deferr
 
 ## Reproducibility & supply chain
 
-- [ ] **The Keelson pin documented in the README cannot resolve, and the nearest valid one breaks `sim_control` at runtime** — [README.md](README.md) documents `docker compose build --build-arg KEELSON_REF=v0.5.3`. Two independent failures.
+- [ ] **Four unverified executables are fetched over the network at build time** — [Dockerfile:35-44](ghost-drone/Dockerfile#L35-L44) pulls the ArduPilot `/stable/` channel, which moves under you, with no `sha256sum -c`. The `pip install` at [Dockerfile:62](ghost-drone/Dockerfile#L62) has no lockfile or hashes, so transitive dependencies resolve at build time too. There is also no `.dockerignore` anywhere in the repo.
 
-  **Verified: keelson tags carry no `v` prefix.** The tags are `0.5.2`, `0.5.3`, `0.5.4`, `0.5.4-pre.1`. `git clone --branch v0.5.3` fails with "Remote branch not found", aborting the build at [Dockerfile:42](ghost-drone/Dockerfile#L42).
-
-  **Verified: `0.5.3` predates the protos `sim_control.py` imports.** `git ls-tree -r --name-only 0.5.3` has no `interfaces/SimulationControl.proto` or `VehicleSimulatorControl.proto`; they appear only in `0.5.4` and `main`. So the *corrected* pin `KEELSON_REF=0.5.3` builds green and then dies at container start on `ModuleNotFoundError`. The supervisor now catches that — `sim_control` exiting takes the container down non-zero instead of leaving it up with all four RPCs silently absent — but a failure that only surfaces at boot still belongs at build time.
-
-  **The fix.** Document `0.5.4`, and add a build-time `RUN python3 -c "import keelson.interfaces.SimulationControl_pb2"` so this class of failure lands at build rather than at boot.
-
-- [ ] **Released images have no recorded Keelson version** — [Dockerfile:7](ghost-drone/Dockerfile#L7) defaults `ARG KEELSON_REF=main`, and [release.yml](.github/workflows/release.yml) never passes it. A tagged, published release image is therefore built against whatever `main` happened to be at that minute, and the artefact records nothing about which. Pin the default, pass `--build-arg` from the workflow, and stamp the resolved ref into an OCI label.
-
-- [ ] **Four unverified executables are fetched over the network at build time** — [Dockerfile:29-36](ghost-drone/Dockerfile#L29-L36) pulls the ArduPilot `/stable/` channel, which moves under you, with no `sha256sum -c`. The `pip install` at [Dockerfile:56](ghost-drone/Dockerfile#L56) has no lockfile or hashes, so transitive dependencies resolve at build time too. There is also no `.dockerignore` anywhere in the repo.
-
-- [ ] **The `sed` patch of an upstream script can fail open, and the quiet failure is the dangerous one** — [Dockerfile:48-49](ghost-drone/Dockerfile#L48-L49) rewrites `uv run protoc` to `protoc` in keelson's `generate_python.sh`. It works today: upstream has exactly three such invocations.
+- [ ] **The `sed` patch of an upstream script can fail open, and the quiet failure is the dangerous one** — [Dockerfile:54-55](ghost-drone/Dockerfile#L54-L55) rewrites `uv run protoc` to `protoc` in keelson's `generate_python.sh`. It works today: upstream has exactly three such invocations.
 
   **The loud case is fine.** If upstream changes the command to something like `uv run --frozen protoc`, the substitution no-ops and the build then fails on missing `uv`. Visible, immediate.
 
-  **The quiet case is not.** If upstream adds a *fourth* generation step under a different invocation, or splits interface generation into a new script, generation partially succeeds, the image builds green, and the missing module surfaces only at container start — the same silent-failure shape as the pin bug above. The script also relies on unguarded `**/*.proto` globs without `shopt -s globstar`, which works only by accident for the single-level `foxglove/` nesting.
+  **The quiet case is narrower than it was.** If upstream adds a *fourth* generation step under a different invocation, or splits interface generation into a new script, generation partially succeeds and the image builds green. The build assertion at the end of the Dockerfile now catches that for anything `sim_control` or the three connectors import — but a proto used by neither would still slip through silently. The script also relies on unguarded `**/*.proto` globs without `shopt -s globstar`, which works only by accident for the single-level `foxglove/` nesting.
 
-  **Preferred fix** is to install `uv` in the image and drop the patch entirely. Failing that, guard with `grep -q 'uv run protoc' … || exit 1` before the `sed` *and* assert the imports afterwards.
+  **Preferred fix** is to install `uv` in the image and drop the patch entirely. Failing that, guard with `grep -q 'uv run protoc' … || exit 1` before the `sed`, so a no-op substitution fails loudly instead of relying on the downstream assertion to notice.
 
 - [ ] **Architecture is pinned in neither the build nor the release** — **verified:** the locally built image is `arm64` while all four SITL binaries are `SITL_x86_64_linux_gnu`. It runs today on Docker Desktop, which registers qemu binfmt handlers VM-wide — the Crowsnest rig was verified underway at 7.8 kn this way — so this is a portability gap, not a present breakage. But the same image will fail with `exec format error` on a bare arm64 Linux host, and [release.yml](.github/workflows/release.yml) declares no `platforms:`, so the published image's architecture silently follows whatever the runner happens to be. Fix with `FROM --platform=linux/amd64` and an explicit `platforms: linux/amd64` in the workflow.
 
@@ -66,7 +54,7 @@ The order to work in. Everything below this section is real but genuinely deferr
 
   **The deleted `ci.yml` cannot be restored verbatim.** `git show 49f58e0^:.github/workflows/ci.yml` ran `uv sync --locked` then `pytest tests/`, but `pyproject.toml`, `uv.lock` and `tests/` were all deleted in that same commit, and v2 is a container rather than a `uv` package.
 
-  **Highest value for the least work:** run the built image with `--entrypoint python3 -c "import keelson.interfaces.SimulationControl_pb2"`. That single check catches the Keelson pin failure above, which is currently invisible until runtime.
+  **Highest value for the least work:** just run `docker build` on a PR. The Dockerfile's final layer already imports `sim_control` and runs `--help` on all three connector entry points, so a build that succeeds has verified the keelson pin end to end — the workflow only has to invoke it. `push: false` with GHA cache keeps it cheap.
 
 - [ ] **`release.yml` will let an old release overwrite `latest`** — [release.yml:36](.github/workflows/release.yml#L36) sets `type=raw,value=latest` unconditionally, so a patch release of an older minor, or a prerelease, republishes `latest` pointing backwards. Guard with `enable=${{ !github.event.release.prerelease }}` and a version condition. There is also no `concurrency:` group, so two near-simultaneous releases race on the tag.
 
@@ -175,7 +163,7 @@ Crowsnest carries simulation machinery that belongs in a simulation backend, and
 
 ## Project hygiene
 
-- [ ] **Runtime defaults live in three places and have already drifted** — [Dockerfile:12-17](ghost-drone/Dockerfile#L12-L17) defines six `ENV`s and is **already missing** `MAVLINK_URL` and `TARGET_SYSTEM`, both of which [entrypoint.sh:5-15](ghost-drone/entrypoint.sh#L5-L15) and [docker-compose.yml](docker-compose.yml) do define. Keep one source of truth — the entrypoint's `${VAR:-default}` block — and drop the `ENV` defaults.
+- [ ] **Runtime defaults live in three places and have already drifted** — [Dockerfile:18-23](ghost-drone/Dockerfile#L18-L23) defines six `ENV`s and is **already missing** `MAVLINK_URL` and `TARGET_SYSTEM`, both of which [entrypoint.sh:5-15](ghost-drone/entrypoint.sh#L5-L15) and [docker-compose.yml](docker-compose.yml) do define. Keep one source of truth — the entrypoint's `${VAR:-default}` block — and drop the `ENV` defaults.
 
 - [ ] **`docker-compose.yml` has no supervision, no health signal and no path to the published image** — no `restart:` policy, so a crashed connector is never recovered; no `healthcheck`, so nothing distinguishes "publishing" from "alive but mute"; no `init: true`, so PID 1 is bash with no zombie reaping. `image: ghost-drone` does not reference `ghcr.io/rise-maritime/ghost-drone`, so `docker compose pull` is impossible and every user must run the multi-minute build. There is no `build.args:`, so `KEELSON_REF` cannot be driven from `.env`. `stdin_open`/`tty` look vestigial and mangle log collection. The container also runs as root — no `USER` directive.
 

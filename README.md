@@ -129,10 +129,27 @@ Create `ghost-drone/config/<VEHICLE_TYPE>/entity_health.json` — see [`keelson/
 
 ## Pinning the Keelson version
 
-The Dockerfile clones Keelson from `main` by default. To pin to a specific release or commit:
+The Dockerfile pins Keelson to `0.5.4`. To build against a different release, branch or commit:
 
 ```bash
-docker compose build --build-arg KEELSON_REF=v0.5.3
+docker compose build --build-arg KEELSON_REF=0.5.4
+```
+
+**Keelson tags carry no `v` prefix** — they are `0.5.3`, `0.5.4`, and so on. `KEELSON_REF=v0.5.4` fails the clone with "Remote branch not found".
+
+`0.5.4` is also the oldest release that works: the `SimulationControl` and `VehicleSimulatorControl` protos `sim_control.py` imports first appear there, so an older pin builds cleanly and then dies at container start. The build now asserts this — it imports `sim_control` and runs `--help` on all three connectors, so a bad pin fails the build rather than the container.
+
+The image records what it was built against:
+
+```bash
+docker image inspect ghost-drone --format '{{index .Config.Labels "se.ri.keelson.ref"}}'
+```
+
+Before bumping the pin, this one command is the whole compatibility test — it diffs every path this container uses, so an empty result means the bump is a no-op here:
+
+```bash
+git diff --stat <new-tag> origin/main -- \
+  sdks/python/ connectors/mavlink/ connectors/platform/ connectors/entity_health/
 ```
 
 ## Development

@@ -2,9 +2,15 @@ FROM ubuntu:24.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Pin to a branch, tag, or commit SHA.
-# Use "main" for latest; set to a tag like "v0.5.3" for a stable pin.
-ARG KEELSON_REF=main
+# Pin to a branch, tag, or commit SHA. Keelson tags carry NO "v" prefix —
+# they are "0.5.3", "0.5.4", etc. "--branch v0.5.4" fails the clone outright.
+# Note 0.5.4 is the first release containing the SimulationControl and
+# VehicleSimulatorControl protos that sim_control.py imports; anything older
+# builds cleanly and then dies at container start.
+# Before bumping, the whole compatibility test is:
+#   git diff --stat <new-tag> origin/main -- \
+#     sdks/python/ connectors/mavlink/ connectors/platform/ connectors/entity_health/
+ARG KEELSON_REF=0.5.4
 
 # Runtime defaults — override via docker run -e or docker-compose environment.
 # ENTITY_ID/SOURCE_ID match the "Ghost Drone (SITL)" entry in the Crowsnest
@@ -66,6 +72,28 @@ COPY sim_control.py /app/sim_control.py
 RUN chmod +x /entrypoint.sh /healthcheck.sh
 
 ENV PATH="/app/venv/bin:$PATH"
+
+# Record which keelson this image was built against, so a published image is
+# self-describing. Single source of truth is ARG KEELSON_REF above — the
+# release workflow deliberately does not pass its own value, which would put
+# the pin in two places that must be bumped together.
+LABEL se.ri.keelson.ref="${KEELSON_REF}"
+
+# Fail the BUILD, not the container, if the pinned keelson is missing anything
+# we need at runtime. `python3` is the venv interpreter here (PATH above), so
+# this exercises the same import path the entrypoint uses.
+#   1. sim_control walks the SDK surface a bad pin breaks: the Simulation*
+#      interfaces, SimulationStatus payload and scaffolding, plus zenoh/pymavlink.
+#   2. --help on each connector walks its full import chain and argparse,
+#      catching a missing transitive dependency sim_control alone would not.
+RUN python3 -c "import sys; sys.path.insert(0, '/app'); import sim_control" \
+    && for c in mavlink/bin/mavlink2keelson \
+                platform/bin/platform-geometry2keelson \
+                entity_health/bin/entity_health2keelson; do \
+           echo "checking ${c}..." \
+           && python3 "/app/keelson/connectors/${c}.py" --help > /dev/null; \
+       done \
+    && echo "build assertion passed (keelson ${KEELSON_REF})"
 
 # Catches the one failure the entrypoint's supervisor cannot see: the router
 # disappearing while every process stays alive. start-period covers the slow
