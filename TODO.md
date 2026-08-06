@@ -1,0 +1,214 @@
+# ghost-drone TODO
+
+Single source of truth for **pending** work, as a checklist. Completed items are pruned — `git log` has the record.
+
+## Start here
+
+The order to work in. Everything below this section is real but genuinely deferred.
+
+1. **Fix the `KEELSON_REF` pin and add a build-time import assertion** → [Reproducibility & supply chain](#reproducibility--supply-chain). The README is wrong today — `v0.5.3` cannot clone, and the corrected `0.5.3` predates the protos `sim_control.py` imports. Anyone following the documented pin gets a failed build or a silently crippled container. One doc line plus one `RUN`.
+
+2. **`sim_control` initial state and ack matching** → [sim_control correctness](#sim_control-correctness). Publishing `STOPPED` while the vessel is underway puts wrong data on the wire, and ack matching means failed commands report success. Correctness of published data is the product.
+
+3. **`config/motorboat/entity_health.json`, then `platform.json`** → [Vehicle coverage](#vehicle-coverage). The cheapest visible payoff: `entity_health` already decodes in Crowsnest and would light up its health panel with no UI work. `platform.json` is additionally a prerequisite for the sensor work, since bino publishes no transforms. A malformed config makes the connector `sys.exit(1)`, which the supervisor now surfaces as a container exit rather than swallowing.
+
+4. **CI on PR with the import smoke test** → [CI & testing](#ci--testing). Catches item 1's entire class of failure at build time rather than at boot. One workflow file.
+
+5. **The `boat` alias and the missing `sailboat` frame class** → [Vehicle coverage](#vehicle-coverage). Small mapping bugs that leave two of the six documented vehicle types quietly wrong.
+
+## sim_control correctness
+
+- [ ] **`simulation_status` publishes `STOPPED` while the simulation is demonstrably running** — [sim_control.py:60](ghost-drone/sim_control.py#L60) initialises `_state = SimulationStatus.STOPPED`, but [entrypoint.sh:89](ghost-drone/entrypoint.sh#L89) launches SITL with `--speedup 1`: physics advancing, telemetry flowing, vessel drifting. Every consumer of the 1 Hz status loop is misled from the first second until someone calls `start`. Either launch at `--speedup 0` and let `start` raise it, or initialise `_state = RUNNING`.
+
+- [ ] **Ack matching accepts any message of the right type, so failed commands report success** — two separate instances.
+
+  **`_set_param` at [sim_control.py:88-89](ghost-drone/sim_control.py#L88-L89)** returns `ack is not None`, treating *any* `PARAM_VALUE` as confirmation without checking `param_id` or the returned value. A `SIM_SPEEDUP` that ArduPilot clamps or rejects is indistinguishable from one it accepted.
+
+  **`_reposition` at [sim_control.py:119-121](ghost-drone/sim_control.py#L119-L121)** checks only for timeout — never `ack.command == MAV_CMD_DO_REPOSITION` nor `ack.result == MAV_RESULT_ACCEPTED`. A `MAV_RESULT_DENIED`, entirely plausible for `DO_REPOSITION` on a disarmed rover, logs nothing and `_on_set_initial_pose` still replies with a success `SetInitialPoseResponse`.
+
+  **Aggravating factor: nothing drains the link between RPCs.** `wait_heartbeat` runs once at startup, then `recv_match` is only called inside handlers. SITL keeps writing HEARTBEATs into a receive buffer nobody reads, so the next `recv_match(type="PARAM_VALUE")` can be satisfied *instantly* by a stale value from a previous call. Any fix needs a background receive pump as well as identity and result assertions.
+
+- [ ] **`stop` does not reset to the configured initial pose, contrary to the interface it implements** — keelson's `SimulationControl.proto` specifies `stop : any -> STOPPED` as "halt and reset to the configured / last-set initial pose". `_stored_pose` is only ever assigned by `set_initial_pose`, so a drone that has never received one simply freezes wherever it drifted to. `SITL_HOME` is known to the container ([entrypoint.sh:7](ghost-drone/entrypoint.sh#L7)) but is never plumbed into `sim_control.py` as the default. Add a `--home lat,lon,alt,hdg` argument and seed `_stored_pose` from it.
+
+- [ ] **`pause` produces a flatline where the contract requires a gap** — `SimulationControl.proto` is explicit that a paused entity "simply stops publishing" and that "the only visible effect is a gap in the data, which is honest". This implementation sets `SIM_SPEEDUP = 0.0` on the autopilot, but `mavlink2keelson` is a separate process on a separate link and keeps publishing the frozen values at full rate. Consumers see a flatline — exactly the dishonest signal the interface was designed to avoid. Also unverified, and per the ack bug above currently unverifiable: whether ArduPilot accepts `SIM_SPEEDUP=0` at all rather than clamping it.
+
+- [ ] **`sim_control.py` still bypasses most of the keelson scaffolding** — `GracefulShutdown` is now in place, but there is no `declare_liveliness_token`, logging is a raw `logging.basicConfig` rather than `setup_logging`, and the publisher is a raw `session.declare_publisher` rather than `declare_publisher_for_subject`, so `simulation_status` publishes without the well-known-subject QoS profile.
+
+  **The liveliness gap has a concrete consequence.** `sim_control` shares `SOURCE_ID=mavlink` with `mavlink2keelson`, so its liveness is implied by a *different process's* token. If `sim_control` dies while the connector lives, Crowsnest still reads the source as alive and its panels stay enabled. A distinct `--source-id` (e.g. `sim`) plus its own token would make the two independently observable.
+
+## Reproducibility & supply chain
+
+- [ ] **The Keelson pin documented in the README cannot resolve, and the nearest valid one breaks `sim_control` at runtime** — [README.md](README.md) documents `docker compose build --build-arg KEELSON_REF=v0.5.3`. Two independent failures.
+
+  **Verified: keelson tags carry no `v` prefix.** The tags are `0.5.2`, `0.5.3`, `0.5.4`, `0.5.4-pre.1`. `git clone --branch v0.5.3` fails with "Remote branch not found", aborting the build at [Dockerfile:42](ghost-drone/Dockerfile#L42).
+
+  **Verified: `0.5.3` predates the protos `sim_control.py` imports.** `git ls-tree -r --name-only 0.5.3` has no `interfaces/SimulationControl.proto` or `VehicleSimulatorControl.proto`; they appear only in `0.5.4` and `main`. So the *corrected* pin `KEELSON_REF=0.5.3` builds green and then dies at container start on `ModuleNotFoundError`. The supervisor now catches that — `sim_control` exiting takes the container down non-zero instead of leaving it up with all four RPCs silently absent — but a failure that only surfaces at boot still belongs at build time.
+
+  **The fix.** Document `0.5.4`, and add a build-time `RUN python3 -c "import keelson.interfaces.SimulationControl_pb2"` so this class of failure lands at build rather than at boot.
+
+- [ ] **Released images have no recorded Keelson version** — [Dockerfile:7](ghost-drone/Dockerfile#L7) defaults `ARG KEELSON_REF=main`, and [release.yml](.github/workflows/release.yml) never passes it. A tagged, published release image is therefore built against whatever `main` happened to be at that minute, and the artefact records nothing about which. Pin the default, pass `--build-arg` from the workflow, and stamp the resolved ref into an OCI label.
+
+- [ ] **Four unverified executables are fetched over the network at build time** — [Dockerfile:29-36](ghost-drone/Dockerfile#L29-L36) pulls the ArduPilot `/stable/` channel, which moves under you, with no `sha256sum -c`. The `pip install` at [Dockerfile:56](ghost-drone/Dockerfile#L56) has no lockfile or hashes, so transitive dependencies resolve at build time too. There is also no `.dockerignore` anywhere in the repo.
+
+- [ ] **The `sed` patch of an upstream script can fail open, and the quiet failure is the dangerous one** — [Dockerfile:48-49](ghost-drone/Dockerfile#L48-L49) rewrites `uv run protoc` to `protoc` in keelson's `generate_python.sh`. It works today: upstream has exactly three such invocations.
+
+  **The loud case is fine.** If upstream changes the command to something like `uv run --frozen protoc`, the substitution no-ops and the build then fails on missing `uv`. Visible, immediate.
+
+  **The quiet case is not.** If upstream adds a *fourth* generation step under a different invocation, or splits interface generation into a new script, generation partially succeeds, the image builds green, and the missing module surfaces only at container start — the same silent-failure shape as the pin bug above. The script also relies on unguarded `**/*.proto` globs without `shopt -s globstar`, which works only by accident for the single-level `foxglove/` nesting.
+
+  **Preferred fix** is to install `uv` in the image and drop the patch entirely. Failing that, guard with `grep -q 'uv run protoc' … || exit 1` before the `sed` *and* assert the imports afterwards.
+
+- [ ] **Architecture is pinned in neither the build nor the release** — **verified:** the locally built image is `arm64` while all four SITL binaries are `SITL_x86_64_linux_gnu`. It runs today on Docker Desktop, which registers qemu binfmt handlers VM-wide — the Crowsnest rig was verified underway at 7.8 kn this way — so this is a portability gap, not a present breakage. But the same image will fail with `exec format error` on a bare arm64 Linux host, and [release.yml](.github/workflows/release.yml) declares no `platforms:`, so the published image's architecture silently follows whatever the runner happens to be. Fix with `FROM --platform=linux/amd64` and an explicit `platforms: linux/amd64` in the workflow.
+
+## CI & testing
+
+- [ ] **There is no CI** — [release.yml](.github/workflows/release.yml) builds and pushes on `release: published` and nothing else. Nothing runs on a PR, nothing `docker build`s outside a release, and there is no `shellcheck`, `hadolint`, `ruff` or `black --check`.
+
+  **The deleted `ci.yml` cannot be restored verbatim.** `git show 49f58e0^:.github/workflows/ci.yml` ran `uv sync --locked` then `pytest tests/`, but `pyproject.toml`, `uv.lock` and `tests/` were all deleted in that same commit, and v2 is a container rather than a `uv` package.
+
+  **Highest value for the least work:** run the built image with `--entrypoint python3 -c "import keelson.interfaces.SimulationControl_pb2"`. That single check catches the Keelson pin failure above, which is currently invisible until runtime.
+
+- [ ] **`release.yml` will let an old release overwrite `latest`** — [release.yml:36](.github/workflows/release.yml#L36) sets `type=raw,value=latest` unconditionally, so a patch release of an older minor, or a prerelease, republishes `latest` pointing backwards. Guard with `enable=${{ !github.event.release.prerelease }}` and a version condition. There is also no `concurrency:` group, so two near-simultaneous releases race on the tag.
+
+- [ ] **Two of the deleted tests are worth rebuilding against the container architecture** — `tests/test_keelson_roundtrip.py` was pure unit work with no live Zenoh (`enclose`/`uncover` byte-identity, `received_at >= enclosed_at` ordering, a well-known-subject assertion) and adapts directly to asserting `simulation_status` is well-known. `tests/test_e2e_zenoh.py` span an in-process router on `tcp/127.0.0.1:17447` with multicast scouting disabled and asserted every subject arrived and decoded — that is exactly the shape of the container smoke test this repo lacks; swap the in-process simulator for `docker run`.
+
+  **Genuinely new work, which never existed:** a `sim_control` state-machine test (start/pause/stop/set_initial_pose transitions plus `INVALID_STATE` on illegal edges, against a fake MAVLink endpoint), and a `bats` test of the entrypoint's `VEHICLE_TYPE` → binary/model/param-file mapping, which would have caught the `boat` alias bug below immediately.
+
+## Vehicle coverage
+
+- [ ] **`VEHICLE_TYPE=boat` silently boots without its parameter file** — [entrypoint.sh:68](ghost-drone/entrypoint.sh#L68) resolves the `motorboat|boat` alias for the *model*, but [entrypoint.sh:84](ghost-drone/entrypoint.sh#L84) keys `PARAM_FILE` on the raw `VEHICLE_TYPE` and the `[ -f ]` test at [entrypoint.sh:90](ghost-drone/entrypoint.sh#L90) skips without warning. `/config/boat/` does not exist, so `boat` runs without `FRAME_CLASS,2` while `motorboat` gets it — and the README advertises the two as equivalent. Introduce a `PARAM_KEY` alongside `SITL_MODEL`, or at minimum an `else` branch that WARNs.
+
+- [ ] **The vehicle config matrix is 2 of 7** — only `motorboat` and `rover` have a `defaults.parm`. `sailboat` is the notable gap: [entrypoint.sh:70-71](ghost-drone/entrypoint.sh#L70-L71) passes `--model sailboat`, but with no `FRAME_CLASS,7` the frame class comes from whatever ardurover last persisted, so the frame and the physics model disagree. `copter`, `plane`, `sub` and the `boat` alias are also unpopulated.
+
+- [ ] **No `platform.json` or `entity_health.json` exists for any vehicle type**, so [entrypoint.sh:143-168](ghost-drone/entrypoint.sh#L143-L168) skips both connectors with a `WARN` on every boot of every vehicle. Highest value first is `config/motorboat/entity_health.json`, because Crowsnest already decodes the `entity_health` subject and it would light up its health panel with no UI work. Note the connector validates its config against a JSON schema and `sys.exit(1)`s on a malformed one; the supervisor now turns that into a visible container exit rather than a silent skip.
+
+## sf18 sensor parity
+
+Parity with `keelson-platforms/platforms/sf18` is a *sensor-surface* goal and strictly additive. sf18 declares 14 streams and no MAVLink surface at all; this drone declares 39 streams and 20 RPCs, so it is already the richer platform for control and attitude. Nothing may be dropped to "match" sf18 or Remote Control, missions, params and geofence all go dark. The gap is six subjects: `image_compressed` ×4, `point_cloud`, `radar_spoke`, `nav_status`, `operational_authority`, `roc_status`.
+
+- [ ] **`bino` supplies the synthetic sensors, and this drone already satisfies its pose contract for free** — `RISE-Maritime/bino` is a maritime perception sensor emulator that synthesizes camera, lidar and radar from externally injected vessel poses. Its ADR-002 fixes its role on the bus: pose injection in, sensor data out, nothing else. It publishes no poses, no `location_fix`, no ground truth and no transforms.
+
+  **The pose half costs nothing.** Bino's `keelson_nav` pose source subscribes to exactly `location_fix` + `heading_true_north_deg`, optionally `pitch_deg` and `roll_deg` — all four of which `mavlink2keelson` already publishes under `source_id=mavlink`. A scenario with `entity_id: drone-sim-01`, `source_id: mavlink` resolves straight onto keys this container emits today, with no change here at all:
+
+  ```text
+  # bino pose input — already published by ghost-drone
+  rise/@v0/drone-sim-01/pubsub/location_fix/mavlink
+  rise/@v0/drone-sim-01/pubsub/heading_true_north_deg/mavlink
+  rise/@v0/drone-sim-01/pubsub/pitch_deg/mavlink
+  rise/@v0/drone-sim-01/pubsub/roll_deg/mavlink
+
+  # bino sensor output — new
+  rise/@v0/drone-sim-01/pubsub/image_raw/camera-axis-1
+  rise/@v0/drone-sim-01/pubsub/point_cloud/lidar-os
+  rise/@v0/drone-sim-01/pubsub/radar_sweep/radar-1201
+  ```
+
+  **Practicalities.** Bino is a private repo needing a sibling checkout; it is TypeScript/pnpm with Rust/WASM kernels for the lidar and radar, publishes GHCR images, and the headless `bino-node` image runs anywhere on software GL. Scenes are declared in a YAML scenario with `vessels[].pose_source` and `vessels[].sensors[]` blocks.
+
+- [ ] **Bino's output subjects do not match what sf18 declares or what Crowsnest consumes** — three mismatches, and only one of them is trivial.
+
+  **Camera.** Bino emits `image_raw` carrying `foxglove.RawImage`. sf18 declares `image_compressed`, and Crowsnest's camera enumeration hard-requires it — the key parser tests `segments[4] === "image_compressed"` before a camera is registered at all. Raw frames will not populate the camera strip no matter how good they are.
+
+  **Radar.** Bino emits `radar_sweep` carrying `keelson.RadarSweep`; sf18 declares `radar_spoke`. Worth knowing that `radar_spoke` currently has zero consumers anywhere in Crowsnest, so this mismatch costs nothing today beyond a data-flow row.
+
+  **Lidar.** `point_cloud` matches on subject, but not on key expression — see the hardcoded lidar bridge under Deferred / external.
+
+  Resolving this is a decision rather than a task: a transcode step, a Crowsnest change, or accepting a different-but-honest subject set.
+
+- [ ] **`scenario.keelson.base_path` has no default and must be chosen deliberately** — bino makes it mandatory precisely so synthetic data cannot silently collide with, or be mistaken for, real data on a shared bus. Setting it to `rise` is what makes Crowsnest render the synthetic sensors as part of the same platform — and is also exactly the shared-network pollution the README already warns about, now with camera and radar volume behind it. A separate realm is safe but invisible to the drone's Crowsnest platform. Pick per use: inject-mode parity wants one realm, everyday development probably does not.
+
+- [ ] **The single container has to become an sf18-style compose stack** — sf18 is roughly twenty compose files, one per sensor group, each with its own `source_id` and each startable and stoppable independently. That independence is the substance, not the packaging: it is what makes per-sensor failure injection possible, which one `entrypoint.sh` running four background jobs cannot do. Note the entrypoint now supervises its children properly and exits non-zero when one dies, so this is no longer a fix for a broken supervisor — it is about per-service isolation, and the restructure would hand that supervision to Docker rather than replace something missing.
+
+- [ ] **Per-device `source_id` conventions, not one flat `mavlink` for everything** — sf18 names its sources after the devices that produce them: `ardusimple/GGA`, `ardusimple/UNIHEADINGA`, `lidar-os`, `camera-axis-1` through `-4`, `radar-aptiv`, `battery_12v_bow`, `battery_12v_stern`, `battery_36v_engine`. This drone uses `mavlink` for all 39 streams. Crowsnest supports multi-segment source ids, so the convention is available; adopting it is what makes the drone a structurally realistic stand-in rather than one connector in a costume. The LabJack analogue is cheap and worth doing early — sf18's battery voltages are just named analog channels, which SITL battery state could feed directly.
+
+- [ ] **`platform.json` becomes a prerequisite rather than a nice-to-have, and sf18's own copy is a trap** — extends the config entry under [Vehicle coverage](#vehicle-coverage). Bino publishes **no** transforms by design (ADR-002), so static sensor-mount geometry has to come from this repo's own `platform` connector. Without it the synthetic sensors have no declared position on the hull.
+
+  **Do not copy `keelson-platforms/platforms/sf18/config.json`.** It is the old array-based `translation`/`rotation` schema with no `sensor_type` and no `ccrp_m`, and the current `platform-geometry2keelson.py` validates against `config-schema.json` and would reject it outright. Copy `keelson/connectors/platform/example-config.json` instead — it is already an SSRS18/sf18 model at 1.8 m LOA with four Axis cameras, an Ouster lidar and a RUTX GNSS antenna, in the schema the connector actually accepts.
+
+## Crowsnest simulator convergence
+
+Crowsnest carries simulation machinery that belongs in a simulation backend, and this repo already holds that role. Today the two codebases run two disconnected simulation surfaces: a browser that fabricates telemetry with no control RPCs, and a container that serves control RPCs with no client.
+
+- [ ] **`SimulatorPublisher.jsx` is a Keelson connector wearing a UI costume** — it reads the physics tick and publishes 13 fabricated subjects at roughly 10 Hz to `crowsnest/@v0/simulator/pubsub/<subject>/sim-physics`: `location_fix`, `speed_over_ground_knots`, `course_over_ground_deg`, `heading_true_north_deg`, `yaw_rate_degps`, `depth_m`, `rudder_angle_deg`, `speed_through_water_knots`, `apparent_wind_speed_mps`, `apparent_wind_angle_deg`, `surge_velocity_mps`, `sway_velocity_mps`, `thruster_power_pct`. It is mounted globally in `crowsnest-dev/src/base-elements/BasePage.jsx:96`, so it runs on every page of the app whenever the sim is running.
+
+  **The registry entry admits what it is.** `crowsnest/@v0/simulator` declares `liveliness: false` on all 13 streams and `"queryables": []` — a real connector declares liveliness tokens and a browser tab cannot.
+
+  **Moving it closes a gap already recorded in this file.** That subject list is very nearly the conning gap under [Deferred / external](#deferred--external) — `speed_through_water_knots`, `depth_m`, `rudder_angle_deg`, `thruster_power_pct`, plus the `surge_velocity_mps`/`sway_velocity_mps` velocities `mavlink2keelson` does not publish. The two entries are one problem seen from opposite ends. Coupling is low: Jotai reads plus `encloseFromTypeName` protobuf encoding, no DOM.
+
+- [ ] **The physics kernels are portable, validated, and homeless** — roughly 2,000 lines across `sim3dof/` (683 lines implementing the MMG standard method, every derivative estimated from hull form per Yoshimura & Masumoto, *JASNAOE* Vol. 14, 2011), `sim_planing/` (Savitsky 1964), `simple_simulator.js`, `trackKeepingController.js`, and a 430-line model registry.
+
+  **The validation is real and worth preserving.** All seven MMG hydro models meet every IMO Res. MSC.137(76) criterion — 35° turning circle advance 3.05–3.37 L against a 4.5 L limit, tactical diameter 3.15–3.60 L against 5.0 L, 10°/10° first overshoot 5.4–8.9°, 20°/20° first overshoot 11.5–18.3°, with 43–60 % speed retention. The planing engine's longitudinal half reproduces OpenPlaning to −2.7 % on trim and +2.2 % on wetted length; its steering half is explicitly calibrated rather than validated, because no estimate-from-particulars regression exists for planing manoeuvring.
+
+  **The kernels are already headless.** Pure ESM, `Math` only — no DOM, no Jotai, no Zenoh, no geodesy. The documented re-validation recipe copies the directory to a scratch dir and runs it under plain node after a two-import `sed` for extensionless imports. That `sed` is the entire porting cost of the kernel itself; everything app-specific already lives in a separate adapter.
+
+  **But it cannot merge into SITL, and there is no committed harness.** ArduPilot models a rover or boat; these model merchant ships and planing hulls, so this is a *second* simulation service rather than a merge. And the validation exists only as a manual procedure — no `tests/` directory and no test runner in Crowsnest's `package.json` — including the SR108 anchor that caught a sign error in the source paper's eq (4.5). Three ways forward, all real: port to Python and re-incur the calibration work; ship a sibling Node service and keep the validated JS as-is; or extract the kernels as a shared versioned package with the harness attached and let both the browser and a backend consume it. Decide before starting, not during.
+
+- [ ] **Two simulation control surfaces should converge on one** — this container serves `SimulationControl/{start,pause,stop}` and `VehicleSimulatorControl/set_initial_pose` with no client anywhere, while Crowsnest's simulator has a full config UI whose start, stop and reset are *local Jotai state* — invisible to any other station, so no second operator can see or control the sim.
+
+  **The precedent already exists in Crowsnest.** `crowsnest-dev/src/services/mcapReplayRpc.js` is a thin RPC client to a backend replay daemon: the browser sends commands and subscribes to status, the daemon owns the loop. The simulator should take that shape, with the OS Config panel becoming an RPC client rather than a local-atom writer. Pairs directly with the Deferred entry about Crowsnest having no `SimulationControl` client — same convergence, opposite end.
+
+## Multi-drone support
+
+- [ ] **The README's "run two drones at once" example cannot work** — three independent reasons, any one of which is fatal.
+
+  **Both SITLs bind the same port.** `MAVLINK_URL` only changes what the *client* dials. [entrypoint.sh:89](ghost-drone/entrypoint.sh#L89) builds `SITL_ARGS` with no `--serial0` and no `-I<instance>`, so both instances bind ArduPilot's default TCP 5760 and collide under `network_mode: host`.
+
+  **`sim_control` would target the wrong drone anyway** — it is hardcoded to `tcp:localhost:5762` at [entrypoint.sh:134](ghost-drone/entrypoint.sh#L134) regardless of `MAVLINK_URL`, so instance 2 would drive instance 1's control port even if the bind succeeded.
+
+  **Compose replaces rather than adds.** `docker compose up -d` twice in the same project recreates the `ghost-drone` service; a second instance needs `-p <project>` or a second service. Either thread an `SITL_INSTANCE` through the entrypoint properly, or delete the section.
+
+- [ ] **The SITL readiness probe has no failure path and cannot see UDP** — [entrypoint.sh:99-109](ghost-drone/entrypoint.sh#L99-L109).
+
+  **No `else` on loop exhaustion.** If SITL never binds within 30 s the loop just falls through and the connectors start against a dead port — no "timed out" message, no non-zero exit. Only the *process died* branch at [entrypoint.sh:105](ghost-drone/entrypoint.sh#L105) is handled.
+
+  **`ss -tlnH` is TCP-listen only**, but [entrypoint.sh:12](ghost-drone/entrypoint.sh#L12) documents `udpin:0.0.0.0:PORT` as a valid `MAVLINK_URL` form. With a `udpin:` URL the probe can never match, so it burns the full 30 s and proceeds regardless. `${MAVLINK_URL##*:}` also yields garbage for any URL without a trailing `:port`, which `ss` then rejects into `2>/dev/null`.
+
+- [ ] **`sim_control`'s MAVLink URL is hardcoded and undocumented** — every other endpoint is env-overridable; port 5762 is not, and it appears nowhere in the README's configuration table. Add `SIM_CONTROL_MAVLINK_URL`, defaulting to `MAVLINK_URL`'s port + 2.
+
+## Devcontainer
+
+- [ ] **The devcontainer cannot build — it `COPY`s a file the cleanup deleted** — **verified:** [.devcontainer/Dockerfile:148](.devcontainer/Dockerfile#L148) is `COPY init-firewall.sh /usr/local/bin/`, but `.devcontainer/` contains only `Dockerfile` and `devcontainer.json`. `git show 49f58e0 --stat` confirms the 121-line script was deleted while the `COPY`, the `chmod` and the sudoers rule at lines 150-151 were left behind. The README's claim that "This repo includes a VS Code devcontainer" is currently false. Secondary point: nothing invokes the script even if restored — there is no `postCreateCommand` — which makes the `NET_ADMIN`/`NET_RAW` capabilities dead weight.
+
+- [ ] **Roughly two thirds of the devcontainer is boilerplate irrelevant to a Docker + Python repo** — it is a verbatim "Claude Sandbox" template. `FROM node:20` for a repo with zero JS since the frontend deletion; `--gpus=all`, which *errors out* on any machine without the nvidia runtime, including this one; an X11 `DISPLAY` mount for a project with no GUI; SDL/freetype/portmidi pygame dependencies; ~16 Chromium runtime packages retained even though the Playwright install is commented out; `postgresql-client` and `pgcli` with no database anywhere; `agent-browser` for a UI that now lives in Crowsnest; eslint/prettier extensions with prettier as the default formatter.
+
+  **Worth keeping:** python3.11, `docker.io` plus the socket mount (the README's workflow depends on it), `--network=host` (needed so the devcontainer sees the same Zenoh router), `iproute2` (the entrypoint's `ss` probe), and the standalone zenoh installs. **Worth adding:** `shellcheck`, `hadolint`, `ruff`, `pymavlink` for local `sim_control.py` iteration.
+
+## Project hygiene
+
+- [ ] **Runtime defaults live in three places and have already drifted** — [Dockerfile:12-17](ghost-drone/Dockerfile#L12-L17) defines six `ENV`s and is **already missing** `MAVLINK_URL` and `TARGET_SYSTEM`, both of which [entrypoint.sh:5-15](ghost-drone/entrypoint.sh#L5-L15) and [docker-compose.yml](docker-compose.yml) do define. Keep one source of truth — the entrypoint's `${VAR:-default}` block — and drop the `ENV` defaults.
+
+- [ ] **`docker-compose.yml` has no supervision, no health signal and no path to the published image** — no `restart:` policy, so a crashed connector is never recovered; no `healthcheck`, so nothing distinguishes "publishing" from "alive but mute"; no `init: true`, so PID 1 is bash with no zombie reaping. `image: ghost-drone` does not reference `ghcr.io/rise-maritime/ghost-drone`, so `docker compose pull` is impossible and every user must run the multi-minute build. There is no `build.args:`, so `KEELSON_REF` cannot be driven from `.env`. `stdin_open`/`tty` look vestigial and mangle log collection. The container also runs as root — no `USER` directive.
+
+- [ ] **No `.env.example`** — the README states options can go "either in a `.env` file or passed directly" and `.gitignore` ignores `.env`, but there is no template to copy. All eight variables from the configuration table belong in one.
+
+- [ ] **No `LICENSE`** — the image is published to `ghcr.io/rise-maritime/ghost-drone` with no license terms attached. Sibling RISE-Maritime repos are Apache-2.0.
+
+- [ ] **No `CLAUDE.md`** — the deleted one describes the v1 `uv` + Vite frontend architecture (`uv sync`, `uv run ghost-drone`, `ghost_drone.toml.example`, `zenoh-bridge-remote-api` on `ws://localhost:10001`) and would be actively misleading if restored. It needs a rewrite for the container layout, the `docker compose` commands, the Keelson-ref story, and the SITL port map: 5760 telemetry, 5762 control.
+
+## Deferred / external
+
+Cross-repo items — these cannot be closed from this repo alone. Mirrors the convention in `crowsnest-dev/TODO.md`.
+
+- [ ] **Crowsnest has no client for `SimulationControl` / `VehicleSimulatorControl`** — all four RPCs this container serves are unreachable from the UI. `simulation_status` decodes on the wire, since it is a well-known subject in keelson's `subjects.yaml`, but nothing renders it. Start, pause and stop have to be driven outside Crowsnest entirely.
+
+- [ ] **`entity_health2keelson` installs no signal handler, so it always dies dirty** — unlike `mavlink2keelson`, which uses `GracefulShutdown` correctly, the entity-health connector has no `GracefulShutdown` and no `signal.signal` call anywhere; its loop is a bare `while True` with no exit condition. Its only handling is `except KeyboardInterrupt`, which is SIGINT-only, so on SIGTERM it dies without undeclaring its liveliness token and subscribers keep seeing a stale-alive source until the router times it out. This container's entrypoint now forwards SIGTERM correctly, so nothing further can be done here — the fix is upstream in keelson.
+
+  Related, and milder: `platform-geometry2keelson` does use `GracefulShutdown` but blocks in `time.sleep(--interval)` rather than `shutdown.wait(...)`, so it only notices the signal when the current sleep ends. The default interval is 10 s, exactly Docker's default grace period, which is why this repo's compose sets `stop_grace_period: 30s`.
+
+- [ ] **`ASSIGNED` has no wire value, and two docstrings in this repo disagree because of it** — `VehicleSimulatorControl.proto` says `set_initial_pose` moves the entity to `ASSIGNED` and that `start` accepts `STOPPED | ASSIGNED | PAUSED`, but `SimulationStatus.proto`'s enum is only `{UNKNOWN, STOPPED, RUNNING, PAUSED}`. `sim_control.py`'s module docstring says the entity "remains in STOPPED". This is an upstream keelson inconsistency — file it there rather than papering over it locally.
+
+- [ ] **Several MAVLink slices remain unexercised against this rig** — mission upload/download, geofence upload, and param snapshot diff. `arm` needs force because of pre-arm checks, and `set_param`/`get_param` on `ARMING_CHECK` hit the connector's 2 s confirmation window. Carried over from the ghost-drone entry in `crowsnest-dev/TODO.md`, which owns the Crowsnest half of the work.
+
+- [ ] **Conning fields Crowsnest expects that `mavlink2keelson` never publishes** — `speed_through_water_knots`, `depth_m`, `rudder_angle_deg`, `engine_rate_rpm`, `propeller_pitch_pct`, `thruster_power_pct` and every wind subject. The connector also publishes `surge_m`/`sway_m` as displacements rather than the `surge_velocity_mps`/`sway_velocity_mps` velocities the conning app reads, so those gauges stay blank on the drone.
+
+- [ ] **Crowsnest hardcodes the lidar key expression to sf18, so drone point clouds can never render** — `LIDAR_KEY_EXPR` in `crowsnest-dev/src/base-elements/KeelsonLidarBridge.jsx:28` is the literal string `rise/@v0/sf18/pubsub/point_cloud/**`. Point clouds published under `drone-sim-01` will not appear on the chart no matter how correct they are. Blocks the lidar half of [sf18 sensor parity](#sf18-sensor-parity); needs a Crowsnest change deriving the expression from the active platform.
+
+- [ ] **`get_config` can never resolve for the drone, so Own Ship config is permanently offline** — `crowsnest-dev/src/apps/os_config/index.jsx:130` builds the RPC key from the *registry key* rather than the entity id: `${platform.realm}/@v0/${key}/@rpc/get_config/connector_platform`. The drone's registry key is `drone_sim_01` with underscores while its entity is `drone-sim-01` with hyphens, so the key never matches. sf18 works only because its registry key and entity id happen to be identical.
+
+  **The dead panel is not the worst of it.** That RPC also drives the live-versus-declared stream merge, which is what preserves declared camera streams — so it blocks the camera work too. Fix is either renaming the registry key to `drone-sim-01` or serving a `connector_platform` responder under the underscore entity; either way it is a Crowsnest change.
+
+- [ ] **Crowsnest can publish synthetic data into a real vessel's key space** — `crowsnest-dev/src/apps/os_config/components/Simulator/SimSourceSelector.jsx:100` offers a "platform" source mode that rebuilds every simulator key as `${realm}/@v0/${key}/pubsub/${subject}/sim` from *any* entry in the platform registry. Select sf18 and a browser tab publishes synthetic position, heading and rudder into `rise/@v0/sf18/pubsub/...` on the shared RISE network, distinguished from ground truth only by a trailing `/sim` source id.
+
+  **This repo's own design already answered the question.** bino makes `scenario.keelson.base_path` mandatory with no default — see [sf18 sensor parity](#sf18-sensor-parity) — precisely so synthetic data cannot silently collide with, or be mistaken for, real data on a shared bus. The fix belongs in Crowsnest as mandatory explicit realm scoping, but it is worth recording here because the precedent is here.
+
+- [ ] **The drone's registry metadata is thinner than sf18's in four ways that all degrade quietly** — `liveliness: false` on all 39 streams where sf18 sets `true` on all 14, which weakens presence reconciliation in data-flow; `expected_hz` a flat `1`/`3` against sf18's real 1–25 values, which makes the staleness basis wrong; empty `camera_calibrations[]` and `frame_transforms[]`; and no `vessel_outlines` key at all, so kinematic prediction and distance measurement fall back to a rectangle derived from LOA and BOA. All of it is JSON in `crowsnest-dev/src/DB/platform_registry.json` — no publishing required.

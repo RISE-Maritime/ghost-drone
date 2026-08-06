@@ -1,4 +1,4 @@
-# ArduRover SITL defaults for motorboat / boat drone
+# ArduRover SITL defaults for the ground rover frame
 # FRAME_CLASS: 1=Rover, 2=Boat (motorboat), 7=Sailboat
-FRAME_CLASS,2
+FRAME_CLASS,1
 SYSID_THISMAV,1

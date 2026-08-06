@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local env overrides (docker-compose reads these)
+.env
+
+# Editor
+.vscode/

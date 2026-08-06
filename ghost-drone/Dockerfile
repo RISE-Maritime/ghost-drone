@@ -7,12 +7,14 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG KEELSON_REF=main
 
 # Runtime defaults — override via docker run -e or docker-compose environment.
-ENV VEHICLE_TYPE=rover
+# ENTITY_ID/SOURCE_ID match the "Ghost Drone (SITL)" entry in the Crowsnest
+# platform registry, so the drone shows up in the UI without extra flags.
+ENV VEHICLE_TYPE=motorboat
 ENV ZENOH_CONNECT=tcp/localhost:7447
 ENV SITL_HOME=57.7089,11.9746,0,270
 ENV REALM=rise
-ENV ENTITY_ID=drone-01
-ENV SOURCE_ID=sitl
+ENV ENTITY_ID=drone-sim-01
+ENV SOURCE_ID=mavlink
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
@@ -59,9 +61,16 @@ RUN python3 -m venv /app/venv \
 
 COPY config/ /config/
 COPY entrypoint.sh /entrypoint.sh
+COPY healthcheck.sh /healthcheck.sh
 COPY sim_control.py /app/sim_control.py
-RUN chmod +x /entrypoint.sh
+RUN chmod +x /entrypoint.sh /healthcheck.sh
 
 ENV PATH="/app/venv/bin:$PATH"
+
+# Catches the one failure the entrypoint's supervisor cannot see: the router
+# disappearing while every process stays alive. start-period covers the slow
+# first boot (SITL bind, then connector startup) so it does not flap.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+    CMD ["/healthcheck.sh"]
 
 ENTRYPOINT ["/entrypoint.sh"]

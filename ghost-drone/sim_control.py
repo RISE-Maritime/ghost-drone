@@ -48,7 +48,11 @@ from keelson.interfaces.VehicleSimulatorControl_pb2 import (
     SetInitialPoseResponse,
 )
 from keelson.payloads.SimulationStatus_pb2 import SimulationStatus
-from keelson.scaffolding import add_common_arguments, create_zenoh_config
+from keelson.scaffolding import (
+    GracefulShutdown,
+    add_common_arguments,
+    create_zenoh_config,
+)
 
 logger = logging.getLogger("sim_control")
 
@@ -300,12 +304,17 @@ def main():
 
     # ── Status publish loop ───────────────────────────────────────────────────
     logger.info("Simulation control ready (state=STOPPED)")
+    # GracefulShutdown handles SIGTERM as well as SIGINT. Without it, a plain
+    # `docker stop` kills this process outright — Python only installs a handler
+    # for SIGINT, so the finally block below would never run and the queryables
+    # would stay advertised on the bus until peers timed them out.
     try:
-        while True:
-            _publish_status()
-            time.sleep(args.status_interval)
-    except KeyboardInterrupt:
-        pass
+        with GracefulShutdown() as shutdown:
+            while not shutdown.is_requested():
+                _publish_status()
+                # wait() rather than sleep() so a signal is acted on at once
+                # instead of after the remainder of the interval.
+                shutdown.wait(timeout=args.status_interval)
     finally:
         for q in queryables:
             q.undeclare()

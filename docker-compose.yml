@@ -5,13 +5,24 @@ services:
     image: ghost-drone
     network_mode: host
     environment:
-      VEHICLE_TYPE: ${VEHICLE_TYPE:-rover}
+      VEHICLE_TYPE: ${VEHICLE_TYPE:-motorboat}
       ZENOH_CONNECT: ${ZENOH_CONNECT:-tcp/localhost:7447}
       SITL_HOME: ${SITL_HOME:-57.7089,11.9746,0,270}
       REALM: ${REALM:-rise}
-      ENTITY_ID: ${ENTITY_ID:-drone-01}
-      SOURCE_ID: ${SOURCE_ID:-sitl}
+      # ENTITY_ID/SOURCE_ID match the "Ghost Drone (SITL)" platform in Crowsnest.
+      ENTITY_ID: ${ENTITY_ID:-drone-sim-01}
+      SOURCE_ID: ${SOURCE_ID:-mavlink}
       MAVLINK_URL: ${MAVLINK_URL:-tcp:localhost:5760}
       TARGET_SYSTEM: ${TARGET_SYSTEM:-1}
     stdin_open: true
     tty: true
+    # The entrypoint exits non-zero when any child dies; this turns that
+    # detection into recovery instead of a stopped container.
+    restart: unless-stopped
+    # Real init as PID 1: zombie reaping and signal forwarding. The entrypoint
+    # keeps its own trap for forwarding signals on to the connectors.
+    init: true
+    # Docker's default is 10s, and platform-geometry2keelson sleeps in blocks of
+    # exactly that, so it currently sits right on the edge of being SIGKILLed
+    # part-way through shutdown.
+    stop_grace_period: 30s
