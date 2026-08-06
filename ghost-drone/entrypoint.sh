@@ -132,7 +132,8 @@ python3 /app/sim_control.py \
     --entity-id "${ENTITY_ID}" \
     --source-id "${SOURCE_ID}" \
     --mavlink-url "tcp:localhost:5762" \
-    --target-system "${TARGET_SYSTEM}" &
+    --target-system "${TARGET_SYSTEM}" \
+    --home "${SITL_HOME}" &
 SIMCTL_PID=$!
 track "${SIMCTL_PID}" "sim_control"
 echo "[ghost-drone] sim_control started (pid=${SIMCTL_PID})"
