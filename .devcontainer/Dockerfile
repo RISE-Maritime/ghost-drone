@@ -1,11 +1,26 @@
-FROM node:20
+# Development container for ghost-drone.
+#
+# The repo is two languages: a Python/Docker simulation container under
+# ghost-drone/, and a React/Vite frontend under sim-console/. Node 22 matches
+# both CI (.github/workflows/ci.yml) and sim-console/Dockerfile — this image
+# used to be node:20, which neither CI nor the shipped image uses and which
+# Vite 8 has dropped.
+FROM node:22
 
 ARG TZ
 ENV TZ="$TZ"
 
-ARG CLAUDE_CODE_VERSION=latest
+# Several installs below are `curl … | sh`. Without pipefail a failed download
+# still pipes an empty body into the shell and the layer succeeds, so a broken
+# install is only discovered later when the tool is missing.
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-# Install basic development tools, iptables/ipset, Python, and display libraries
+# Base tooling. Note what is deliberately absent: iptables/ipset/aggregate/
+# dnsutils existed only to serve init-firewall.sh, which was deleted in
+# 49f58e0 and is not coming back (see the note at the end of this file).
+# Gone too: SDL2/freetype/portmidi (pygame, never in this repo), a Postgres
+# client (no database), and 17 Chromium libraries (the Playwright venv that
+# wanted them was commented out years ago).
 RUN apt-get update && apt-get install -y --no-install-recommends \
   less \
   git \
@@ -17,64 +32,61 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   unzip \
   gnupg2 \
   gh \
-  iptables \
-  ipset \
-  iproute2 \
-  dnsutils \
-  aggregate \
   jq \
   nano \
   vim \
-  python3.11 \
+  lsof \
+  ca-certificates \
+  # `ss`, used by ghost-drone/entrypoint.sh's SITL readiness probe
+  iproute2 \
+  # shellcheck is one of the three linters CI gates on
+  shellcheck \
+  python3 \
   python3-pip \
   python3-venv \
-  postgresql-client \
-  libsdl2-dev \
-  libsdl2-image-dev \
-  libsdl2-mixer-dev \
-  libsdl2-ttf-dev \
-  libfreetype6-dev \
-  libportmidi-dev \
-  libnss3 \
-  libnspr4 \
-  libatk1.0-0 \
-  libatk-bridge2.0-0 \
-  libcups2 \
-  libdrm2 \
-  libdbus-1-3 \
-  libxkbcommon0 \
-  libxcomposite1 \
-  libxdamage1 \
-  libxfixes3 \
-  libxrandr2 \
-  libgbm1 \
-  libpango-1.0-0 \
-  libcairo2 \
-  libasound2 \
-  libatspi2.0-0 \
-  lsof \
-  docker.io \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Allow node user to use Docker socket
+# Docker CLI + Compose v2 only. The daemon comes from the host through the
+# socket mount in devcontainer.json, so `docker.io` (daemon + containerd) was
+# far more than needed.
+RUN install -m 0755 -d /etc/apt/keyrings \
+  && curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc \
+  && chmod a+r /etc/apt/keyrings/docker.asc \
+  && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] \
+https://download.docker.com/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable" \
+    > /etc/apt/sources.list.d/docker.list \
+  && apt-get update \
+  && apt-get install -y --no-install-recommends docker-ce-cli docker-compose-plugin \
+  && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# hadolint — the second CI linter. Arch-aware; the release publishes x86_64
+# and arm64 under those names.
+ARG HADOLINT_VERSION=2.12.0
+RUN case "$(dpkg --print-architecture)" in \
+      amd64) HL_ARCH=x86_64 ;; \
+      arm64) HL_ARCH=arm64 ;; \
+      *) echo "unsupported arch for hadolint" >&2; exit 1 ;; \
+    esac \
+  && curl -fsSL -o /usr/local/bin/hadolint \
+     "https://github.com/hadolint/hadolint/releases/download/v${HADOLINT_VERSION}/hadolint-Linux-${HL_ARCH}" \
+  && chmod +x /usr/local/bin/hadolint
+
 RUN groupadd -f docker && usermod -aG docker node
 
-# Ensure default node user has access to /usr/local/share
 RUN mkdir -p /usr/local/share/npm-global && \
   chown -R node:node /usr/local/share
 
 ARG USERNAME=node
 
-# Persist bash history.
-RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" \
-  && mkdir /commandhistory \
+# Persist bash history across rebuilds (paired with the volume mount).
+# The original set a SNIPPET variable here and never used it; the export it
+# describes is applied by zsh-in-docker further down.
+RUN mkdir /commandhistory \
   && touch /commandhistory/.bash_history \
   && chown -R $USERNAME /commandhistory
 
-# Set `DEVCONTAINER` environment variable to help with orientation
 ENV DEVCONTAINER=true
 
-# Create workspace and config directories and set permissions
 RUN mkdir -p /workspace /home/node/.claude && \
   chown -R node:node /workspace /home/node/.claude
 
@@ -82,36 +94,18 @@ WORKDIR /workspace
 
 ARG GIT_DELTA_VERSION=0.18.2
 RUN ARCH=$(dpkg --print-architecture) && \
-  wget "https://github.com/dandavison/delta/releases/download/${GIT_DELTA_VERSION}/git-delta_${GIT_DELTA_VERSION}_${ARCH}.deb" && \
-  sudo dpkg -i "git-delta_${GIT_DELTA_VERSION}_${ARCH}.deb" && \
+  wget -q "https://github.com/dandavison/delta/releases/download/${GIT_DELTA_VERSION}/git-delta_${GIT_DELTA_VERSION}_${ARCH}.deb" && \
+  dpkg -i "git-delta_${GIT_DELTA_VERSION}_${ARCH}.deb" && \
   rm "git-delta_${GIT_DELTA_VERSION}_${ARCH}.deb"
 
-# Install zenoh router and bridge-remote-api
-ARG ZENOH_VERSION=1.7.2
-
-RUN wget -q https://github.com/eclipse-zenoh/zenoh/releases/download/${ZENOH_VERSION}/zenoh-${ZENOH_VERSION}-x86_64-unknown-linux-gnu-standalone.zip -O /tmp/zenoh.zip && \
-    unzip /tmp/zenoh.zip -d /usr/local/bin && \
-    rm /tmp/zenoh.zip
-
-RUN wget -q https://github.com/eclipse-zenoh/zenoh-ts/releases/download/${ZENOH_VERSION}/zenoh-ts-${ZENOH_VERSION}-x86_64-unknown-linux-gnu-standalone.zip -O /tmp/zenoh-ts.zip && \
-  unzip /tmp/zenoh-ts.zip -d /usr/local/bin && \
-  rm /tmp/zenoh-ts.zip
-
-# Set up non-root user
 USER node
 
-# Install global packages
 ENV NPM_CONFIG_PREFIX=/usr/local/share/npm-global
 ENV PATH=$PATH:/usr/local/share/npm-global/bin
-
-# Set the default shell to zsh rather than sh
 ENV SHELL=/bin/zsh
-
-# Set the default editor and visual
 ENV EDITOR=nano
 ENV VISUAL=nano
 
-# Default powerline10k theme
 ARG ZSH_IN_DOCKER_VERSION=1.2.0
 RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v${ZSH_IN_DOCKER_VERSION}/zsh-in-docker.sh)" -- \
   -p git \
@@ -121,33 +115,37 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
   -a "export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" \
   -x
 
-# Install Claude
-RUN curl -fsSL https://claude.ai/install.sh | bash && \
-    echo 'alias claude="claude --dangerously-skip-permissions"' >> /home/node/.bashrc && \
-    echo 'alias claude="claude --dangerously-skip-permissions"' >> /home/node/.zshrc
+# Claude Code.
+#
+# There is deliberately no `alias claude="claude --dangerously-skip-permissions"`
+# here. The image used to ship one, justified by init-firewall.sh locking egress
+# down. That script is gone (it was written for a Windows host, allowlisted the
+# wrong dev port, and nothing ever invoked it), so the alias would now mean
+# skipping permissions with unrestricted network access. Pass the flag per
+# session if you want it.
+RUN curl -fsSL https://claude.ai/install.sh | bash
 
-# # Install uv and Python tools
+# uv, plus ruff pinned to the exact version CI uses. An unpinned ruff means the
+# devcontainer and CI disagree about what is a lint error, which is the whole
+# problem ruff.toml exists to prevent.
+ARG RUFF_VERSION=0.16.1
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
-    /home/node/.local/bin/uv tool install black && \
-    /home/node/.local/bin/uv tool install pgcli 
+    /home/node/.local/bin/uv tool install "ruff==${RUFF_VERSION}"
 
-# # Install Playwright in a dedicated venv
-# RUN python3 -m venv /home/node/.playwright-venv && \
-#     /home/node/.playwright-venv/bin/pip install --no-cache-dir playwright && \
-#     /home/node/.playwright-venv/bin/playwright install chromium && \
-#     /home/node/.playwright-venv/bin/playwright install firefox
+# pymavlink for poking at SITL directly (the connectors run in the drone
+# container; this is for host-side debugging).
+RUN python3 -m venv /home/node/.venv && \
+    /home/node/.venv/bin/pip install --no-cache-dir --upgrade pip pymavlink
 
-# Install agent-browser
-RUN npm install -g agent-browser
-RUN agent-browser install 
+ENV PATH="/home/node/.local/bin:/home/node/.venv/bin:$PATH"
 
-# Add uv, Python tools, and Playwright to PATH
-ENV PATH="/home/node/.cargo/bin:/home/node/.local/bin:/home/node/.playwright-venv/bin:$PATH"
-
-# Copy and set up firewall script
-COPY init-firewall.sh /usr/local/bin/
-USER root
-RUN chmod +x /usr/local/bin/init-firewall.sh && \
-  echo "node ALL=(root) NOPASSWD: /usr/local/bin/init-firewall.sh" > /etc/sudoers.d/node-firewall && \
-  chmod 0440 /etc/sudoers.d/node-firewall
-USER node
+# ENV PATH alone is not enough. A login shell sources /etc/profile, which
+# rebuilds PATH from scratch and drops both the venv and the npm-global bin —
+# and VS Code opens login shells, so `python3` would silently be the system one
+# without pymavlink. Re-assert the additions in the rc files each shell reads:
+# .zshrc for interactive zsh (the default shell here), .bashrc for interactive
+# bash, .profile for bash login shells.
+RUN PATH_SNIPPET='export PATH="/home/node/.local/bin:/home/node/.venv/bin:/usr/local/share/npm-global/bin:$PATH"' \
+  && for rc in /home/node/.zshrc /home/node/.bashrc /home/node/.profile; do \
+       touch "$rc" && echo "$PATH_SNIPPET" >> "$rc"; \
+     done

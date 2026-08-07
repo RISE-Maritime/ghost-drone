@@ -1,51 +1,50 @@
 {
-  "name": "Claude Sandbox",
+  "name": "ghost-drone",
   "build": {
     "dockerfile": "Dockerfile",
     "args": {
       "TZ": "${localEnv:TZ:Europe/Stockholm}",
-      "CLAUDE_CODE_VERSION": "latest",
       "GIT_DELTA_VERSION": "0.18.2",
-      "ZSH_IN_DOCKER_VERSION": "1.2.0"
+      "ZSH_IN_DOCKER_VERSION": "1.2.0",
+      "RUFF_VERSION": "0.16.1"
     }
   },
-  "runArgs": [
-    "--network=host",
-    "--cap-add=NET_ADMIN",
-    "--cap-add=NET_RAW",
-    "--gpus=all",
-    "-e",
-    "DISPLAY=${localEnv:DISPLAY}",
-    "-v",
-    "/tmp/.X11-unix:/tmp/.X11-unix:rw"
-  ],
+  // --network=host is load-bearing, not habit: it puts this container in the
+  // same namespace as the Zenoh router and the drone (both network_mode: host),
+  // so they reach each other on localhost, which is what the README documents.
+  //
+  // The cost: forwardPorts cannot be used alongside it, so reaching Vite on
+  // 5174 from a macOS browser needs Docker Desktop's host-networking option.
+  //
+  // Deliberately removed: --gpus=all (Docker Desktop has no NVIDIA runtime, so
+  // it failed `docker create` outright), NET_ADMIN/NET_RAW and the X11 DISPLAY
+  // mount (all three served only the deleted firewall script and a GUI this
+  // repo does not have).
+  "runArgs": ["--network=host"],
   "customizations": {
     "vscode": {
       "extensions": [
         "anthropic.claude-code",
         "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode",
         "ms-python.python",
-        "ms-python.black-formatter"
+        // ruff, not black: it is what the repo and CI actually use.
+        "charliermarsh.ruff",
+        "bradlc.vscode-tailwindcss",
+        // Surface the same findings CI gates on, in the editor.
+        "timonwong.shellcheck",
+        "exiasr.hadolint",
+        "ms-azuretools.vscode-docker"
       ],
       "settings": {
         "editor.formatOnSave": true,
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "[python]": {
-          "editor.defaultFormatter": "ms-python.black-formatter"
-        },
-        "editor.codeActionsOnSave": {
-          "source.fixAll.eslint": "explicit"
-        },
+        // No prettier config exists in sim-console (eslint only), so prettier
+        // is not set as the default formatter. eslint --fix does the work.
+        "editor.codeActionsOnSave": { "source.fixAll.eslint": "explicit" },
+        "[python]": { "editor.defaultFormatter": "charliermarsh.ruff" },
         "terminal.integrated.defaultProfile.linux": "zsh",
         "terminal.integrated.profiles.linux": {
-          "bash": {
-            "path": "bash",
-            "icon": "terminal-bash"
-          },
-          "zsh": {
-            "path": "zsh"
-          }
+          "bash": { "path": "bash", "icon": "terminal-bash" },
+          "zsh": { "path": "zsh" }
         }
       }
     }
@@ -61,6 +60,9 @@
     "CLAUDE_CONFIG_DIR": "/home/node/.claude",
     "POWERLEVEL9K_DISABLE_GITSTATUS": "true"
   },
+  // Nothing bootstrapped the frontend before; a fresh container had no
+  // node_modules and `npm run dev` failed until you noticed.
+  "postCreateCommand": "cd sim-console && npm ci",
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=delegated",
   "workspaceFolder": "/workspace"
 }
