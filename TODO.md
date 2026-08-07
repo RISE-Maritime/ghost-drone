@@ -6,8 +6,6 @@ Single source of truth for **pending** work, as a checklist. Completed items are
 
 The order to work in. Everything below this section is real but genuinely deferred.
 
-- [ ] **CI that builds on PR** → [CI & testing](#ci--testing). The Dockerfile now asserts its own imports and connector entry points, but nothing runs that assertion before merge — a change that breaks the keelson pin is only caught by whoever next builds locally. One workflow file turns an existing check into an enforced one.
-
 - [ ] **The `boat` alias and the missing `sailboat` frame class** → [Vehicle coverage](#vehicle-coverage). Small mapping bugs that leave two of the six documented vehicle types quietly wrong.
 
 ## sim_control correctness
@@ -44,17 +42,13 @@ The order to work in. Everything below this section is real but genuinely deferr
 
 ## CI & testing
 
-- [ ] **There is no CI** — [release.yml](.github/workflows/release.yml) builds and pushes on `release: published` and nothing else. Nothing runs on a PR, nothing `docker build`s outside a release, and there is no `shellcheck`, `hadolint`, `ruff` or `black --check`.
-
-  **The deleted `ci.yml` cannot be restored verbatim.** `git show 49f58e0^:.github/workflows/ci.yml` ran `uv sync --locked` then `pytest tests/`, but `pyproject.toml`, `uv.lock` and `tests/` were all deleted in that same commit, and v2 is a container rather than a `uv` package.
-
-  **Highest value for the least work:** just run `docker build` on a PR. The Dockerfile's final layer already imports `sim_control` and runs `--help` on all three connector entry points, so a build that succeeds has verified the keelson pin end to end — the workflow only has to invoke it. `push: false` with GHA cache keeps it cheap.
+- [ ] **CI has never actually run** — [ci.yml](.github/workflows/ci.yml) was written and statically checked (actionlint clean, all six action refs resolve, every step reproduced by hand locally), but GitHub Actions cannot be executed locally, so the first genuine run happens on the first PR. Expect to iterate once on runner-specific details: `--network host` behaviour, GHA cache warm-up, and whether 45 s is enough for SITL to boot on a cold runner.
 
 - [ ] **`release.yml` will let an old release overwrite `latest`** — [release.yml:36](.github/workflows/release.yml#L36) sets `type=raw,value=latest` unconditionally, so a patch release of an older minor, or a prerelease, republishes `latest` pointing backwards. Guard with `enable=${{ !github.event.release.prerelease }}` and a version condition. There is also no `concurrency:` group, so two near-simultaneous releases race on the tag.
 
-- [ ] **Two of the deleted tests are worth rebuilding against the container architecture** — `tests/test_keelson_roundtrip.py` was pure unit work with no live Zenoh (`enclose`/`uncover` byte-identity, `received_at >= enclosed_at` ordering, a well-known-subject assertion) and adapts directly to asserting `simulation_status` is well-known. `tests/test_e2e_zenoh.py` span an in-process router on `tcp/127.0.0.1:17447` with multicast scouting disabled and asserted every subject arrived and decoded — that is exactly the shape of the container smoke test this repo lacks; swap the in-process simulator for `docker run`.
+- [ ] **There is still no unit-level testing — only the end-to-end smoke test** — [tests/smoke_test.py](tests/smoke_test.py) now covers the shape the deleted `test_e2e_zenoh.py` had (router up, assert subjects arrive and decode), but everything it checks needs a full container and ~90 s. Nothing exercises a single function in isolation.
 
-  **Genuinely new work, which never existed:** a `sim_control` state-machine test (start/pause/stop/set_initial_pose transitions plus `INVALID_STATE` on illegal edges, against a fake MAVLink endpoint), and a `bats` test of the entrypoint's `VEHICLE_TYPE` → binary/model/param-file mapping, which would have caught the `boat` alias bug below immediately.
+  **The two worth writing:** a `sim_control` state-machine test against a fake MAVLink endpoint (start/pause/stop/set_initial_pose plus `INVALID_STATE` on illegal edges, and the ack-matching paths, which the smoke test only touches via one pause/start round-trip); and a `bats` test of the entrypoint's `VEHICLE_TYPE` → binary/model/param-file mapping, which would catch the `boat` alias bug under Vehicle coverage immediately. The deleted `test_keelson_roundtrip.py` is also still worth porting — pure `enclose`/`uncover` byte-identity and ordering assertions, no Zenoh needed.
 
 ## Vehicle coverage
 

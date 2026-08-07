@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Ghost-drone simulation lifecycle controller.
 
@@ -32,16 +31,9 @@ import queue
 import threading
 import time
 
+import keelson
 import zenoh
 from google.protobuf.timestamp_pb2 import Timestamp
-from pymavlink import mavutil
-
-# Explicit dialect rather than mavutil.mavlink, which binds whatever dialect
-# pymavlink happened to load last. ardupilotmega is the ArduPilot superset and
-# is what makes MAV_RESULT_* / MAV_CMD_* references reliable.
-from pymavlink.dialects.v20 import ardupilotmega as mavlink_dialect
-
-import keelson
 from keelson import enclose
 from keelson.interfaces.ErrorResponse_pb2 import ErrorResponse
 from keelson.interfaces.SimulationControl_pb2 import (
@@ -59,6 +51,12 @@ from keelson.scaffolding import (
     add_common_arguments,
     create_zenoh_config,
 )
+from pymavlink import mavutil
+
+# Explicit dialect rather than mavutil.mavlink, which binds whatever dialect
+# pymavlink happened to load last. ardupilotmega is the ArduPilot superset and
+# is what makes MAV_RESULT_* / MAV_CMD_* references reliable.
+from pymavlink.dialects.v20 import ardupilotmega as mavlink_dialect
 
 logger = logging.getLogger("sim_control")
 
@@ -438,7 +436,9 @@ def main():
         pub.put(enclose(msg.SerializeToString()))
 
     # ── RPC handlers ──────────────────────────────────────────────────────────
-    global _state, _stored_pose
+    # Only _stored_pose is assigned at this scope; _state is read here and
+    # assigned inside the individual handlers, which declare it themselves.
+    global _stored_pose
 
     # Seed the pose stop() resets to. Without this, stop on a drone that never
     # received set_initial_pose just freezes wherever it drifted, contrary to
@@ -507,7 +507,7 @@ def main():
         _publish_status()
 
     def _on_set_initial_pose(query):
-        global _state, _stored_pose
+        global _stored_pose  # _state is only read here, not assigned
         pose = InitialPose()
         payload = query.payload
         if payload is not None:

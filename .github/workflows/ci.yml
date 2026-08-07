@@ -1,0 +1,110 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A superseded push has nothing useful to say; cancel it rather than queue it.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      # Versions are pinned: all three tools gate the build, and an unpinned
+      # linter turns an upstream default change into a red build on an
+      # unrelated PR.
+      - name: shellcheck
+        uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          scandir: ./ghost-drone
+          format: gcc
+
+      - name: hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: ghost-drone/Dockerfile
+          config: .hadolint.yaml
+
+      - name: ruff
+        uses: astral-sh/ruff-action@v3
+        with:
+          version: 0.16.1
+
+  build-and-smoke:
+    name: Build and smoke test
+    runs-on: ubuntu-latest
+    # Build plus a SITL boot; generous, but a hung run should not burn an hour.
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      # push:false so a PR from a fork cannot publish; load:true so the smoke
+      # step can actually run the image. The Dockerfile's final layer asserts
+      # its own imports, the three connector entry points and both shipped
+      # configs, so a green build has already checked the keelson pin.
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: ghost-drone/
+          push: false
+          load: true
+          tags: ghost-drone:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Port 17447, not the keelson default 7447: this router is disposable and
+      # must never be mistaken for a real one, and the drone must never reach a
+      # real bus from CI.
+      - name: Start throwaway Zenoh router
+        run: |
+          docker run -d --name test-router --network host \
+            eclipse/zenoh:1.9.0 -l tcp/0.0.0.0:17447 --no-multicast-scouting
+          sleep 5
+
+      - name: Start ghost-drone
+        run: |
+          docker run -d --name ghost-drone --network host \
+            -e ZENOH_CONNECT=tcp/localhost:17447 \
+            ghost-drone:ci
+          # SITL bind, then connector startup.
+          sleep 45
+          test "$(docker inspect -f '{{.State.Status}}' ghost-drone)" = running
+
+      - name: Smoke test
+        run: |
+          docker run --rm --network host \
+            -v "${{ github.workspace }}/tests/smoke_test.py:/t.py:ro" \
+            --entrypoint python3 ghost-drone:ci /t.py --connect tcp/localhost:17447
+
+      # The supervisor must forward SIGTERM to every child. If it does not, the
+      # children are SIGKILLed at the 30s grace period instead.
+      - name: Shutdown is clean and prompt
+        run: |
+          start=$(date +%s)
+          docker stop ghost-drone
+          elapsed=$(( $(date +%s) - start ))
+          code=$(docker inspect -f '{{.State.ExitCode}}' ghost-drone)
+          echo "stopped in ${elapsed}s with exit code ${code}"
+          test "${code}" -eq 0
+          test "${elapsed}" -lt 20
+
+      # A smoke failure with no logs is unactionable.
+      - name: Container logs
+        if: always()
+        run: |
+          echo "::group::ghost-drone"; docker logs ghost-drone 2>&1 || true; echo "::endgroup::"
+          echo "::group::router"; docker logs test-router 2>&1 || true; echo "::endgroup::"
+
+      - name: Clean up
+        if: always()
+        run: docker rm -f ghost-drone test-router 2>/dev/null || true

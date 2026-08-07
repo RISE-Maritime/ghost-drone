@@ -1,0 +1,14 @@
+# hadolint configuration.
+#
+# Exactly one rule is ignored, and only because complying would make the build
+# less reliable rather than more. Everything else hadolint reports is treated
+# as a failure.
+ignored:
+  # DL3008 — "pin versions in apt-get install".
+  # Ubuntu's archive removes old package versions when the mirror rolls, so a
+  # pinned apt version turns a working Dockerfile into one that fails to build
+  # a few weeks later. The genuine reproducibility gap this rule points at
+  # (no lockfile, no checksums for the ArduPilot binaries) is tracked as its
+  # own entry under "Reproducibility & supply chain" in TODO.md, and the fix
+  # there is a lockfile rather than inline apt pins.
+  - DL3008

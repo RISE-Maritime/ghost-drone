@@ -51,10 +51,12 @@ RUN git clone --depth 1 --branch "${KEELSON_REF}" \
 # Generate protobuf Python bindings from the .proto definitions.
 # The generate script calls `uv run protoc`; we install protoc-wheel-0 via pip
 # (which puts `protoc` on PATH) and patch the script to call it directly.
-RUN pip3 install --no-cache-dir --break-system-packages protoc-wheel-0 \
+# protoc is pinned: the compiler version affects the generated bindings.
+# generate_python.sh does `cd "$(dirname "$0")"` itself, so calling it by
+# absolute path is enough — no need to cd first.
+RUN pip3 install --no-cache-dir --break-system-packages protoc-wheel-0==30.2 \
     && sed -i 's/uv run protoc/protoc/g' /app/keelson/sdks/python/generate_python.sh \
-    && cd /app/keelson/sdks \
-    && bash python/generate_python.sh
+    && bash /app/keelson/sdks/python/generate_python.sh
 
 # Install keelson Python SDK + the three companion connectors.
 # Order matters: keelson SDK must be installed before the connectors.
@@ -69,6 +71,7 @@ COPY config/ /config/
 COPY entrypoint.sh /entrypoint.sh
 COPY healthcheck.sh /healthcheck.sh
 COPY sim_control.py /app/sim_control.py
+COPY validate-configs.py /app/validate-configs.py
 RUN chmod +x /entrypoint.sh /healthcheck.sh
 
 ENV PATH="/app/venv/bin:$PATH"
@@ -93,6 +96,7 @@ RUN python3 -c "import sys; sys.path.insert(0, '/app'); import sim_control" \
            echo "checking ${c}..." \
            && python3 "/app/keelson/connectors/${c}.py" --help > /dev/null; \
        done \
+    && python3 /app/validate-configs.py \
     && echo "build assertion passed (keelson ${KEELSON_REF})"
 
 # Catches the one failure the entrypoint's supervisor cannot see: the router

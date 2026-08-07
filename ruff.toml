@@ -1,0 +1,28 @@
+# Explicit rule set so CI does not drift when ruff changes its defaults.
+# Everything selected here has already caught a real defect in this repo:
+# I found unsorted imports, PLW found two dead `global` declarations, EXE
+# found a shebang on a file that is never executed directly, and BLE flagged
+# exception handlers that swallowed silently.
+line-length = 100
+
+[lint]
+select = [
+    "E4",   # pycodestyle: imports
+    "E7",   # pycodestyle: statements
+    "E9",   # pycodestyle: runtime errors
+    "F",    # pyflakes
+    "I",    # isort
+    "PLW",  # pylint warnings
+    "EXE",  # shebang / executable-bit consistency
+    "BLE",  # blind except (allowed where the handler logs)
+]
+
+ignore = [
+    # PLW0603 — "global statement to update X is discouraged".
+    # sim_control.py keeps its simulation state in module-level globals guarded
+    # by a lock. That is a dated design and the rule is not wrong, but the fix
+    # is a refactor to a state object, not a suppression comment on five lines.
+    # PLW0602 (declaring a global you never assign) stays enabled — it found
+    # two genuinely dead declarations.
+    "PLW0603",
+]
