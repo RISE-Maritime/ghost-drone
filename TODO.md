@@ -6,7 +6,13 @@ Single source of truth for **pending** work, as a checklist. Completed items are
 
 The order to work in. Everything below this section is real but genuinely deferred.
 
-- [ ] **The `boat` alias and the missing `sailboat` frame class** → [Vehicle coverage](#vehicle-coverage). Small mapping bugs that leave two of the six documented vehicle types quietly wrong.
+- [ ] **The devcontainer cannot build** → [Devcontainer](#devcontainer). It `COPY`s `init-firewall.sh`, deleted in `49f58e0`, so the README's claim that this repo ships a working devcontainer is currently false. The smallest genuinely-broken thing left.
+
+- [ ] **`release.yml` can publish `latest` backwards, and pins no architecture** → [CI & testing](#ci--testing) and [Reproducibility & supply chain](#reproducibility--supply-chain). A patch release of an old minor overwrites `latest`, and with no `platforms:` the published image's arch follows whatever the runner happens to be — which matters because the SITL binaries are x86_64-only. Both live in one file and are one change.
+
+- [ ] **No `LICENSE`** → [Project hygiene](#project-hygiene). The image publishes to a public registry with no license terms at all. Sibling RISE-Maritime repos are Apache-2.0; this is a one-file fix that should not wait behind engineering work.
+
+- [ ] **`sim_control` declares no liveliness token** → [sim_control correctness](#sim_control-correctness). It shares `SOURCE_ID` with `mavlink2keelson`, so if it dies alone Crowsnest still shows the source alive and leaves its panels enabled. Now that the health connector has its own `--source-id`, this is the last process whose liveness is somebody else's.
 
 ## sim_control correctness
 
@@ -52,9 +58,7 @@ The order to work in. Everything below this section is real but genuinely deferr
 
 ## Vehicle coverage
 
-- [ ] **`VEHICLE_TYPE=boat` silently boots without its parameter file** — [entrypoint.sh:68](ghost-drone/entrypoint.sh#L68) resolves the `motorboat|boat` alias for the *model*, but [entrypoint.sh:84](ghost-drone/entrypoint.sh#L84) keys `PARAM_FILE` on the raw `VEHICLE_TYPE` and the `[ -f ]` test at [entrypoint.sh:90](ghost-drone/entrypoint.sh#L90) skips without warning. `/config/boat/` does not exist, so `boat` runs without `FRAME_CLASS,2` while `motorboat` gets it — and the README advertises the two as equivalent. Introduce a `PARAM_KEY` alongside `SITL_MODEL`, or at minimum an `else` branch that WARNs.
-
-- [ ] **The vehicle config matrix is 2 of 7** — only `motorboat` and `rover` have a `defaults.parm`. `sailboat` is the notable gap: [entrypoint.sh:70-71](ghost-drone/entrypoint.sh#L70-L71) passes `--model sailboat`, but with no `FRAME_CLASS,7` the frame class comes from whatever ardurover last persisted, so the frame and the physics model disagree. `copter`, `plane`, `sub` and the `boat` alias are also unpopulated.
+- [ ] **The motorboat has no wind or waves, where ArduPilot's own SITL defaults do** — upstream's `Tools/autotest/default_params/motorboat.parm` sets `SIM_WIND_SPD 3`, `SIM_WIND_T 1` and `SIM_WAVE_ENABLE 1`; [config/motorboat/defaults.parm](ghost-drone/config/motorboat/defaults.parm) sets only `FRAME_CLASS`. Adopting them would make the default vehicle behave more like a boat at sea. Deliberately not done alongside the sailboat work: it changes the motion of the vehicle that Crowsnest's verified rig and every check in `tests/smoke_test.py` run against, so it deserves its own change and its own re-verification.
 
 - [ ] **Only `motorboat` has `platform.json` and `entity_health.json`** — every other vehicle type still skips both connectors with a `WARN` at [entrypoint.sh:144-173](ghost-drone/entrypoint.sh#L144-L173). The motorboat pair is a working template, but `entity_health.json` is not portable as-is: its rate bands are pinned to the ~1 Hz that ArduRover happens to stream, and a copter or plane streams differently. Measure before copying.
 

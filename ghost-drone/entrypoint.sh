@@ -62,32 +62,44 @@ on_signal() {
 trap on_signal TERM INT
 
 # ── Select ArduPilot SITL binary and frame ───────────────────────────────────
+# PARAM_KEY is the /config/<dir> the parameter file lives in. It is separate
+# from VEHICLE_TYPE so an alias resolves to the config of the type it aliases:
+# `boat` previously looked for /config/boat/, which does not exist, and so
+# booted without FRAME_CLASS while `motorboat` got it.
 case "${VEHICLE_TYPE}" in
     rover)
-        SITL_BINARY="ardurover"; SITL_MODEL="rover" ;;
+        SITL_BINARY="ardurover"; SITL_MODEL="rover";     PARAM_KEY="rover" ;;
     motorboat|boat)
-        SITL_BINARY="ardurover"; SITL_MODEL="motorboat" ;;
+        SITL_BINARY="ardurover"; SITL_MODEL="motorboat"; PARAM_KEY="motorboat" ;;
     sailboat)
-        SITL_BINARY="ardurover"; SITL_MODEL="sailboat" ;;
+        SITL_BINARY="ardurover"; SITL_MODEL="sailboat";  PARAM_KEY="sailboat" ;;
     copter)
-        SITL_BINARY="arducopter"; SITL_MODEL="+" ;;
+        SITL_BINARY="arducopter"; SITL_MODEL="+";        PARAM_KEY="copter" ;;
     plane)
-        SITL_BINARY="arduplane"; SITL_MODEL="plane" ;;
+        SITL_BINARY="arduplane"; SITL_MODEL="plane";     PARAM_KEY="plane" ;;
     sub)
-        SITL_BINARY="ardusub"; SITL_MODEL="vectored" ;;
+        SITL_BINARY="ardusub"; SITL_MODEL="vectored";    PARAM_KEY="sub" ;;
     *)
         echo "[ghost-drone] ERROR: unknown VEHICLE_TYPE '${VEHICLE_TYPE}'" >&2
         exit 1 ;;
 esac
 
 # ── Start ArduPilot SITL ─────────────────────────────────────────────────────
-PARAM_FILE="/config/${VEHICLE_TYPE}/defaults.parm"
+PARAM_FILE="/config/${PARAM_KEY}/defaults.parm"
 SITL_DIR="/tmp/sitl-${VEHICLE_TYPE}"
 mkdir -p "${SITL_DIR}"
 cd "${SITL_DIR}"
 
 SITL_ARGS=(-S --model "${SITL_MODEL}" --home "${SITL_HOME}" --speedup 1)
-[ -f "${PARAM_FILE}" ] && SITL_ARGS+=(--defaults "${PARAM_FILE}")
+# Only the boat family needs a parameter override (FRAME_CLASS); copter, plane
+# and sub are correct on their binary's built-in defaults with --model doing
+# the work. The WARN exists so a *missing* file is visible either way — the
+# silent skip is what let `boat` run unconfigured.
+if [ -f "${PARAM_FILE}" ]; then
+    SITL_ARGS+=(--defaults "${PARAM_FILE}")
+else
+    echo "[ghost-drone] WARN: no ${PARAM_FILE} — using ${SITL_BINARY} built-in defaults"
+fi
 
 echo "[ghost-drone] Starting SITL: ${SITL_BINARY} model=${SITL_MODEL}"
 "/usr/local/bin/${SITL_BINARY}" "${SITL_ARGS[@]}" &

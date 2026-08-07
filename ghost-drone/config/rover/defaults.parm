@@ -1,4 +1,10 @@
-# ArduRover SITL defaults for the ground rover frame
-# FRAME_CLASS: 1=Rover, 2=Boat (motorboat), 7=Sailboat
+# ArduRover SITL defaults for the ground rover frame.
+#
+# FRAME_CLASS: 0=Undefined, 1=Rover, 2=Boat, 3=BalanceBot (ArduPilot's own
+# enumeration — there is no sailboat class; a sailboat is FRAME_CLASS 2 plus
+# SAIL_ENABLE 1, see ../sailboat/defaults.parm).
 FRAME_CLASS,1
-SYSID_THISMAV,1
+
+# MAV_SYSID, not SYSID_THISMAV: ArduPilot renamed it, and an unknown name in a
+# --defaults file is ignored silently rather than reported.
+MAV_SYSID,1

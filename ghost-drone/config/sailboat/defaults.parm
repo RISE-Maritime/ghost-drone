@@ -1,0 +1,39 @@
+# ArduRover SITL defaults for the sailboat frame.
+#
+# Ported from ArduPilot's own Tools/autotest/default_params/sailboat.parm.
+# sim_vehicle.py applies that file automatically; this container runs the raw
+# ardurover binary, so it has to be passed with --defaults instead. Re-sync
+# from upstream rather than hand-tuning here.
+#
+# FRAME_CLASS: 0=Undefined, 1=Rover, 2=Boat, 3=BalanceBot. There is no
+# sailboat frame class — a sailboat is a Boat with SAIL_ENABLE on.
+FRAME_CLASS,2
+SAIL_ENABLE,1
+MAV_SYSID,1
+
+# Wind vane: 10 = SITL simulated, for both direction and speed.
+WNDVN_TYPE,10
+WNDVN_SPEED_TYPE,10
+
+# Sail actuators. Without these the vehicle has sail mode enabled but nothing
+# to trim with, and sits motionless.
+SERVO4_FUNCTION,89
+SERVO4_MIN,1000
+SERVO4_MAX,2000
+SERVO5_FUNCTION,137
+SERVO5_MIN,1000
+SERVO5_MAX,2000
+
+# Simulated airspeed sensor, used as the wind sensor.
+ARSPD_OFFSET,2013
+ARSPD_PIN,1
+ARSPD_BUS,2
+
+# Sailing needs actual wind to sail in.
+SIM_WIND_SPD,3
+SIM_WIND_T,1
+
+LOIT_TYPE,1
+MOT_SLEWRATE,0
+RPM1_TYPE,3
+RPM1_MIN,0
