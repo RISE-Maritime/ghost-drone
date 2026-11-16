@@ -72,19 +72,19 @@ Parity with `keelson-platforms/platforms/sf18` is a *sensor-surface* goal and st
 
 - [ ] **`bino` supplies the synthetic sensors, and this drone already satisfies its pose contract for free** — `RISE-Maritime/bino` is a maritime perception sensor emulator that synthesizes camera, lidar and radar from externally injected vessel poses. Its ADR-002 fixes its role on the bus: pose injection in, sensor data out, nothing else. It publishes no poses, no `location_fix`, no ground truth and no transforms.
 
-  **The pose half costs nothing.** Bino's `keelson_nav` pose source subscribes to exactly `location_fix` + `heading_true_north_deg`, optionally `pitch_deg` and `roll_deg` — all four of which `mavlink2keelson` already publishes under `source_id=mavlink`. A scenario with `entity_id: drone-sim-01`, `source_id: mavlink` resolves straight onto keys this container emits today, with no change here at all:
+  **The pose half costs nothing.** Bino's `keelson_nav` pose source subscribes to exactly `location_fix` + `heading_true_north_deg`, optionally `pitch_deg` and `roll_deg` — all four of which `mavlink2keelson` already publishes under `source_id=mavlink`. A scenario with `entity_id: sim-drone-01`, `source_id: mavlink` resolves straight onto keys this container emits today, with no change here at all:
 
   ```text
   # bino pose input — already published by ghost-drone
-  rise/@v0/drone-sim-01/pubsub/location_fix/mavlink
-  rise/@v0/drone-sim-01/pubsub/heading_true_north_deg/mavlink
-  rise/@v0/drone-sim-01/pubsub/pitch_deg/mavlink
-  rise/@v0/drone-sim-01/pubsub/roll_deg/mavlink
+  rise/@v0/sim-drone-01/pubsub/location_fix/mavlink
+  rise/@v0/sim-drone-01/pubsub/heading_true_north_deg/mavlink
+  rise/@v0/sim-drone-01/pubsub/pitch_deg/mavlink
+  rise/@v0/sim-drone-01/pubsub/roll_deg/mavlink
 
   # bino sensor output — new
-  rise/@v0/drone-sim-01/pubsub/image_raw/camera-axis-1
-  rise/@v0/drone-sim-01/pubsub/point_cloud/lidar-os
-  rise/@v0/drone-sim-01/pubsub/radar_sweep/radar-1201
+  rise/@v0/sim-drone-01/pubsub/image_raw/camera-axis-1
+  rise/@v0/sim-drone-01/pubsub/point_cloud/lidar-os
+  rise/@v0/sim-drone-01/pubsub/radar_sweep/radar-1201
   ```
 
   **Practicalities.** Bino is a private repo needing a sibling checkout; it is TypeScript/pnpm with Rust/WASM kernels for the lidar and radar, publishes GHCR images, and the headless `bino-node` image runs anywhere on software GL. Scenes are declared in a YAML scenario with `vessels[].pose_source` and `vessels[].sensors[]` blocks.
@@ -185,13 +185,13 @@ Cross-repo items — these cannot be closed from this repo alone. Mirrors the co
 
 - [ ] **Conning fields Crowsnest expects that `mavlink2keelson` never publishes** — `speed_through_water_knots`, `depth_m`, `rudder_angle_deg`, `engine_rate_rpm`, `propeller_pitch_pct`, `thruster_power_pct` and every wind subject. The connector also publishes `surge_m`/`sway_m` as displacements rather than the `surge_velocity_mps`/`sway_velocity_mps` velocities the conning app reads, so those gauges stay blank on the drone.
 
-- [ ] **Crowsnest hardcodes the lidar key expression to sf18, so drone point clouds can never render** — `LIDAR_KEY_EXPR` in `crowsnest-dev/src/base-elements/KeelsonLidarBridge.jsx:28` is the literal string `rise/@v0/sf18/pubsub/point_cloud/**`. Point clouds published under `drone-sim-01` will not appear on the chart no matter how correct they are. Blocks the lidar half of [sf18 sensor parity](#sf18-sensor-parity); needs a Crowsnest change deriving the expression from the active platform.
+- [ ] **Crowsnest hardcodes the lidar key expression to sf18, so drone point clouds can never render** — `LIDAR_KEY_EXPR` in `crowsnest-dev/src/base-elements/KeelsonLidarBridge.jsx:28` is the literal string `rise/@v0/sf18/pubsub/point_cloud/**`. Point clouds published under `sim-drone-01` will not appear on the chart no matter how correct they are. Blocks the lidar half of [sf18 sensor parity](#sf18-sensor-parity); needs a Crowsnest change deriving the expression from the active platform.
 
-- [ ] **`get_config` can never resolve for the drone, so Own Ship config is permanently offline** — `crowsnest-dev/src/apps/os_config/index.jsx` builds the RPC key as `${platform.realm}/@v0/${key}/@rpc/get_config/connector_platform`, which mismatches on **two** independent counts. The registry key is `drone_sim_01` with underscores while the entity is `drone-sim-01` with hyphens; and the responder is hardcoded `connector_platform` while the platform connector runs under `--source-id ${SOURCE_ID}`, i.e. `mavlink`. It actually serves `rise/@v0/drone-sim-01/@rpc/get_config/mavlink`. sf18 works only because its registry key equals its entity id *and* it runs the connector under a matching source id.
+- [ ] **`get_config` can never resolve for the drone, so Own Ship config is permanently offline** — `crowsnest-dev/src/apps/os_config/index.jsx` builds the RPC key as `${platform.realm}/@v0/${key}/@rpc/get_config/connector_platform`, which mismatched on **two** independent counts. The first, a registry key `drone_sim_01` with underscores against the entity `sim-drone-01`, is gone: Crowsnest's registry key is now the entity, `sim-drone-01` (RISE-Maritime/crowsnest-dev#420). The second remains: the responder is hardcoded `connector_platform` while the platform connector runs under `--source-id ${SOURCE_ID}`, i.e. `mavlink`. It actually serves `rise/@v0/sim-drone-01/@rpc/get_config/mavlink`. sf18 works only because its registry key equals its entity id *and* it runs the connector under a matching source id.
 
 - [ ] **Crowsnest reads none of the platform connector's wire output** — `length_over_all_m`, `breadth_over_all_m`, `frame_transform` and `configuration_json` are all published and all ignored; `keelsonWorker.js` has no handler for any of them. Geometry reaches the chart only through the static `platform_registry.json`, and even a *successful* `get_config` merge copies just identity and dimensions — never `ccrp_m`, `frame_transforms` or `vessel_outlines`. So the `frame_transforms` and `vessel_outlines` now in `config/motorboat/platform.json` are groundwork for bino and for MCAP recording, not something visible in the UI. Making them render means adding them to the registry too.
 
-  **The dead panel is not the worst of it.** That RPC also drives the live-versus-declared stream merge, which is what preserves declared camera streams — so it blocks the camera work too. Fix is either renaming the registry key to `drone-sim-01` or serving a `connector_platform` responder under the underscore entity; either way it is a Crowsnest change.
+  **The dead panel is not the worst of it.** That RPC also drives the live-versus-declared stream merge, which is what preserves declared camera streams — so it blocks the camera work too. The registry-key half is fixed (the key is the entity, `sim-drone-01`); the responder half is still a Crowsnest change.
 
 - [ ] **Crowsnest can publish synthetic data into a real vessel's key space** — `crowsnest-dev/src/apps/os_config/components/Simulator/SimSourceSelector.jsx:100` offers a "platform" source mode that rebuilds every simulator key as `${realm}/@v0/${key}/pubsub/${subject}/sim` from *any* entry in the platform registry. Select sf18 and a browser tab publishes synthetic position, heading and rudder into `rise/@v0/sf18/pubsub/...` on the shared RISE network, distinguished from ground truth only by a trailing `/sim` source id.
 

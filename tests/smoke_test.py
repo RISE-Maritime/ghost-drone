@@ -72,7 +72,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--connect", default="tcp/localhost:17447")
     ap.add_argument("--realm", default="rise")
-    ap.add_argument("--entity", default="drone-sim-01")
+    ap.add_argument("--entity", default="sim-drone-01")
     ap.add_argument("--source", default="mavlink")
     ap.add_argument("--collect-s", type=float, default=8.0)
     # The drone genuinely reports CRITICAL for its first few seconds while the

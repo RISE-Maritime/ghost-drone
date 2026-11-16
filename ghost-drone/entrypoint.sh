@@ -7,7 +7,7 @@ ZENOH_CONNECT="${ZENOH_CONNECT:-tcp/localhost:7447}"
 SITL_HOME="${SITL_HOME:-57.7089,11.9746,0,270}"
 REALM="${REALM:-rise}"
 # Matches the "Ghost Drone (SITL)" entry in the Crowsnest platform registry.
-ENTITY_ID="${ENTITY_ID:-drone-sim-01}"
+ENTITY_ID="${ENTITY_ID:-sim-drone-01}"
 SOURCE_ID="${SOURCE_ID:-mavlink}"
 # pymavlink URL — tcp:HOST:PORT or udpin:0.0.0.0:PORT
 MAVLINK_URL="${MAVLINK_URL:-tcp:localhost:5760}"

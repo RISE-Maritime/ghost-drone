@@ -15,7 +15,7 @@ There is no built-in UI — [Crowsnest](https://github.com/RISE-Maritime/crowsne
 # Build the image (first build compiles .proto files and downloads SITL binaries — takes a few minutes)
 docker compose build
 
-# Run with defaults (motorboat, entity drone-sim-01)
+# Run with defaults (motorboat, entity sim-drone-01)
 docker compose up
 ```
 
@@ -23,7 +23,7 @@ The container connects to the Zenoh router on the host and starts publishing tel
 
 ## Viewing the drone
 
-[Crowsnest](https://github.com/RISE-Maritime/crowsnest-dev) is the frontend for this container. Its platform registry already contains a `drone_sim_01` entry — **"Ghost Drone (SITL)"** — wired to 39 data streams and 20 RPC procedures. The defaults in this repo (`ENTITY_ID=drone-sim-01`, `SOURCE_ID=mavlink`) are chosen to match it, so no extra flags are needed.
+[Crowsnest](https://github.com/RISE-Maritime/crowsnest-dev) is the frontend for this container. Its platform registry already contains a `sim-drone-01` entry — **"Ghost Drone (SITL)"** — wired to 39 data streams and 20 RPC procedures. The defaults in this repo (`ENTITY_ID=sim-drone-01`, `SOURCE_ID=mavlink`) are chosen to match it, so no extra flags are needed.
 
 ### Startup order
 
@@ -58,11 +58,11 @@ Two `localStorage` keys silently override the platform selection, and when they 
 - `remote_control_target_override_v1` — entity ID
 - `mavlink_connector_target_v1` — source ID
 
-Clear both (or point them at `drone-sim-01` / `mavlink`) and reload.
+Clear both (or point them at `sim-drone-01` / `mavlink`) and reload.
 
 ### Do not set `VITE_ZENOH_BASE_KEYEXP`
 
-It is defined in Crowsnest's `src/config/env.js` but has no importers — setting it does nothing. Its default value (`rise/v0/...`) is also wrong: real keelson keys use a literal `@v0` segment, as in `rise/@v0/drone-sim-01/pubsub/location_fix/mavlink`.
+It is defined in Crowsnest's `src/config/env.js` but has no importers — setting it does nothing. Its default value (`rise/v0/...`) is also wrong: real keelson keys use a literal `@v0` segment, as in `rise/@v0/sim-drone-01/pubsub/location_fix/mavlink`.
 
 > **Heads-up:** the default router bridges to the shared RISE network. A running ghost-drone puts a fake vessel in front of every other Crowsnest user. Stop it when you are finished.
 
@@ -83,7 +83,7 @@ All options are set via environment variables — either in a `.env` file or pas
 | `VEHICLE_TYPE` | `motorboat` | Vehicle to simulate (see table below) |
 | `ZENOH_CONNECT` | `tcp/localhost:7447` | Zenoh router endpoint |
 | `REALM` | `rise` | Keelson realm |
-| `ENTITY_ID` | `drone-sim-01` | Keelson entity ID — matches Crowsnest's registry |
+| `ENTITY_ID` | `sim-drone-01` | Keelson entity ID — matches Crowsnest's registry |
 | `SOURCE_ID` | `mavlink` | Keelson source ID — matches Crowsnest's registry |
 | `SITL_HOME` | `57.7089,11.9746,0,270` | SITL start position: `lat,lon,alt,heading` |
 | `MAVLINK_URL` | `tcp:localhost:5760` | pymavlink connection string to SITL |
@@ -168,5 +168,5 @@ docker compose up
 Query the router's REST port directly:
 
 ```bash
-curl -s 'http://localhost:8000/rise/@v0/drone-sim-01/pubsub/**' | head
+curl -s 'http://localhost:8000/rise/@v0/sim-drone-01/pubsub/**' | head
 ```

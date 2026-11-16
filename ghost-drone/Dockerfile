@@ -19,7 +19,7 @@ ENV VEHICLE_TYPE=motorboat
 ENV ZENOH_CONNECT=tcp/localhost:7447
 ENV SITL_HOME=57.7089,11.9746,0,270
 ENV REALM=rise
-ENV ENTITY_ID=drone-sim-01
+ENV ENTITY_ID=sim-drone-01
 ENV SOURCE_ID=mavlink
 
 RUN apt-get update && apt-get install -y --no-install-recommends \

@@ -10,7 +10,7 @@ services:
       SITL_HOME: ${SITL_HOME:-57.7089,11.9746,0,270}
       REALM: ${REALM:-rise}
       # ENTITY_ID/SOURCE_ID match the "Ghost Drone (SITL)" platform in Crowsnest.
-      ENTITY_ID: ${ENTITY_ID:-drone-sim-01}
+      ENTITY_ID: ${ENTITY_ID:-sim-drone-01}
       SOURCE_ID: ${SOURCE_ID:-mavlink}
       MAVLINK_URL: ${MAVLINK_URL:-tcp:localhost:5760}
       TARGET_SYSTEM: ${TARGET_SYSTEM:-1}
